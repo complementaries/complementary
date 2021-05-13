@@ -196,6 +196,7 @@ int main(int argc, char **argv) {
     SDL_Quit();
 
     void *memoryLeak = malloc(10);
+    (void)memoryLeak;
     stb_leakcheck_dumpmem();
     return 0;
 }

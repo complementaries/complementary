@@ -25,14 +25,14 @@ jobs:
         run: |
           mkdir -p upload/assets
           cp build/complementary upload/complementary
-          cp -r assets/* upload/assets/*
+          cp -r assets/ upload/assets/
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: complementary
           path: |
-            upload/*
+            upload
 
   build-mac:
     runs-on: macos-10.15
@@ -58,14 +58,14 @@ jobs:
         run: |
           mkdir -p upload/assets
           cp build/complementary upload/complementary
-          cp -r assets/* upload/assets/*
+          cp -r assets/ upload/assets/
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: complementary
           path: |
-            upload/*
+            upload
 
   build-windows:
     runs-on: windows-2019
@@ -86,16 +86,17 @@ jobs:
 
       - name: Prepare upload
         run: |
-          mkdir -p upload/assets
-          cp build/complementary upload/complementary
-          cp -r assets/* upload/assets/*
+          mkdir upload
+          mkdir upload\assets
+          xcopy build\complementary upload\complementary /E
+          xcopy assets\ upload/assets\ /E
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: complementary
           path: |
-            upload/*
+            upload
 
   check-style:
     runs-on: ubuntu-latest

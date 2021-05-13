@@ -1,5 +1,6 @@
 #include <iostream>
 
+#define GLEW_STATIC
 #include <GL/glew.h>
 #include <SDL.h>
 #include <SDL_image.h>
@@ -18,8 +19,6 @@ static const GLchar *vertexShaderCode =
 
 static const GLchar *fragmentShaderCode =
     "#version 410\n"
-    ""
-    "uniform sampler2D samp;"
     ""
     "out vec4 color;"
     ""
@@ -93,6 +92,11 @@ static void initVertexBuffer() {
 }
 
 static bool init() {
+    glewExperimental = GL_TRUE;
+    if (glewInit() != GLEW_OK) {
+        puts("cannot init glew");
+        return true;
+    }
     if (initShaders()) {
         return true;
     }
@@ -145,34 +149,11 @@ int main() {
         return 1;
     }
 
-    SDL_Surface *surface = SDL_GetWindowSurface(window);
-    if (surface == nullptr) {
-        fprintf(stderr, "Failed to load surface: %s\n", SDL_GetError());
-        return 1;
-    }
-
-    constexpr int imgFlags = IMG_INIT_PNG;
-    if (!(IMG_Init(imgFlags) & imgFlags)) {
-        printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
-        return 1;
-    }
-
     SDL_Surface *loadedSurface = IMG_Load("assets/image.png");
-    SDL_Surface *pngImage = nullptr;
     if (loadedSurface == nullptr) {
         printf("Unable to load image! SDL_image Error: %s\n", IMG_GetError());
         return 1;
-    } else {
-        pngImage = SDL_ConvertSurface(loadedSurface, surface->format, 0);
-        if (pngImage == nullptr) {
-            printf("Unable to optimize image! SDL Error: %s\n", SDL_GetError());
-            return 1;
-        }
-        SDL_FreeSurface(loadedSurface);
     }
-
-    SDL_BlitSurface(pngImage, nullptr, surface, nullptr);
-    SDL_UpdateWindowSurface(window);
 
     bool quit = false;
     SDL_Event e;
@@ -182,16 +163,16 @@ int main() {
                 quit = true;
             }
         }
-        SDL_GL_SwapWindow(window);
+        glClearColor(1.0, 0.5, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(vertexArray);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+        SDL_GL_SwapWindow(window);
     }
 
     cleanUp();
 
     SDL_DestroyWindow(window);
-    SDL_FreeSurface(pngImage);
 
     SDL_Quit();
 

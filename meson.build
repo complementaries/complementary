@@ -24,12 +24,13 @@ args = ['-Wall', '-std=c++17', '-pedantic']
 if host_machine.system() == 'linux'
     args += ['-Werror', '-Wextra']
 elif host_machine.system() == 'windows'
-    args += []
+    if not compiler.compiles(code, name : '#include <EGL/egl.h>')
+        args += ['-D_MSC_VER']
+    endif
 elif host_machine.system() == 'darwin'
     args += ['-Werror', '-Wextra']
     dependencies += dependency('appleframeworks', modules: 'OpenGL')
 endif
-
 
 exe = executable('complementary', 
     sources: src,

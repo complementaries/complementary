@@ -11,6 +11,15 @@ imgui_proj = subproject('imgui')
 rapidjson_proj = subproject('rapidjson')
 stb_proj = subproject('stb')
 
+args = ['-Wall', '-std=c++17', '-pedantic']
+if host_machine.system() == 'linux'
+    args += ['-Werror']
+elif host_machine.system() == 'windows'
+    args += ['-WX']
+elif host_machine.system() == 'darwin'
+    args += ['-Werror']
+endif
+
 exe = executable('complementary', 
     sources: src,
     dependencies: [
@@ -21,6 +30,6 @@ exe = executable('complementary',
         rapidjson_proj.get_variable('rapidjson_dep'),
         stb_proj.get_variable('stb_dep')
     ],
-    cpp_args: ['-Wall', '-pedantic', '-std=c++17'])
+    cpp_args: args)
 
 test('run', exe, workdir : meson.current_source_dir())

@@ -11,10 +11,6 @@ imgui_proj = subproject('imgui')
 rapidjson_proj = subproject('rapidjson')
 stb_proj = subproject('stb')
 
-configure_file(input: 'image.png',
-  output: 'image.png',
-  copy: true)
-
 executable('complementary', 
     sources: src,
     dependencies: [

@@ -9,7 +9,7 @@
 #include <stb_leakcheck.h>
 
 static const GLchar *vertexShaderCode =
-    "#version 430\n"
+    "#version 410\n"
     "layout(location = 0) in vec2 pos;"
     ""
     "void main(void) {"
@@ -17,9 +17,9 @@ static const GLchar *vertexShaderCode =
     "}";
 
 static const GLchar *fragmentShaderCode =
-    "#version 430\n"
+    "#version 410\n"
     ""
-    "layout(binding = 0) uniform sampler2D samp;"
+    "uniform sampler2D samp;"
     ""
     "out vec4 color;"
     ""

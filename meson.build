@@ -13,11 +13,11 @@ stb_proj = subproject('stb')
 
 args = ['-Wall', '-std=c++17', '-pedantic']
 if host_machine.system() == 'linux'
-    args += ['-Werror']
+    args += ['-Werror', '-Wextra']
 elif host_machine.system() == 'windows'
     args += ['-WX']
 elif host_machine.system() == 'darwin'
-    args += ['-Werror']
+    args += ['-Werror', '-Wextra']
 endif
 
 exe = executable('complementary', 

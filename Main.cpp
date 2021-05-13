@@ -93,10 +93,6 @@ static void initVertexBuffer() {
 }
 
 static bool init() {
-    if (glewInit() != GLEW_OK) {
-        puts("cannot init glew");
-        return true;
-    }
     if (initShaders()) {
         return true;
     }

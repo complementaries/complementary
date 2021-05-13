@@ -1,0 +1,9 @@
+.vscode
+
+/build
+
+/subprojects/*
+!/subprojects/packagefiles
+!/subprojects/*.wrap
+
+.pch

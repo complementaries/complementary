@@ -1,6 +1,6 @@
 project('sdl2-image', 'c')
 
-feature_args = ['-DLOAD_BMP', '-DLOAD_PNG', '-DLOAD_JPG']
+feature_args = ['-DLOAD_BMP', '-DLOAD_PNG', '-DLOAD_JPG', '-DSDL_IMAGE_USE_COMMON_BACKEND']
 
 sdl2_dep = dependency('sdl2')
 png_dep = dependency('libpng')

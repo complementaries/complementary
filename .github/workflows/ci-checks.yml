@@ -4,7 +4,8 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Install dependencies
         shell: bash
@@ -23,8 +24,40 @@ jobs:
         shell: bash
         run: |
           mkdir -p upload/assets
-          cp ./complementary upload/complementary
-          cp -r ../assets/* upload/assets/*
+          cp build/complementary upload/complementary
+          cp -r build/assets/* upload/assets/*
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: complementary
+          path: |
+            upload/*
+
+  build-mac:
+    runs-on: macos-10.15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          pip3 install meson
+
+      - name: Build
+        shell: bash
+        run: |
+          meson . build
+          cd build
+          ninja
+
+      - name: Prepare upload
+        shell: bash
+        run: |
+          mkdir -p upload/assets
+          cp build/complementary upload/complementary
+          cp -r build/assets/* upload/assets/*
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v2

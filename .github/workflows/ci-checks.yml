@@ -1,13 +1,13 @@
 name: ci-checks
 on: [push, pull_request]
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - shell: bash
         run: |
-          sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1-mesa-dev lxde libxi-dev
+          sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1-mesa-dev libglu1-mesa-dev lxde libxi-dev
           pip3 install meson
       - shell: bash
         run: |
@@ -15,17 +15,22 @@ jobs:
           cd build
           ninja
 
+          cp -r ../assets ./assets
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: complementary
+          path: |
+            complementary
+            assets/*
+
   check-style:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - shell: bash
         run: |
-          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-      - shell: bash
-        run: |
           sudo apt-get install clang-format
       - shell: bash
         run: |
           ! clang-format *.h *.cpp -style=file --output-replacements-xml | grep "<replacement "
-

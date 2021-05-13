@@ -1,0 +1,30 @@
+name: ci-checks
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - shell: bash
+        run: |
+          sudo apt-get install -y ninja-build
+          pip3 install meson
+
+          meson . build
+          cd build
+          ninja
+
+  check-style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - shell: bash
+        run: |
+          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+      - shell: bash
+        run: |
+          sudo apt-get install clang-format
+      - shell: bash
+        run: |
+          ! clang-format *.h *.cpp -style=file --output-replacements-xml | grep "<replacement "
+

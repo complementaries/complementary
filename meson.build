@@ -24,10 +24,7 @@ args = ['-Wall', '-std=c++17', '-pedantic']
 if host_machine.system() == 'linux'
     args += ['-Werror', '-Wextra']
 elif host_machine.system() == 'windows'
-    compiler = meson.get_compiler('cpp')
-    #if not compiler.compiles('#include <EGL/egl.h>', name : 'Has EGL header')
-    args += ['-D_MSC_VER']
-    #endif
+    args += []
 elif host_machine.system() == 'darwin'
     args += ['-Werror', '-Wextra']
     dependencies += dependency('appleframeworks', modules: 'OpenGL')

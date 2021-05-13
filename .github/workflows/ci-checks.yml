@@ -81,7 +81,6 @@ jobs:
       - name: Build
         run: |
           meson . build --backend vs
-          cd build
           meson compile -C build
 
       - name: Prepare upload

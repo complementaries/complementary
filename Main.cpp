@@ -122,7 +122,7 @@ int main(int argc, char **args) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     SDL_Window *window = SDL_CreateWindow("SDL Example", SDL_WINDOWPOS_UNDEFINED,
-                                          SDL_WINDOWPOS_UNDEFINED, 1280, 720, SDL_WINDOW_OPENGL);
+                                          SDL_WINDOWPOS_UNDEFINED, 850, 480, SDL_WINDOW_OPENGL);
     if (window == nullptr) {
         fprintf(stderr, "SDL window failed to initialise: %s\n", SDL_GetError());
         return 1;

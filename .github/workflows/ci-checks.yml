@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v2
       - shell: bash
         run: |
-          sudo apt-get install -y ninja-build
+          sudo apt-get install -y ninja-build mesa
           pip3 install meson
 
           meson . build

@@ -6,9 +6,6 @@
 #include <SDL_image.h>
 #include <SDL_opengl.h>
 
-#define STB_LEAKCHECK_IMPLEMENTATION
-#include <stb_leakcheck.h>
-
 static const GLchar *vertexShaderCode =
     "#version 410\n"
     "layout(location = 0) in vec2 pos;"
@@ -178,8 +175,5 @@ int main(int argc, char **args) {
 
     SDL_Quit();
 
-    void *memoryLeak = malloc(10);
-    (void)memoryLeak;
-    stb_leakcheck_dumpmem();
     return 0;
 }

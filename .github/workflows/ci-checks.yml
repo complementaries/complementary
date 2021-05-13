@@ -5,9 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: openrndr/setup-opengl@v1.1
       - shell: bash
         run: |
-          sudo apt-get install -y ninja-build mesa
+          sudo apt-get install -y ninja-build
           pip3 install meson
 
           meson . build

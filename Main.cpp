@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    SDL_Surface *loadedSurface = IMG_Load("image.png");
+    SDL_Surface *loadedSurface = IMG_Load("assets/image.png");
     SDL_Surface *pngImage = nullptr;
     if (loadedSurface == nullptr) {
         printf("Unable to load image! SDL_image Error: %s\n", IMG_GetError());

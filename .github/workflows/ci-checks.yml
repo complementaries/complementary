@@ -67,35 +67,35 @@ jobs:
           path: |
             upload
 
-  build-windows:
-    runs-on: windows-2019
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+  # build-windows:
+  #   runs-on: windows-2019
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: |
-          choco install ninja
-          pip install meson
+  #     - name: Install dependencies
+  #       run: |
+  #         choco install ninja
+  #         pip install meson
 
-      - name: Build
-        run: |
-          meson . build --backend vs
-          meson compile -C build
+  #     - name: Build
+  #       run: |
+  #         meson . build --backend vs
+  #         meson compile -C build
 
-      - name: Prepare upload
-        run: |
-          mkdir upload
-          mkdir upload\assets
-          xcopy build\complementary.exe upload\complementary.exe /E
-          xcopy assets\ upload/assets\ /E
+  #     - name: Prepare upload
+  #       run: |
+  #         mkdir upload
+  #         mkdir upload\assets
+  #         xcopy build\complementary.exe upload\complementary.exe /E
+  #         xcopy assets\ upload/assets\ /E
           
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: complementary-windows
-          path: |
-            upload
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: complementary-windows
+  #         path: |
+  #           upload
 
   check-style:
     runs-on: ubuntu-latest

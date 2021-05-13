@@ -31,5 +31,3 @@ exe = executable('complementary',
         stb_proj.get_variable('stb_dep')
     ],
     cpp_args: args)
-
-test('run', exe, workdir : meson.current_source_dir())

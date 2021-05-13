@@ -5,24 +5,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install dependencies
       - shell: bash
         run: |
           sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1-mesa-dev libglu1-mesa-dev lxde libxi-dev
           pip3 install meson
-      - shell: bash
+
+      - name: Build
+        shell: bash
         run: |
           meson . build
           cd build
           ninja
 
-          cp -r ../assets ./assets
+      - name: Prepare upload
+        shell: bash
+        run: |
+          mkdir -p upload/assets
+          cp ./complementary upload/complementary
+          cp -r ../assets/* upload/assets/*
+          
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: complementary
           path: |
-            complementary
-            assets/*
+            upload/*
 
   check-style:
     runs-on: ubuntu-latest

@@ -43,6 +43,7 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
+          brew install ninja
           pip3 install meson
 
       - name: Build

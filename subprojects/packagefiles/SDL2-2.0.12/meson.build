@@ -196,7 +196,7 @@ elif host_machine.system() == 'windows'
 
   compiler = meson.get_compiler('cpp')
   if not compiler.compiles('#include <EGL/egl.h>', name : 'Has EGL header')
-    core_args += ['-D_MSC_VER']
+    core_args += ['-D_MSC_VER' '2000']
   endif
 elif host_machine.system() == 'darwin'
   cdata.set('HAVE_GCC_ATOMICS', 1)

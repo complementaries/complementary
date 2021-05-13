@@ -16,7 +16,6 @@ all_sources += files(
   'SDL_rect.c',
   'SDL_pixels.c',
   'SDL_shape.c',
-  'SDL_egl.c',
   'SDL_video.c',
   'SDL_vulkan_utils.c',
   'SDL_yuv.c',

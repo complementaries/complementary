@@ -134,6 +134,8 @@ int main(int argc, char **args) {
         return 1;
     }
 
+    std::cout << glGetString(GL_VERSION) << "\n";
+
     GLenum glewError = glewInit();
     if (glewError != GLEW_OK) {
         fprintf(stderr, "Error initializing GLEW! %s\n", glewGetErrorString(glewError));
@@ -162,7 +164,7 @@ int main(int argc, char **args) {
                 quit = true;
             }
         }
-        glClearColor(1.0, 0.5, 0.0, 1.0);
+        glClearColor(0.0, 1.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(vertexArray);
         glDrawArrays(GL_TRIANGLES, 0, 6);

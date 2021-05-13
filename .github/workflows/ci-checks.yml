@@ -80,9 +80,9 @@ jobs:
 
       - name: Build
         run: |
-          meson . build
+          meson . build --backend vs
           cd build
-          ninja
+          meson compile -C build
 
       - name: Prepare upload
         run: |

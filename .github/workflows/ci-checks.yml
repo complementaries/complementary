@@ -30,7 +30,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: complementary
+          name: complementary-linux
           path: |
             upload
 
@@ -63,7 +63,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: complementary
+          name: complementary-mac
           path: |
             upload
 
@@ -88,13 +88,13 @@ jobs:
         run: |
           mkdir upload
           mkdir upload\assets
-          xcopy build\complementary upload\complementary /E
+          xcopy build\complementary.exe upload\complementary.exe /E
           xcopy assets\ upload/assets\ /E
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: complementary
+          name: complementary-windows
           path: |
             upload
 

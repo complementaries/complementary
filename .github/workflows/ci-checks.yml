@@ -67,6 +67,36 @@ jobs:
           path: |
             upload/*
 
+  build-windows:
+    runs-on: windows-2019
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          choco install ninja
+          pip install meson
+
+      - name: Build
+        run: |
+          meson . build
+          cd build
+          ninja
+
+      - name: Prepare upload
+        run: |
+          mkdir -p upload/assets
+          cp build/complementary upload/complementary
+          cp -r assets/* upload/assets/*
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: complementary
+          path: |
+            upload/*
+
   check-style:
     runs-on: ubuntu-latest
     steps:

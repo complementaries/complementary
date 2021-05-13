@@ -151,6 +151,7 @@ core_args = []#'-DUSING_GENERATED_CONFIG_H']
 core_ldflags = []
 
 cdata.set('SDL_SENSOR_DUMMY', 1)
+cdata.set('SDL_VIDEO_OPENGL', 1)
 
 if host_machine.system() == 'linux'
   cdata.set('HAVE_GCC_ATOMICS', 1)
@@ -210,7 +211,7 @@ elif host_machine.system() == 'darwin'
   core_args += ['-pthread']
   core_deps += [dependency('appleframeworks',
     modules : ['CoreFoundation', 'Foundation',
-     'QuartzCore', 'CoreAudio',
+    'QuartzCore', 'CoreAudio',
     'AudioUnit', 'AudioToolbox', 'ForceFeedback',
     'IOKit', 'Cocoa', 'Carbon', 'CoreGraphics'])]
 else

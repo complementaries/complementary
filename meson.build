@@ -11,7 +11,7 @@ imgui_proj = subproject('imgui')
 rapidjson_proj = subproject('rapidjson')
 stb_proj = subproject('stb')
 
-executable('complementary', 
+exe = executable('complementary', 
     sources: src,
     dependencies: [
         sdl2_proj.get_variable('sdl2_dep'),
@@ -22,3 +22,5 @@ executable('complementary',
         stb_proj.get_variable('stb_dep')
     ],
     cpp_args: ['-Wall', '-pedantic', '-std=c++17'])
+
+test('run', exe, workdir : meson.current_source_dir())

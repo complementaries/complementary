@@ -112,7 +112,9 @@ static void cleanUp() {
     glDeleteProgram(program);
 }
 
-int main() {
+int main(int argc, const char **args) {
+    (void)argc;
+    (void)args;
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
         return 1;

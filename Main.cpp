@@ -112,7 +112,7 @@ static void cleanUp() {
     glDeleteProgram(program);
 }
 
-int main(int argc, const char **args) {
+int main(int argc, char **args) {
     (void)argc;
     (void)args;
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {

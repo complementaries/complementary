@@ -26,7 +26,7 @@ if host_machine.system() == 'linux'
 elif host_machine.system() == 'windows'
     compiler = meson.get_compiler('cpp')
     #if not compiler.compiles('#include <EGL/egl.h>', name : 'Has EGL header')
-        args += ['-D_MSC_VER']
+    args += ['-D_MSC_VER']
     #endif
 elif host_machine.system() == 'darwin'
     args += ['-Werror', '-Wextra']

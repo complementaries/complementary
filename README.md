@@ -2,7 +2,7 @@
 
 ## Local development
 
-Setup the build directory with `meson . build` and run the program with `cd build && meson test run`
+Setup the build directory with `meson build`, compile with `ninja -C build` and run the program with `./build/complementary`
 
 ## Formatting
 

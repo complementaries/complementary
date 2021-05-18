@@ -7,6 +7,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Apply build cache
+        id: cache-build
+        uses: actions/cache@v2
+        with:
+          path: |
+            build
+            subprojects/*
+            !subprojects/packagefiles
+            !subprojects/*.wrap
+          key: ${{ runner.os }}-build
+
       - name: Install dependencies
         shell: bash
         run: |
@@ -23,9 +34,9 @@ jobs:
       - name: Prepare upload
         shell: bash
         run: |
-          mkdir -p upload/assets
+          mkdir -p upload
           cp build/complementary upload/complementary
-          cp -r assets/ upload/assets/
+          cp -r assets upload/assets
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -40,11 +51,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Apply build cache
+        id: cache-build
+        uses: actions/cache@v2
+        with:
+          path: |
+            build
+            subprojects/*
+            !subprojects/packagefiles
+            !subprojects/*.wrap
+          key: ${{ runner.os }}-build
+
       - name: Install dependencies
         shell: bash
         run: |
-          brew install ninja
-          pip3 install meson
+          pip3 install meson ninja
 
       - name: Build
         shell: bash
@@ -55,9 +76,9 @@ jobs:
       - name: Prepare upload
         shell: bash
         run: |
-          mkdir -p upload/assets
+          mkdir -p upload
           cp build/complementary upload/complementary
-          cp -r assets/ upload/assets/
+          cp -r assets upload/assets
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -72,6 +93,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Apply build cache
+        id: cache-build
+        uses: actions/cache@v2
+        with:
+          path: |
+            build
+            subprojects/*
+            !subprojects/packagefiles
+            !subprojects/*.wrap
+          key: ${{ runner.os }}-build
+
       - name: Install dependencies
         run: |
           pip install meson
@@ -80,7 +112,7 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
-          meson setup build --backend vs
+          meson build --backend vs
           meson compile -C build -j0
 
       - name: Prepare upload

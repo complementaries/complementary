@@ -1,5 +1,5 @@
 name: ci-checks
-on: [push, pull_request]
+on: [push]
 jobs:
   build-linux:
     runs-on: ubuntu-latest
@@ -10,15 +10,15 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
+          sudo apt-get update
           sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1-mesa-dev libglu1-mesa-dev lxde libxi-dev
           pip3 install meson
 
       - name: Build
         shell: bash
         run: |
-          meson . build
-          cd build
-          ninja
+          meson build
+          ninja -C build
 
       - name: Prepare upload
         shell: bash
@@ -49,9 +49,8 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          meson . build
-          cd build
-          ninja
+          meson build
+          ninja -C build
 
       - name: Prepare upload
         shell: bash
@@ -67,35 +66,36 @@ jobs:
           path: |
             upload
 
-  # build-windows:
-  #   runs-on: windows-2019
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v2
+  build-windows:
+    runs-on: windows-2019
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-  #     - name: Install dependencies
-  #       run: |
-  #         choco install ninja
-  #         pip install meson
+      - name: Install dependencies
+        run: |
+          pip install meson
 
-  #     - name: Build
-  #       run: |
-  #         meson . build --backend vs
-  #         meson compile -C build
+      - name: Build
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          meson setup build --backend vs
+          meson compile -C build -j0
 
-  #     - name: Prepare upload
-  #       run: |
-  #         mkdir upload
-  #         mkdir upload\assets
-  #         xcopy build\complementary.exe upload\complementary.exe /E
-  #         xcopy assets\ upload/assets\ /E
+      - name: Prepare upload
+        shell: cmd
+        run: |
+          mkdir upload
+          copy build\complementary.exe upload\complementary.exe /B
+          xcopy assets upload\assets /E /I
           
-  #     - name: Upload artifacts
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: complementary-windows
-  #         path: |
-  #           upload
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: complementary-windows
+          path: |
+            upload
 
   check-style:
     runs-on: ubuntu-latest

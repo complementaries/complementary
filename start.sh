@@ -1,9 +1,7 @@
 #!/bin/bash
 clear
 cd "$(dirname "$0")"
-cd build
-if ninja; then
+if ninja -C build; then
     echo "Build succeeded."
-    cd ..
     ./build/complementary
 fi

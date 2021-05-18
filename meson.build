@@ -4,6 +4,10 @@ src = [
     'Main.cpp'
 ]
 
+zlib_proj = subproject('zlib')
+libjpeg_proj = subproject('libjpeg')
+libpng_proj = subproject('libpng')
+
 sdl2_proj = subproject('sdl2')
 sdl2_image_proj = subproject('sdl2_image')
 glew_proj = subproject('glew')
@@ -12,6 +16,10 @@ rapidjson_proj = subproject('rapidjson')
 stb_proj = subproject('stb')
 
 dependencies = [
+    zlib_proj.get_variable('zlib_dep'),
+    libjpeg_proj.get_variable('jpeg_dep'),
+    libpng_proj.get_variable('libpng_dep'),
+
     sdl2_proj.get_variable('sdl2_dep'),
     sdl2_image_proj.get_variable('sdl2_image_dep'),
     glew_proj.get_variable('glew_dep'),

@@ -13,6 +13,7 @@ all_sources += files(
   'SDL_blit_0.c',
   'SDL_blit_copy.c',
   'SDL_blit_auto.c',
+  'SDL_egl.c',
   'SDL_rect.c',
   'SDL_pixels.c',
   'SDL_shape.c',

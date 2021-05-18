@@ -193,11 +193,6 @@ elif host_machine.system() == 'windows'
     # Seems to be only needed on 32 bit platforms. Don't know why.
     core_args += ['-DHAVE_LIBC']
   endif
-
-  compiler = meson.get_compiler('cpp')
-  if not compiler.compiles('#include <EGL/egl.h>', name : 'Has EGL header')
-    core_args += ['-D_MSC_VER=2000']
-  endif
 elif host_machine.system() == 'darwin'
   cdata.set('HAVE_GCC_ATOMICS', 1)
   cdata.set('HAVE_GCC_SYNC_LOCK_TEST_AND_SET', 1)

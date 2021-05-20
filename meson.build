@@ -28,13 +28,14 @@ dependencies = [
     stb_proj.get_variable('stb_dep')
 ]
 
-args = ['-Wall', '-std=c++17', '-pedantic']
-if host_machine.system() == 'linux'
-    args += ['-Werror', '-Wextra']
-elif host_machine.system() == 'windows'
-    args += []
-elif host_machine.system() == 'darwin'
-    args += ['-Werror', '-Wextra']
+args = ['-Wall', '-pedantic']
+if host_machine.system() == 'windows'
+    args += ['/std:c++17']
+elif host_machine.system() == 'darwin' or host_machine.system() == 'linux'
+    args += ['-Werror', '-Wextra', '-std=c++17']
+endif
+
+if host_machine.system() == 'darwin'
     dependencies += dependency('appleframeworks', modules: 'OpenGL')
 endif
 

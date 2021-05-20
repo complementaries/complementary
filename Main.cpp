@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 
 #define GLEW_STATIC
@@ -112,6 +113,14 @@ static void cleanUp() {
 int main(int argc, char **args) {
     (void)argc;
     (void)args;
+
+#ifndef NDEBUG
+    if (!std::filesystem::exists("assets")) {
+        puts("Attempted to fix the working directory.\n");
+        std::filesystem::current_path("..");
+    }
+#endif
+
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
         return 1;

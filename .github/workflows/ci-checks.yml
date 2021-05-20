@@ -28,7 +28,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          meson build --wipe
+          meson build
           ninja -C build
 
       - name: Prepare upload
@@ -70,7 +70,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          meson build --wipe
+          meson build
           ninja -C build
 
       - name: Prepare upload
@@ -112,7 +112,7 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
-          meson build --wipe --backend vs
+          meson build --backend vs
           meson compile -C build -j0
 
       - name: Prepare upload

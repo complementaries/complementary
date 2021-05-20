@@ -1,4 +1,4 @@
-project('complementary', 'cpp')
+project('complementary', 'cpp', default_options : ['cpp_std=c++17'])
 
 src = [
     'Main.cpp'
@@ -30,9 +30,9 @@ dependencies = [
 
 args = ['-Wall', '-pedantic']
 if host_machine.system() == 'windows'
-    args += ['/std:c++17']
+    args += []
 elif host_machine.system() == 'darwin' or host_machine.system() == 'linux'
-    args += ['-Werror', '-Wextra', '-std=c++17']
+    args += ['-Werror', '-Wextra']
 endif
 
 if host_machine.system() == 'darwin'

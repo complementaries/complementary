@@ -30,7 +30,7 @@ dependencies = [
 
 args = ['-Wall', '-pedantic']
 if host_machine.system() == 'windows'
-    args += ['/W3', '/WX']
+    args += []
 elif host_machine.system() == 'darwin' or host_machine.system() == 'linux'
     args += ['-Werror', '-Wextra']
 endif

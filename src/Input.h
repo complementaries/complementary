@@ -33,6 +33,6 @@ namespace Input {
 
     Button getButton(ButtonType type);
     float getHorizontal();
-};
+}
 
 #endif

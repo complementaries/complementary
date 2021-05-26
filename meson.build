@@ -1,4 +1,4 @@
-project('complementary', 'cpp', default_options : ['cpp_std=c++17'])
+project('complementary', 'cpp', default_options : ['cpp_std=c++2a'])
 
 src = [
   'src/graphics/gl/Shader.cpp',

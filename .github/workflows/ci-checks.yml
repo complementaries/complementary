@@ -138,4 +138,4 @@ jobs:
           sudo apt-get install clang-format
       - shell: bash
         run: |
-          ! clang-format *.h *.cpp -style=file --output-replacements-xml | grep "<replacement "
+          ! ./tools/format.sh --output-replacements-xml | grep "<replacement "

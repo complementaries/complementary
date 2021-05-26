@@ -4,7 +4,7 @@ clang_format_command="clang-format"
 
 cat <<EOF > .git/hooks/pre-commit
 #!/bin/sh
-FILES=\$(git diff --cached --name-only --diff-filter=ACMR "*.h" "*.cpp" | sed 's| |\\ |g')
+FILES=\$(git diff --cached --name-only --diff-filter=ACMR "src/**/*.h" "src/**/*.cpp" "assets/shaders/**/*.vs" "assets/shaders/**/*.fs" "assets/shaders/**/*.gs" | sed 's| |\\ |g')
 [ -z "\$FILES" ] && exit 0
 echo "Applying auto formatting..."
 # Format all changed files

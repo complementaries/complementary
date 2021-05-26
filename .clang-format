@@ -10,5 +10,10 @@ AlwaysBreakBeforeMultilineStrings: true
 AlwaysBreakTemplateDeclarations: true
 IndentWidth: 4
 ColumnLimit: 100
+NamespaceIndentation: All
+PointerAlignment: Left
+FixNamespaceComments: false
+IndentCaseLabels: true
+IndentCaseBlocks: false
 
 ...

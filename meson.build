@@ -1,7 +1,12 @@
 project('complementary', 'cpp', default_options : ['cpp_std=c++17'])
 
 src = [
-    'Main.cpp'
+  'src/graphics/gl/Shader.cpp',
+  'src/graphics/gl/VertexBuffer.cpp',
+  'src/graphics/Window.cpp',
+  'src/Game.cpp',
+  'src/Input.cpp',
+  'src/Main.cpp'
 ]
 
 zlib_proj = subproject('zlib')
@@ -42,4 +47,5 @@ endif
 exe = executable('complementary', 
     sources: src,
     dependencies: dependencies,
-    cpp_args: args)
+    cpp_args: args,
+    include_directories: 'src')

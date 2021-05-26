@@ -1,9 +1,4 @@
-standard = 'cpp_std=c++2a'
-if host_machine.system() == 'windows'
-    standard = ['cpp_std=c++latest']
-endif
-
-project('complementary', 'cpp', default_options : [standard])
+project('complementary', 'cpp', default_options : ['cpp_std=c++17'])
 
 src = [
   'src/graphics/gl/Shader.cpp',
@@ -42,7 +37,7 @@ args = ['-Wall']
 if host_machine.system() == 'windows'
     args += []
 elif host_machine.system() == 'darwin' or host_machine.system() == 'linux'
-    args += ['-Werror', '-Wextra', '-pedantic']
+    args += ['-Werror', '-Wextra']
 endif
 
 if host_machine.system() == 'darwin'

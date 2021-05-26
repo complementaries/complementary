@@ -1,4 +1,4 @@
-project('complementary', 'cpp', default_options : ['cpp_std=c++17'])
+project('complementary', 'cpp')
 
 src = [
   'src/graphics/gl/Shader.cpp',
@@ -34,10 +34,12 @@ dependencies = [
 ]
 
 args = ['-Wall']
+standard_option = 'cpp_std=c++2a'
 if host_machine.system() == 'windows'
     args += []
+    standard_option = 'cpp_std=c++latest'
 elif host_machine.system() == 'darwin' or host_machine.system() == 'linux'
-    args += ['-Werror', '-Wextra']
+    args += ['-Werror', '-Wextra', '-pedantic']
 endif
 
 if host_machine.system() == 'darwin'
@@ -48,4 +50,5 @@ exe = executable('complementary',
     sources: src,
     dependencies: dependencies,
     cpp_args: args,
-    include_directories: 'src')
+    include_directories: 'src',
+    override_options: [standard_option])

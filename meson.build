@@ -1,4 +1,9 @@
-project('complementary', 'cpp', default_options : ['cpp_std=c++2a'])
+standard = 'cpp_std=c++2a'
+if host_machine.system() == 'windows'
+    standard = ['cpp_std=c++latest']
+endif
+
+project('complementary', 'cpp', default_options : [standard])
 
 src = [
   'src/graphics/gl/Shader.cpp',
@@ -33,11 +38,11 @@ dependencies = [
     stb_proj.get_variable('stb_dep')
 ]
 
-args = ['-Wall', '-pedantic']
+args = ['-Wall']
 if host_machine.system() == 'windows'
     args += []
 elif host_machine.system() == 'darwin' or host_machine.system() == 'linux'
-    args += ['-Werror', '-Wextra']
+    args += ['-Werror', '-Wextra', '-pedantic']
 endif
 
 if host_machine.system() == 'darwin'

@@ -20,8 +20,7 @@ static void initVertexBuffer() {
 }
 
 bool Game::init() {
-    if (shader.compile(
-            {.vertexPath = "assets/shaders/test.vs", .fragmentPath = "assets/shaders/test.fs"})) {
+    if (shader.compile({"assets/shaders/test.vs", "assets/shaders/test.fs"})) {
         return true;
     }
     initVertexBuffer();

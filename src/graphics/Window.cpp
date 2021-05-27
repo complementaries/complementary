@@ -1,13 +1,12 @@
 #include "Window.h"
 
-#define GLEW_STATIC
-#include <GL/glew.h>
 #include <SDL.h>
 #include <chrono>
 #include <iostream>
 
 #include "Game.h"
 #include "Input.h"
+#include "graphics/gl/Glew.h"
 
 typedef long long int Nanos;
 static constexpr Nanos NANOS_PER_TICK = 1'000'000'000L * Window::SECONDS_PER_TICK;

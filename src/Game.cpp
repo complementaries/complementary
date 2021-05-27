@@ -1,9 +1,9 @@
 #include "Game.h"
 
-#include <GL/glew.h>
 #include <iostream>
 
 #include "Input.h"
+#include "graphics/gl/Glew.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 

@@ -1,11 +1,10 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#define GLEW_STATIC
-#include <GL/glew.h>
 #include <vector>
 
 #include "NonCopyable.h"
+#include "graphics/gl/Glew.h"
 
 namespace GL {
     class Shader final : private NonCopyable {

@@ -40,7 +40,6 @@ bool Window::init() {
 
     std::cout << glGetString(GL_VERSION) << "\n";
 
-    glewExperimental = GL_TRUE;
     GLenum glewError = glewInit();
     if (glewError != GLEW_OK) {
         fprintf(stderr, "Error initializing GLEW! %s\n", glewGetErrorString(glewError));

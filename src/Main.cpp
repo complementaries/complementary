@@ -1,9 +1,6 @@
 #include <filesystem>
 #include <iostream>
 
-#define GLEW_STATIC
-#include <GL/glew.h>
-
 #include "graphics/Window.h"
 
 int main(int argc, char** args) {

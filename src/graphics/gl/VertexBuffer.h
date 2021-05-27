@@ -1,9 +1,11 @@
 #ifndef VERTEX_BUFFER_H
 #define VERTEX_BUFFER_H
 
-#include "NonCopyable.h"
+#define GLEW_STATIC
 #include <GL/glew.h>
 #include <vector>
+
+#include "NonCopyable.h"
 
 namespace GL {
     class VertexBuffer final : private NonCopyable {

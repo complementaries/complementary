@@ -21,6 +21,11 @@ GL::VertexBuffer::Attributes& GL::VertexBuffer::Attributes::addVector4() {
     return addFloat(4);
 }
 
+GL::VertexBuffer::Attributes& GL::VertexBuffer::Attributes::addRGBA() {
+    data.push_back({GL_UNSIGNED_BYTE, true, 4, 4});
+    return *this;
+}
+
 GL::VertexBuffer::VertexBuffer() : vertexArray(0), vertexBuffer(0) {
 }
 

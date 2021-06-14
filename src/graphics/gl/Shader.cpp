@@ -14,6 +14,7 @@ bool GL::Shader::readFile(std::vector<GLchar>& code, const char* path) const {
     std::ifstream in;
     in.open(path);
     if (!in.good()) {
+        printf("cannot open shader file '%s'\n", path);
         return true;
     }
     while (in.good()) {

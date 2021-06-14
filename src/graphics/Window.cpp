@@ -30,7 +30,6 @@ bool Window::init() {
         fprintf(stderr, "SDL window failed to initialise: %s\n", SDL_GetError());
         return true;
     }
-    SDL_MinimizeWindow(window);
 
     SDL_GLContext gContext = SDL_GL_CreateContext(window);
     if (gContext == nullptr) {

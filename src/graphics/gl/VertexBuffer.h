@@ -17,6 +17,7 @@ namespace GL {
             Attributes& addVector2();
             Attributes& addVector3();
             Attributes& addVector4();
+            Attributes& addRGBA();
 
           private:
             Attributes& addFloat(int count);

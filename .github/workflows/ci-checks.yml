@@ -98,7 +98,6 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            build
             subprojects/*
             !subprojects/packagefiles
             !subprojects/*.wrap

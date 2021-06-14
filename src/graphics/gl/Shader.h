@@ -5,6 +5,7 @@
 
 #include "NonCopyable.h"
 #include "graphics/gl/Glew.h"
+#include "math/Matrix.h"
 
 namespace GL {
     class Shader final : private NonCopyable {
@@ -20,6 +21,7 @@ namespace GL {
 
         void use();
         void setFloat(const char* name, float f);
+        void setMatrix(const char* name, const Matrix& matrix);
 
       private:
         bool readFile(std::vector<GLchar>& code, const char* path) const;

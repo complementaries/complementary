@@ -6,11 +6,13 @@ src = [
   'src/graphics/Window.cpp',
   'src/graphics/Buffer.cpp',
   'src/graphics/Color.cpp',
+  'src/math/Matrix.cpp',
   'src/Game.cpp',
   'src/Input.cpp',
   'src/tilemap/Tilemap.cpp',
   'src/tilemap/Tile.cpp',
   'src/tilemap/Tiles.cpp',
+  'src/Player.cpp',
   'src/Main.cpp'
 ]
 

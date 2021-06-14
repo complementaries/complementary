@@ -1,4 +1,5 @@
 #include "Tilemap.h"
+#include "Game.h"
 #include "Tiles.h"
 #include "graphics/Buffer.h"
 
@@ -33,11 +34,6 @@ void Tilemap::setTile(int x, int y, const Tile& tile) {
     dirty = true;
 }
 
-static float transform(int i, int max) {
-    float normalized = i / static_cast<float>(max);
-    return normalized * 2.0f - 1.0f;
-}
-
 void Tilemap::prepareRendering() {
     if (!dirty) {
         return;
@@ -45,10 +41,10 @@ void Tilemap::prepareRendering() {
     Buffer data;
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            float minX = transform(x, width);
-            float minY = -transform(y, height);
-            float maxX = minX + 2.0f / width;
-            float maxY = minY - 2.0f / height;
+            float minX = x;
+            float minY = y;
+            float maxX = minX + 1;
+            float maxY = minY + 1;
             Color color = getTile(x, y).getColor();
 
             data.add(minX).add(minY).add(color);
@@ -65,6 +61,7 @@ void Tilemap::prepareRendering() {
 
 void Tilemap::render() {
     shader.use();
+    shader.setMatrix("view", Game::viewMatrix);
     prepareRendering();
     buffer.drawTriangles(width * height * 6);
 }

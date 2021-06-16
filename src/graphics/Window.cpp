@@ -1,8 +1,11 @@
 #include "Window.h"
 
-#include <SDL.h>
 #include <chrono>
 #include <iostream>
+
+#include <SDL.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl.h>
 
 #include "Game.h"
 #include "Input.h"
@@ -49,12 +52,38 @@ bool Window::init() {
         fprintf(stderr, "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
     }
 
+    // Imgui setup
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    // TODO: keyboard and gamepad navigation is disabled because it
+    // conflicts with player movement, figure something out
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad; //
+    // Enable Keyboard and Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+
+    // Setup Platform/Renderer backends
+    if (!ImGui_ImplSDL2_InitForOpenGL(window, gContext)) {
+        fprintf(stderr, "Failed to initialize ImGui");
+        return true;
+    }
+    if (!ImGui_ImplOpenGL3_Init("#version 410")) {
+        fprintf(stderr, "Failed to initialize ImGui");
+        return true;
+    }
+
     return false;
 }
 
 static void pollEvents() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
+        ImGui_ImplSDL2_ProcessEvent(&e);
+
         switch (e.type) {
             case SDL_QUIT: {
                 running = false;
@@ -123,6 +152,19 @@ void Window::run() {
         }
 
         Game::render(static_cast<float>(lag) / NANOS_PER_TICK);
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(window);
+        ImGui::NewFrame();
+
+#ifndef NDEBUG
+        Game::renderImGui();
+#endif
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         SDL_GL_SwapWindow(window);
     }
 }

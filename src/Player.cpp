@@ -1,6 +1,9 @@
 #include <cmath>
 #include <iostream>
 
+#include <imgui.h>
+#include <imgui/ImGuiUtils.h>
+
 #include "Game.h"
 #include "Input.h"
 #include "Player.h"
@@ -40,16 +43,16 @@ void Player::tick(const Tilemap& map) {
     lastX = x;
     lastY = y;
 
-    velocityX += Input::getHorizontal() * 0.1f;
-    velocityY += 0.04f;
+    velocityX += Input::getHorizontal() * moveSpeed;
+    velocityY += gravity;
     if (Input::getButton(ButtonType::JUMP).pressed && onGround) {
-        velocityY -= 1.5f;
+        velocityY -= jumpVelocity;
         onGround = false;
     }
     onGround = false;
 
-    velocityX *= 0.5f;
-    velocityY *= 0.9f;
+    velocityX *= dragX;
+    velocityY *= dragY;
 
     const float step = 0.005f;
     float energyX = velocityX;
@@ -106,4 +109,25 @@ void Player::render(float lag) {
                       ix + width, iy, ix,         iy + height, ix + width, iy + height};
     buffer.setData(data, sizeof(data));
     buffer.drawTriangles(6);
+}
+
+void Player::renderImGui() {
+    ImGui::Begin("Player");
+
+    ImGui::DragFloat("Move Speed", &moveSpeed, 0.02f);
+    ImGui::DragFloat("Jump Velocity", &jumpVelocity, 0.1f);
+    ImGui::DragFloat("Gravity", &gravity, 0.01f);
+    ImGui::DragFloat2("Drag", &dragX, 0.1f);
+
+    ImGui::Spacing();
+
+    ImGui::DragFloat2("Position", &x);
+    ImGui::DragFloat2("Size", &width);
+    ImGui::DragFloat2("Velocity", &velocityX);
+
+    ImGui::PushDisabled();
+    ImGui::Checkbox("Grounded", &onGround);
+    ImGui::PopDisabled();
+
+    ImGui::End();
 }

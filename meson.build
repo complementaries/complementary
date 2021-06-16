@@ -3,17 +3,18 @@ project('complementary', 'cpp', default_options : ['cpp_std=c++17'])
 src = [
   'src/graphics/gl/Shader.cpp',
   'src/graphics/gl/VertexBuffer.cpp',
-  'src/graphics/Window.cpp',
   'src/graphics/Buffer.cpp',
   'src/graphics/Color.cpp',
+  'src/graphics/Window.cpp',
+  'src/imgui/ImGuiUtils.cpp',
   'src/math/Matrix.cpp',
+  'src/tilemap/Tile.cpp',
+  'src/tilemap/Tilemap.cpp',
+  'src/tilemap/Tiles.cpp',
   'src/Game.cpp',
   'src/Input.cpp',
-  'src/tilemap/Tilemap.cpp',
-  'src/tilemap/Tile.cpp',
-  'src/tilemap/Tiles.cpp',
-  'src/Player.cpp',
-  'src/Main.cpp'
+  'src/Main.cpp',
+  'src/Player.cpp'
 ]
 
 zlib_proj = subproject('zlib')

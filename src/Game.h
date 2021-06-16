@@ -7,6 +7,7 @@ namespace Game {
     bool init();
     void tick();
     void render(float lag);
+    void renderImGui();
 
     extern Matrix viewMatrix;
 }

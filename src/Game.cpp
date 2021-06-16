@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <imgui.h>
 
 #include "Game.h"
 #include "Player.h"
@@ -23,6 +24,7 @@ bool Game::init() {
             tilemap.setTile(x, y, rand() % 20 ? Tiles::AIR : Tiles::WALL);
         }
     }
+
     return false;
 }
 
@@ -35,4 +37,12 @@ void Game::render(float lag) {
     MatrixUtils::setTransform(tilemap.getWidth(), tilemap.getHeight(), viewMatrix);
     tilemap.render();
     player.render(lag);
+}
+
+void Game::renderImGui() {
+    ImGui::Begin("Tilemap");
+    ImGui::Text("Width: %d, Height: %d", tilemap.getWidth(), tilemap.getHeight());
+    ImGui::End();
+
+    player.renderImGui();
 }

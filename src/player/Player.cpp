@@ -9,6 +9,7 @@
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "math/Vector.h"
+#include "objects/Objects.h"
 #include "player/Player.h"
 
 static constexpr float step = 0.005f;
@@ -53,7 +54,7 @@ static bool isColliding(const Tilemap& map) {
             }
         }
     }
-    return false;
+    return Objects::collidesWithAny(position, size);
 }
 
 void Player::addForce(const Vector& force) {
@@ -69,7 +70,7 @@ static void tickCollision(const Tilemap& map) {
         Vector min = position + FaceUtils::getDirection(face) * step;
         Vector max = min + size;
 
-        collision[face] = false;
+        collision[face] = Objects::handleFaceCollision(min, size, face);
 
         int minX = floorf(min[0]);
         int minY = floorf(min[1]);
@@ -101,6 +102,8 @@ static void tickCollision(const Tilemap& map) {
             map.getTile(x, y).onCollision();
         }
     }
+
+    Objects::handleCollision(position, size);
 }
 
 static void move(const Tilemap& map) {

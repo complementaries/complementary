@@ -23,7 +23,7 @@ bool Game::init() {
             tilemap.setTile(x, y, rand() % 20 ? Tiles::AIR : Tiles::WALL);
         }
     }
-
+    tilemap.setTile(5, tilemap.getHeight() - 1, Tiles::SPIKES);
     return false;
 }
 

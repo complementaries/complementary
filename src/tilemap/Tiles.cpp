@@ -8,6 +8,7 @@ static std::vector<Tile*> tiles;
 
 Tile Tiles::AIR{ColorUtils::rgba(0xFF, 0xFF, 0xFF), false};
 Tile Tiles::WALL{ColorUtils::rgba(0x00, 0x00, 0x00), true};
+SpikeTile Tiles::SPIKES;
 
 void Tiles::addTile(Tile& tile) {
     tile.id = tiles.size();
@@ -17,6 +18,7 @@ void Tiles::addTile(Tile& tile) {
 void Tiles::init() {
     addTile(AIR);
     addTile(WALL);
+    addTile(SPIKES);
 }
 
 const Tile& Tiles::get(int id) {

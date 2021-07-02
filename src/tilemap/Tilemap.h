@@ -3,9 +3,9 @@
 
 #include <vector>
 
-#include "Tile.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
+#include "tiles/Tile.h"
 
 class Tilemap final {
   public:
@@ -25,6 +25,7 @@ class Tilemap final {
 
     GL::Shader shader;
     GL::VertexBuffer buffer;
+    int vertices;
     bool dirty;
 
     int width;

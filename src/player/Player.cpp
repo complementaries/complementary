@@ -130,6 +130,11 @@ static void move(const Tilemap& map) {
     }
 }
 
+void Player::kill() {
+    position = Vector();
+    lastPosition = position;
+}
+
 void Player::tick(const Tilemap& map) {
     lastPosition = position;
 

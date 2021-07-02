@@ -3,7 +3,7 @@
 #include "Tiles.h"
 #include "graphics/Buffer.h"
 
-Tilemap::Tilemap() : dirty(true), width(0), height(0) {
+Tilemap::Tilemap() : vertices(0), dirty(true), width(0), height(0) {
 }
 
 bool Tilemap::init(int width, int height) {
@@ -41,20 +41,10 @@ void Tilemap::prepareRendering() {
     Buffer data;
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            float minX = x;
-            float minY = y;
-            float maxX = minX + 1;
-            float maxY = minY + 1;
-            Color color = getTile(x, y).getColor();
-
-            data.add(minX).add(minY).add(color);
-            data.add(maxX).add(minY).add(color);
-            data.add(minX).add(maxY).add(color);
-            data.add(maxX).add(maxY).add(color);
-            data.add(maxX).add(minY).add(color);
-            data.add(minX).add(maxY).add(color);
+            getTile(x, y).render(data, x, y);
         }
     }
+    vertices = data.getSize() / (sizeof(float) * 2 + 4);
     buffer.setData(data.getData(), data.getSize());
     dirty = false;
 }
@@ -63,5 +53,5 @@ void Tilemap::render() {
     shader.use();
     shader.setMatrix("view", Game::viewMatrix);
     prepareRendering();
-    buffer.drawTriangles(width * height * 6);
+    buffer.drawTriangles(vertices);
 }

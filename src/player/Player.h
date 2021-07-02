@@ -11,6 +11,7 @@ namespace Player {
     bool isColliding(Face face);
     void addForce(const Vector& force);
     void addForce(Face face, float force);
+    void kill();
 
     void tick(const Tilemap& map);
     void render(float lag);

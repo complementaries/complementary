@@ -7,7 +7,7 @@ static Tile defaultTile{ColorUtils::rgba(0xFF, 0x66, 0x00), false};
 static std::vector<Tile*> tiles;
 
 Tile Tiles::AIR{ColorUtils::rgba(0xFF, 0xFF, 0xFF), false};
-Tile Tiles::WALL{ColorUtils::rgba(0x00, 0x00, 0x00), true};
+BoxTile Tiles::WALL{ColorUtils::rgba(0x00, 0x00, 0x00), true};
 SpikeTile Tiles::SPIKES;
 
 void Tiles::addTile(Tile& tile) {

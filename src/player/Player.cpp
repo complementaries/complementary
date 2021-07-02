@@ -45,17 +45,17 @@ bool Player::isColliding(Face face) {
     return collision[face];
 }
 
-static bool isColliding(const Tilemap& map) {
+static bool isColliding() {
     int minX = floorf(position[0]);
     int minY = floorf(position[1]);
     int maxX = floorf(position[0] + size[0]);
     int maxY = floorf(position[1] + size[1]);
-    if (minX < 0 || minY < 0 || maxX >= map.getWidth() || maxY >= map.getHeight()) {
+    if (minX < 0 || minY < 0 || maxX >= Tilemap::getWidth() || maxY >= Tilemap::getHeight()) {
         return true;
     }
     for (int x = minX; x <= maxX; x++) {
         for (int y = minY; y <= maxY; y++) {
-            if (map.getTile(x, y).isSolid()) {
+            if (Tilemap::getTile(x, y).isSolid()) {
                 return true;
             }
         }
@@ -71,7 +71,7 @@ void Player::addForce(Face face, float force) {
     addForce(FaceUtils::getDirection(face) * force);
 }
 
-static void tickCollision(const Tilemap& map) {
+static void tickCollision() {
     for (Face face : FaceUtils::getFaces()) {
         Vector min = position + FaceUtils::getDirection(face) * step;
         Vector max = min + size;
@@ -82,13 +82,13 @@ static void tickCollision(const Tilemap& map) {
         int minY = floorf(min[1]);
         int maxX = floorf(max[0]);
         int maxY = floorf(max[1]);
-        if (minX < 0 || minY < 0 || maxX >= map.getWidth() || maxY >= map.getHeight()) {
+        if (minX < 0 || minY < 0 || maxX >= Tilemap::getWidth() || maxY >= Tilemap::getHeight()) {
             collision[face] = true;
             continue;
         }
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
-                const Tile& tile = map.getTile(x, y);
+                const Tile& tile = Tilemap::getTile(x, y);
                 if (tile.isSolid()) {
                     collision[face] = true;
                     tile.onFaceCollision(face);
@@ -101,18 +101,18 @@ static void tickCollision(const Tilemap& map) {
     Vector max = min + size;
     int minX = std::max(static_cast<int>(floorf(min[0])), 0);
     int minY = std::max(static_cast<int>(floorf(min[1])), 0);
-    int maxX = std::min(static_cast<int>(floorf(max[0])), map.getWidth() - 1);
-    int maxY = std::min(static_cast<int>(floorf(max[1])), map.getHeight() - 1);
+    int maxX = std::min(static_cast<int>(floorf(max[0])), Tilemap::getWidth() - 1);
+    int maxY = std::min(static_cast<int>(floorf(max[1])), Tilemap::getHeight() - 1);
     for (int x = minX; x <= maxX; x++) {
         for (int y = minY; y <= maxY; y++) {
-            map.getTile(x, y).onCollision();
+            Tilemap::getTile(x, y).onCollision();
         }
     }
 
     Objects::handleCollision(position, size);
 }
 
-static void move(const Tilemap& map) {
+static void move() {
     Vector energy = velocity;
     while (energy[0] != 0.0f || energy[1] != 0.0f) {
         for (int i = 0; i < 2; i++) {
@@ -130,7 +130,7 @@ static void move(const Tilemap& map) {
                 position[i] += energy[i];
                 energy[i] = 0.0f;
             }
-            if (isColliding(map)) {
+            if (isColliding()) {
                 energy[i] = 0.0f;
                 position[i] = old;
                 velocity[i] = 0.0f;
@@ -157,13 +157,13 @@ bool Player::invertColors() {
     return worldType;
 }
 
-void Player::tick(const Tilemap& map) {
+void Player::tick() {
     lastPosition = position;
 
     if (Input::getButton(ButtonType::SWITCH).pressedTicks == 1 &&
         Input::getButton(ButtonType::SWITCH).pressed) {
         worldType = !worldType;
-        Tilemap::setDirty();
+        Tilemap::forceReload();
     }
 
     acceleration = Vector();
@@ -188,8 +188,8 @@ void Player::tick(const Tilemap& map) {
     velocity += acceleration;
     velocity *= drag;
 
-    move(map);
-    tickCollision(map);
+    move();
+    tickCollision();
 }
 
 void Player::render(float lag) {

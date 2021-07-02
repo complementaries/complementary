@@ -11,6 +11,7 @@ src = [
   'src/math/Vector.cpp',
   'src/tilemap/tiles/Tile.cpp',
   'src/tilemap/tiles/SpikeTile.cpp',
+  'src/tilemap/tiles/BoxTile.cpp',
   'src/tilemap/Tilemap.cpp',
   'src/tilemap/Tiles.cpp',
   'src/objects/Objects.cpp',

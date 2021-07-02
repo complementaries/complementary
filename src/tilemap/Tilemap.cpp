@@ -3,7 +3,13 @@
 #include "Tiles.h"
 #include "graphics/Buffer.h"
 
-Tilemap::Tilemap() : vertices(0), dirty(true), width(0), height(0) {
+bool Tilemap::dirty = true;
+
+void Tilemap::setDirty() {
+    dirty = true;
+}
+
+Tilemap::Tilemap() : vertices(0), width(0), height(0) {
 }
 
 bool Tilemap::init(int width, int height) {

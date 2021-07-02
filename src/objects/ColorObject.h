@@ -4,10 +4,11 @@
 #include "Object.h"
 #include "graphics/Color.h"
 #include "math/Vector.h"
+#include "player/Ability.h"
 
 class ColorObject : public Object {
   public:
-    ColorObject(const Vector& position, const Vector& size, Color c);
+    ColorObject(const Vector& position, const Vector& size, Ability a, Ability b);
 
     bool isSolid() const override;
     void onFaceCollision(Face playerFace) override;
@@ -17,7 +18,7 @@ class ColorObject : public Object {
   private:
     Vector position;
     Vector size;
-    Color color;
+    Ability abilities[2];
 };
 
 #endif

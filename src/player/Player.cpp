@@ -6,11 +6,13 @@
 
 #include "Game.h"
 #include "Input.h"
+#include "graphics/Buffer.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "math/Vector.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
+#include "tilemap/Tilemap.h"
 
 static constexpr float step = 0.005f;
 
@@ -35,7 +37,7 @@ bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
         return true;
     }
-    buffer.init(GL::VertexBuffer::Attributes().addVector2());
+    buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
     return false;
 }
 
@@ -151,8 +153,18 @@ bool Player::hasAbility(Ability a) {
     return abilities[worldType] == a;
 }
 
+bool Player::invertColors() {
+    return worldType;
+}
+
 void Player::tick(const Tilemap& map) {
     lastPosition = position;
+
+    if (Input::getButton(ButtonType::SWITCH).pressedTicks == 1 &&
+        Input::getButton(ButtonType::SWITCH).pressed) {
+        worldType = !worldType;
+        Tilemap::setDirty();
+    }
 
     acceleration = Vector();
     addForce(Face::RIGHT, Input::getHorizontal() * moveSpeed);
@@ -186,10 +198,20 @@ void Player::render(float lag) {
 
     Vector i = lastPosition + (position - lastPosition) * lag;
 
-    float data[12] = {i[0], i[1],           i[0] + size[0], i[1],
-                      i[0], i[1] + size[1], i[0] + size[0], i[1],
-                      i[0], i[1] + size[1], i[0] + size[0], i[1] + size[1]};
-    buffer.setData(data, sizeof(data));
+    Buffer data;
+    float minX = i[0];
+    float minY = i[1];
+    float maxX = minX + size[0];
+    float maxY = minY + size[1];
+    Color color = AbilityUtils::getColor(abilities[worldType]);
+    data.add(minX).add(minY).add(color);
+    data.add(maxX).add(minY).add(color);
+    data.add(minX).add(maxY).add(color);
+    data.add(maxX).add(maxY).add(color);
+    data.add(maxX).add(minY).add(color);
+    data.add(minX).add(maxY).add(color);
+
+    buffer.setData(data.getData(), data.getSize());
     buffer.drawTriangles(6);
 }
 

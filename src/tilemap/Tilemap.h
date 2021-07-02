@@ -20,13 +20,15 @@ class Tilemap final {
 
     void render();
 
+    static void setDirty();
+
   private:
     void prepareRendering();
 
     GL::Shader shader;
     GL::VertexBuffer buffer;
     int vertices;
-    bool dirty;
+    static bool dirty;
 
     int width;
     int height;

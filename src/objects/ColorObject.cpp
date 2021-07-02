@@ -3,8 +3,10 @@
 #include "ObjectRenderer.h"
 #include "player/Player.h"
 
-ColorObject::ColorObject(const Vector& position, const Vector& size, Color c)
-    : position(position), size(size), color(c) {
+ColorObject::ColorObject(const Vector& position, const Vector& size, Ability a, Ability b)
+    : position(position), size(size) {
+    abilities[0] = a;
+    abilities[1] = b;
 }
 
 bool ColorObject::isSolid() const {
@@ -13,7 +15,7 @@ bool ColorObject::isSolid() const {
 
 void ColorObject::onFaceCollision(Face playerFace) {
     (void)playerFace;
-    Player::setAbilities(Ability::WALL_JUMP, Ability::DASH);
+    Player::setAbilities(abilities[0], abilities[1]);
 }
 
 bool ColorObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {
@@ -23,5 +25,6 @@ bool ColorObject::collidesWith(const Vector& pPosition, const Vector& pSize) con
 
 void ColorObject::render(float lag) const {
     (void)lag;
-    ObjectRenderer::drawRectangle(position, size, color);
+    ObjectRenderer::drawRectangle(position, size,
+                                  AbilityUtils::getColor(abilities[Player::invertColors()]));
 }

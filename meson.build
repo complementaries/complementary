@@ -21,7 +21,8 @@ src = [
   'src/Input.cpp',
   'src/Main.cpp',
   'src/player/Player.cpp',
-  'src/player/Face.cpp'
+  'src/player/Face.cpp',
+  'src/player/Ability.cpp'
 ]
 
 zlib_proj = subproject('zlib')

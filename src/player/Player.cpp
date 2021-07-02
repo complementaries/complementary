@@ -145,9 +145,9 @@ void Player::renderImGui() {
     ImGui::DragFloat2("Position", position);
     ImGui::DragFloat2("Size", size);
     ImGui::DragFloat2("Velocity", velocity);
-    ImGui::DragFloat2("Acceleration", acceleration);
 
     ImGui::PushDisabled();
+    ImGui::DragFloat2("Acceleration", acceleration);
     ImGui::Checkbox("Left", &(collision[Face::LEFT]));
     ImGui::Checkbox("Right", &(collision[Face::RIGHT]));
     ImGui::Checkbox("Up", &(collision[Face::UP]));

@@ -6,6 +6,6 @@ namespace ImGui {
     // https://github.com/ocornut/imgui/issues/211#issuecomment-857704649
     void PushDisabled();
     void PopDisabled();
-};
+}
 
 #endif

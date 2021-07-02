@@ -8,13 +8,15 @@ src = [
   'src/graphics/Window.cpp',
   'src/imgui/ImGuiUtils.cpp',
   'src/math/Matrix.cpp',
+  'src/math/Vector.cpp',
   'src/tilemap/Tile.cpp',
   'src/tilemap/Tilemap.cpp',
   'src/tilemap/Tiles.cpp',
   'src/Game.cpp',
   'src/Input.cpp',
   'src/Main.cpp',
-  'src/Player.cpp'
+  'src/player/Player.cpp',
+  'src/player/Face.cpp'
 ]
 
 zlib_proj = subproject('zlib')

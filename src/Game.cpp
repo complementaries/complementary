@@ -2,21 +2,20 @@
 #include <imgui.h>
 
 #include "Game.h"
-#include "Player.h"
 #include "graphics/gl/Glew.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "math/Matrix.h"
+#include "player/Player.h"
 #include "tilemap/Tilemap.h"
 #include "tilemap/Tiles.h"
 
 static Tilemap tilemap;
-static Player player;
 Matrix Game::viewMatrix;
 
 bool Game::init() {
     Tiles::init();
-    if (tilemap.init(32, 18) || player.init()) {
+    if (tilemap.init(32, 18) || Player::init()) {
         return true;
     }
     for (int x = 0; x < tilemap.getWidth(); x++) {
@@ -29,14 +28,14 @@ bool Game::init() {
 }
 
 void Game::tick() {
-    player.tick(tilemap);
+    Player::tick(tilemap);
 }
 
 void Game::render(float lag) {
     glClear(GL_COLOR_BUFFER_BIT);
     MatrixUtils::setTransform(tilemap.getWidth(), tilemap.getHeight(), viewMatrix);
     tilemap.render();
-    player.render(lag);
+    Player::render(lag);
 }
 
 void Game::renderImGui() {
@@ -44,5 +43,5 @@ void Game::renderImGui() {
     ImGui::Text("Width: %d, Height: %d", tilemap.getWidth(), tilemap.getHeight());
     ImGui::End();
 
-    player.renderImGui();
+    Player::renderImGui();
 }

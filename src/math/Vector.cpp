@@ -72,6 +72,6 @@ Vector& Vector::operator*=(const Vector& other) {
 
 Vector Vector::operator*(const Vector& other) const {
     Vector v = *this;
-    v -= other;
+    v *= other;
     return v;
 }

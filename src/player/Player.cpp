@@ -48,7 +48,7 @@ static bool isColliding(const Tilemap& map) {
     }
     for (int x = minX; x <= maxX; x++) {
         for (int y = minY; y <= maxY; y++) {
-            if (map.getTile(x, y).getColor() == 0xFF000000) {
+            if (map.getTile(x, y).isSolid()) {
                 return true;
             }
         }
@@ -66,11 +66,40 @@ void Player::addForce(Face face, float force) {
 
 static void tickCollision(const Tilemap& map) {
     for (Face face : FaceUtils::getFaces()) {
-        Vector v = FaceUtils::getDirection(face);
-        Vector p = position;
-        position += v * step;
-        collision[face] = isColliding(map);
-        position = p;
+        Vector min = position + FaceUtils::getDirection(face) * step;
+        Vector max = min + size;
+
+        collision[face] = false;
+
+        int minX = floorf(min[0]);
+        int minY = floorf(min[1]);
+        int maxX = floorf(max[0]);
+        int maxY = floorf(max[1]);
+        if (minX < 0 || minY < 0 || maxX >= map.getWidth() || maxY >= map.getHeight()) {
+            collision[face] = true;
+            continue;
+        }
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                const Tile& tile = map.getTile(x, y);
+                if (tile.isSolid()) {
+                    collision[face] = true;
+                    tile.onFaceCollision(face);
+                }
+            }
+        }
+    }
+
+    Vector min = position;
+    Vector max = min + size;
+    int minX = std::max(static_cast<int>(floorf(min[0])), 0);
+    int minY = std::max(static_cast<int>(floorf(min[1])), 0);
+    int maxX = std::min(static_cast<int>(floorf(max[0])), map.getWidth() - 1);
+    int maxY = std::min(static_cast<int>(floorf(max[1])), map.getHeight() - 1);
+    for (int x = minX; x <= maxX; x++) {
+        for (int y = minY; y <= maxY; y++) {
+            map.getTile(x, y).onCollision();
+        }
     }
 }
 

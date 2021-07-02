@@ -27,6 +27,10 @@ static float gravity = 0.04f;
 static Vector drag{0.5f, 0.9f};
 static std::array<bool, FACES> collision;
 
+static Ability abilities[2] = {Ability::NONE, Ability::NONE};
+static bool worldType = false;
+static int wallJumpCooldown = 0;
+
 bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
         return true;
@@ -138,6 +142,15 @@ void Player::kill() {
     lastPosition = position;
 }
 
+void Player::setAbilities(Ability dark, Ability light) {
+    abilities[0] = dark;
+    abilities[1] = light;
+}
+
+bool Player::hasAbility(Ability a) {
+    return abilities[worldType] == a;
+}
+
 void Player::tick(const Tilemap& map) {
     lastPosition = position;
 
@@ -145,9 +158,20 @@ void Player::tick(const Tilemap& map) {
     addForce(Face::RIGHT, Input::getHorizontal() * moveSpeed);
     addForce(Face::DOWN, gravity);
 
-    if (Input::getButton(ButtonType::JUMP).pressed && isColliding(Face::DOWN)) {
-        addForce(Face::UP, jumpVelocity);
+    if (Input::getButton(ButtonType::JUMP).pressed) {
+        if (isColliding(Face::DOWN)) {
+            addForce(Face::UP, jumpVelocity);
+            wallJumpCooldown = 10;
+        } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
+            if (isColliding(Face::LEFT) && Input::getButton(ButtonType::LEFT).pressed) {
+                addForce(Vector(1.5f, -1.0f) * jumpVelocity);
+            } else if (isColliding(Face::RIGHT) && Input::getButton(ButtonType::RIGHT).pressed) {
+                addForce(Vector(-1.5f, -1.0f) * jumpVelocity);
+            }
+        }
     }
+
+    wallJumpCooldown -= wallJumpCooldown > 0;
 
     velocity += acceleration;
     velocity *= drag;

@@ -13,6 +13,7 @@ bool ColorObject::isSolid() const {
 
 void ColorObject::onFaceCollision(Face playerFace) {
     (void)playerFace;
+    Player::setAbilities(Ability::WALL_JUMP, Ability::DASH);
 }
 
 bool ColorObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {

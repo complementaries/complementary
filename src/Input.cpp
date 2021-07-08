@@ -22,6 +22,10 @@ void Input::Internal::setButtonReleased(ButtonType type) {
     button.pressedTicks = -1;
 }
 
+void Input::Internal::setJoystickFactor(float factor) {
+    Input::Internal::joystickFactor = factor;
+}
+
 void Input::Internal::setAxis(AxisType type, float value) {
     axes[(size_t)type] = value;
 }
@@ -31,10 +35,9 @@ void Input::Internal::update() {
         button.pressedFirstFrame = button.pressed && button.pressedTicks == 0;
         button.pressedTicks = button.pressed ? button.pressedTicks + 1 : 0;
     }
-
     horizontal = axes[(size_t)AxisType::HORIZONTAL];
-    horizontal -= buttons[(size_t)ButtonType::LEFT].pressed;
-    horizontal += buttons[(size_t)ButtonType::RIGHT].pressed;
+    horizontal -= buttons[(size_t)ButtonType::LEFT].pressed * Input::Internal::joystickFactor;
+    horizontal += buttons[(size_t)ButtonType::RIGHT].pressed * Input::Internal::joystickFactor;
 }
 
 Button Input::getButton(ButtonType type) {

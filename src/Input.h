@@ -30,8 +30,11 @@ namespace Input {
     namespace Internal {
         void setButtonPressed(ButtonType type);
         void setButtonReleased(ButtonType type);
+        void setJoystickFactor(float factor);
         void setAxis(AxisType type, float value);
         void update();
+
+        static float joystickFactor = 1.0f;
     }
 
     Button getButton(ButtonType type);
@@ -39,8 +42,8 @@ namespace Input {
     SDL_GameController* getController();
     void setController(SDL_GameController* controller);
     static SDL_GameController* controller;
-    static bool buttonPressed[SDL_CONTROLLER_BUTTON_MAX];
     const char* getButtonName(ButtonType button);
+
 }
 
 #endif

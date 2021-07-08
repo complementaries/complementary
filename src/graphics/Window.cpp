@@ -4,6 +4,8 @@
 #include <iostream>
 
 #include <SDL.h>
+#include <algorithm>
+#include <cmath>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
 
@@ -150,127 +152,74 @@ static void pollEvents() {
             case SDL_CONTROLLERBUTTONDOWN: {
                 switch (e.cbutton.button) {
                     case SDL_CONTROLLER_BUTTON_A:
-                        Input::Internal::setButtonPressed(ButtonType::JUMP);
-                        Input::buttonPressed[SDL_CONTROLLER_BUTTON_A] = true;
-                        break;
                     case SDL_CONTROLLER_BUTTON_B:
                         Input::Internal::setButtonPressed(ButtonType::JUMP);
-                        Input::buttonPressed[SDL_CONTROLLER_BUTTON_B] = true;
                         break;
                     case SDL_CONTROLLER_BUTTON_X:
-                        Input::Internal::setButtonPressed(ButtonType::ABILITY);
-                        Input::buttonPressed[SDL_CONTROLLER_BUTTON_X] = true;
-                        break;
                     case SDL_CONTROLLER_BUTTON_Y:
                         Input::Internal::setButtonPressed(ButtonType::ABILITY);
-                        Input::buttonPressed[SDL_CONTROLLER_BUTTON_Y] = true;
                         break;
                     case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-                        Input::Internal::setButtonPressed(ButtonType::SWITCH);
-                        Input::buttonPressed[SDL_CONTROLLER_BUTTON_LEFTSHOULDER] = true;
-                        break;
                     case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
                         Input::Internal::setButtonPressed(ButtonType::SWITCH);
-                        Input::buttonPressed[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = true;
                         break;
                     case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
                         Input::Internal::setButtonPressed(ButtonType::LEFT);
-                        Input::buttonPressed[SDL_CONTROLLER_BUTTON_DPAD_LEFT] = true;
                         break;
                     case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
                         Input::Internal::setButtonPressed(ButtonType::RIGHT);
-                        Input::buttonPressed[SDL_CONTROLLER_BUTTON_DPAD_RIGHT] = true;
                         break;
                 }
+                break;
             }
             case SDL_CONTROLLERBUTTONUP: {
                 switch (e.cbutton.button) {
                     case SDL_CONTROLLER_BUTTON_A:
-                        if (Input::buttonPressed[SDL_CONTROLLER_BUTTON_A]) {
-                            Input::buttonPressed[SDL_CONTROLLER_BUTTON_A] = false;
-                        } else {
-                            Input::Internal::setButtonReleased(ButtonType::JUMP);
-                        }
-                        break;
                     case SDL_CONTROLLER_BUTTON_B:
-                        if (Input::buttonPressed[SDL_CONTROLLER_BUTTON_B]) {
-                            Input::buttonPressed[SDL_CONTROLLER_BUTTON_B] = false;
-                        } else {
-                            Input::Internal::setButtonReleased(ButtonType::JUMP);
-                        }
+                        Input::Internal::setButtonReleased(ButtonType::JUMP);
                         break;
                     case SDL_CONTROLLER_BUTTON_X:
-                        if (Input::buttonPressed[SDL_CONTROLLER_BUTTON_X]) {
-                            Input::buttonPressed[SDL_CONTROLLER_BUTTON_X] = false;
-                        } else {
-                            Input::Internal::setButtonReleased(ButtonType::ABILITY);
-                        }
-                        break;
                     case SDL_CONTROLLER_BUTTON_Y:
-                        if (Input::buttonPressed[SDL_CONTROLLER_BUTTON_Y]) {
-                            Input::buttonPressed[SDL_CONTROLLER_BUTTON_Y] = false;
-                        } else {
-                            Input::Internal::setButtonReleased(ButtonType::ABILITY);
-                        }
+                        Input::Internal::setButtonReleased(ButtonType::ABILITY);
                         break;
                     case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-                        if (Input::buttonPressed[SDL_CONTROLLER_BUTTON_LEFTSHOULDER]) {
-                            Input::buttonPressed[SDL_CONTROLLER_BUTTON_LEFTSHOULDER] = false;
-                        } else {
-                            Input::Internal::setButtonReleased(ButtonType::SWITCH);
-                        }
-                        break;
                     case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-                        if (Input::buttonPressed[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER]) {
-                            Input::buttonPressed[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = false;
-                        } else {
-                            Input::Internal::setButtonReleased(ButtonType::SWITCH);
-                        }
+                        Input::Internal::setButtonReleased(ButtonType::SWITCH);
                         break;
                     case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-                        if (Input::buttonPressed[SDL_CONTROLLER_BUTTON_DPAD_LEFT]) {
-                            Input::buttonPressed[SDL_CONTROLLER_BUTTON_DPAD_LEFT] = false;
-                        } else {
-                            Input::Internal::setButtonReleased(ButtonType::LEFT);
-                        }
+                        Input::Internal::setButtonReleased(ButtonType::LEFT);
                         break;
                     case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-                        if (Input::buttonPressed[SDL_CONTROLLER_BUTTON_DPAD_RIGHT]) {
-                            Input::buttonPressed[SDL_CONTROLLER_BUTTON_DPAD_RIGHT] = false;
+                        Input::Internal::setButtonReleased(ButtonType::RIGHT);
+                        break;
+                }
+                break;
+            }
+            case SDL_CONTROLLERAXISMOTION: {
+                switch (e.jaxis.axis) {
+                    case SDL_CONTROLLER_AXIS_LEFTX:
+                        float value = e.caxis.value / 32768.0f;
+                        int sign = value < 0 ? -1 : 1;
+                        value = (std::abs(value) - 0.2f) / (0.9f - 0.2f);
+                        value = (float)sign * std::clamp(value, 0.0f, 1.0f);
+                        Input::Internal::setJoystickFactor(std::abs(value));
+
+                        if (value < 0) {
+                            Input::Internal::setButtonPressed(ButtonType::LEFT);
+                        } else if (value > 0) {
+                            Input::Internal::setButtonPressed(ButtonType::RIGHT);
                         } else {
-                            Input::Internal::setButtonReleased(ButtonType::RIGHT);
+                            Input::Internal::setJoystickFactor(1.0f);
+                            if (e.cbutton.button != SDL_CONTROLLER_BUTTON_DPAD_LEFT &&
+                                e.cbutton.button != SDL_CONTROLLER_BUTTON_DPAD_RIGHT) {
+                                Input::Internal::setButtonReleased(ButtonType::LEFT);
+                                Input::Internal::setButtonReleased(ButtonType::RIGHT);
+                            }
                         }
                         break;
                 }
+                break;
             }
-                // TODO: make this work
-                // case SDL_CONTROLLERAXISMOTION: {
-                //    switch (e.jaxis.axis) {
-                //        case SDL_CONTROLLER_AXIS_LEFTX:
-                //            if (e.caxis.value < -2000) {
-                //                if (!Input::buttonPressed[SDL_CONTROLLER_BUTTON_LEFTSTICK]) {
-                //                    std::cout << "Left" << std::endl;
-                //                    Input::Internal::setButtonPressed(ButtonType::LEFT);
-                //                    Input::buttonPressed[SDL_CONTROLLER_BUTTON_LEFTSTICK] = true;
-                //                    Input::buttonPressed[SDL_CONTROLLER_BUTTON_RIGHTSTICK] =
-                //                    false;
-                //                }
-                //            } else if (e.caxis.value > 2000) {
-                //                if (!Input::buttonPressed[SDL_CONTROLLER_BUTTON_RIGHTSTICK]) {
-                //                    std::cout << "Right" << std::endl;
-                //                    Input::Internal::setButtonPressed(ButtonType::RIGHT);
-                //                    Input::buttonPressed[SDL_CONTROLLER_BUTTON_RIGHTSTICK] = true;
-                //                    Input::buttonPressed[SDL_CONTROLLER_BUTTON_LEFTSTICK] = false;
-                //                }
-                //            } else {
-                //                Input::Internal::setButtonReleased(ButtonType::LEFT);
-                //                Input::Internal::setButtonReleased(ButtonType::RIGHT);
-                //                Input::buttonPressed[SDL_CONTROLLER_BUTTON_LEFTSTICK] = false;
-                //                Input::buttonPressed[SDL_CONTROLLER_BUTTON_RIGHTSTICK] = false;
-                //            }
-                //            break;
-                //    }
-                //}
 
                 // TODO: make sure controllers can be connected and disconnected during gameplay
                 // case SDL_CONTROLLERDEVICEADDED: {

@@ -43,3 +43,11 @@ Button Input::getButton(ButtonType type) {
 float Input::getHorizontal() {
     return horizontal;
 }
+
+SDL_GameController* Input::getController() {
+    return controller;
+}
+
+void Input::setController(SDL_GameController* controller) {
+    Input::controller = controller;
+}

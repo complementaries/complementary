@@ -14,6 +14,5 @@ NamespaceIndentation: All
 PointerAlignment: Left
 FixNamespaceComments: false
 IndentCaseLabels: true
-IndentCaseBlocks: false
 
 ...

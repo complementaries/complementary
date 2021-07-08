@@ -1,6 +1,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include <SDL_gamecontroller.h>
+
 enum class ButtonType {
     JUMP,
     SWITCH,
@@ -33,6 +35,10 @@ namespace Input {
 
     Button getButton(ButtonType type);
     float getHorizontal();
+    SDL_GameController* getController();
+    void setController(SDL_GameController* controller);
+    static SDL_GameController* controller;
+    static bool buttonPressed[SDL_CONTROLLER_BUTTON_MAX];
 }
 
 #endif

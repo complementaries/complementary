@@ -12,7 +12,7 @@ void Input::Internal::setButtonPressed(ButtonType type) {
     auto& button = buttons[(size_t)type];
     button.pressed = true;
     button.pressedFirstFrame = true;
-    button.pressedTicks = -1;
+    button.pressedTicks = 0;
 }
 
 void Input::Internal::setButtonReleased(ButtonType type) {
@@ -28,7 +28,8 @@ void Input::Internal::setAxis(AxisType type, float value) {
 
 void Input::Internal::update() {
     for (auto& button : buttons) {
-        button.pressedTicks++;
+        button.pressedFirstFrame = button.pressed && button.pressedTicks == 0;
+        button.pressedTicks = button.pressed ? button.pressedTicks + 1 : 0;
     }
 
     horizontal = axes[(size_t)AxisType::HORIZONTAL];
@@ -50,4 +51,15 @@ SDL_GameController* Input::getController() {
 
 void Input::setController(SDL_GameController* controller) {
     Input::controller = controller;
+}
+
+const char* Input::getButtonName(ButtonType type) {
+    switch (type) {
+        case ButtonType::JUMP: return "Jump";
+        case ButtonType::SWITCH: return "Switch";
+        case ButtonType::ABILITY: return "Ability";
+        case ButtonType::LEFT: return "Left";
+        case ButtonType::RIGHT: return "Right";
+        default: return "?";
+    }
 }

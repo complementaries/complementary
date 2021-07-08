@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include <SDL_gamecontroller.h>
+#include <string>
 
 enum class ButtonType {
     JUMP,
@@ -39,6 +40,7 @@ namespace Input {
     void setController(SDL_GameController* controller);
     static SDL_GameController* controller;
     static bool buttonPressed[SDL_CONTROLLER_BUTTON_MAX];
+    const char* getButtonName(ButtonType button);
 }
 
 #endif

@@ -160,8 +160,7 @@ bool Player::invertColors() {
 void Player::tick() {
     lastPosition = position;
 
-    if (Input::getButton(ButtonType::SWITCH).pressedTicks == 1 &&
-        Input::getButton(ButtonType::SWITCH).pressed) {
+    if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
         worldType = !worldType;
         Tilemap::forceReload();
     }
@@ -170,7 +169,7 @@ void Player::tick() {
     addForce(Face::RIGHT, Input::getHorizontal() * moveSpeed);
     addForce(Face::DOWN, gravity);
 
-    if (Input::getButton(ButtonType::JUMP).pressed) {
+    if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
         if (isColliding(Face::DOWN)) {
             addForce(Face::UP, jumpVelocity);
             wallJumpCooldown = 10;
@@ -216,8 +215,6 @@ void Player::render(float lag) {
 }
 
 void Player::renderImGui() {
-    ImGui::Begin("Player");
-
     ImGui::DragFloat("Move Speed", &moveSpeed, 0.02f);
     ImGui::DragFloat("Jump Velocity", &jumpVelocity, 0.1f);
     ImGui::DragFloat("Gravity", &gravity, 0.01f);
@@ -236,6 +233,4 @@ void Player::renderImGui() {
     ImGui::Checkbox("Up", &(collision[Face::UP]));
     ImGui::Checkbox("Down", &(collision[Face::DOWN]));
     ImGui::PopDisabled();
-
-    ImGui::End();
 }

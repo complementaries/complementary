@@ -2,9 +2,11 @@
 #include <imgui.h>
 
 #include "Game.h"
+#include "Input.h"
 #include "graphics/gl/Glew.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
+#include "imgui/ImGuiUtils.h"
 #include "math/Matrix.h"
 #include "objects/ColorObject.h"
 #include "objects/Objects.h"
@@ -51,9 +53,30 @@ void Game::render(float lag) {
 }
 
 void Game::renderImGui() {
-    ImGui::Begin("Tilemap");
-    ImGui::Text("Width: %d, Height: %d", Tilemap::getWidth(), Tilemap::getHeight());
-    ImGui::End();
+    ImGui::Begin("DevGUI");
+    if (ImGui::CollapsingHeader("Tilemap")) {
+        ImGui::Text("Width: %d, Height: %d", Tilemap::getWidth(), Tilemap::getHeight());
+    }
 
-    Player::renderImGui();
+    if (ImGui::CollapsingHeader("Player")) {
+        Player::renderImGui();
+    }
+
+    if (ImGui::CollapsingHeader("Input Debug")) {
+        ImGui::PushDisabled();
+        for (int i = 0; i < (int)ButtonType::MAX; i++) {
+            auto button = Input::getButton((ButtonType)i);
+            ImGui::Checkbox(Input::getButtonName((ButtonType)i), &button.pressed);
+            ImGui::SameLine();
+            ImGui::Checkbox("FirstFrame", &button.pressedFirstFrame);
+            ImGui::SameLine();
+            ImGui::Text("PressedTicks: %d", button.pressedTicks);
+        }
+
+        float horizontal = Input::getHorizontal();
+        ImGui::SliderFloat("Horizontal", &horizontal, -1, 1);
+        ImGui::PopDisabled();
+    }
+
+    ImGui::End();
 }

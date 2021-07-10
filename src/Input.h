@@ -33,15 +33,12 @@ namespace Input {
         void setJoystickFactor(float factor);
         void setAxis(AxisType type, float value);
         void update();
-
-        static float joystickFactor = 1.0f;
     }
 
     Button getButton(ButtonType type);
     float getHorizontal();
     SDL_GameController* getController();
     void setController(SDL_GameController* controller);
-    static SDL_GameController* controller;
     const char* getButtonName(ButtonType button);
 
 }

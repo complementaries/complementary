@@ -7,6 +7,8 @@ static Button buttons[(size_t)ButtonType::MAX];
 static float axes[(size_t)AxisType::MAX];
 
 static float horizontal;
+static float joystickFactor = 1.0f;
+static SDL_GameController* controller;
 
 void Input::Internal::setButtonPressed(ButtonType type) {
     auto& button = buttons[(size_t)type];
@@ -23,7 +25,7 @@ void Input::Internal::setButtonReleased(ButtonType type) {
 }
 
 void Input::Internal::setJoystickFactor(float factor) {
-    Input::Internal::joystickFactor = factor;
+    joystickFactor = factor;
 }
 
 void Input::Internal::setAxis(AxisType type, float value) {
@@ -36,8 +38,8 @@ void Input::Internal::update() {
         button.pressedTicks = button.pressed ? button.pressedTicks + 1 : 0;
     }
     horizontal = axes[(size_t)AxisType::HORIZONTAL];
-    horizontal -= buttons[(size_t)ButtonType::LEFT].pressed * Input::Internal::joystickFactor;
-    horizontal += buttons[(size_t)ButtonType::RIGHT].pressed * Input::Internal::joystickFactor;
+    horizontal -= buttons[(size_t)ButtonType::LEFT].pressed * joystickFactor;
+    horizontal += buttons[(size_t)ButtonType::RIGHT].pressed * joystickFactor;
 }
 
 Button Input::getButton(ButtonType type) {
@@ -52,8 +54,8 @@ SDL_GameController* Input::getController() {
     return controller;
 }
 
-void Input::setController(SDL_GameController* controller) {
-    Input::controller = controller;
+void Input::setController(SDL_GameController* c) {
+    controller = c;
 }
 
 const char* Input::getButtonName(ButtonType type) {

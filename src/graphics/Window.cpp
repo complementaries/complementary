@@ -80,26 +80,7 @@ bool Window::init() {
 
     // Initialize game controller subsystem
     if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) != 1) SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
-    int nJoysticks = SDL_NumJoysticks();
 
-    bool gamePadConnected = false;
-    for (int i = 0; i < nJoysticks && !gamePadConnected; i++) {
-        if (SDL_IsGameController(i)) {
-            gamePadConnected = true;
-        }
-    }
-    if (gamePadConnected) {
-        // Open the controller and add it to our list
-        SDL_GameController* pad = SDL_GameControllerOpen(0);
-        if (SDL_GameControllerGetAttached(pad) == 1) {
-            Input::setController(pad);
-            // std::cout << SDL_GameControllerMapping(Input::getController());
-            // If we want to change the mapping, this is how it works
-            // SDL_GameControllerAddMapping("0,PS4 Controller, a:b11, b:b10");
-        } else {
-            std::cout << "SDL_GetError() = " << SDL_GetError() << std::endl;
-        }
-    }
     SDL_GameControllerEventState(SDL_ENABLE);
     return false;
 }
@@ -220,12 +201,39 @@ static void pollEvents() {
                 }
                 break;
             }
+            case SDL_CONTROLLERDEVICEADDED: {
+                if (Input::getController() == NULL) {
+                    int nJoysticks = SDL_NumJoysticks();
 
-                // TODO: make sure controllers can be connected and disconnected during gameplay
-                // case SDL_CONTROLLERDEVICEADDED: {
-                //}
-                // case SDL_CONTROLLERDEVICEREMOVED: {
-                //}
+                    bool gamePadConnected = false;
+                    for (int i = 0; i < nJoysticks && !gamePadConnected; i++) {
+                        if (SDL_IsGameController(i)) {
+                            gamePadConnected = true;
+                        }
+                    }
+                    if (gamePadConnected) {
+                        // Open the controller and add it to our list
+                        SDL_GameController* pad = SDL_GameControllerOpen(0);
+                        if (SDL_GameControllerGetAttached(pad) == 1) {
+                            Input::setController(pad);
+                            // std::cout << SDL_GameControllerMapping(Input::getController());
+                            // If we want to change the mapping, this is how it works
+                            // SDL_GameControllerAddMapping("0,PS4 Controller, a:b11, b:b10");
+                        } else {
+                            std::cout << "SDL_GetError() = " << SDL_GetError() << std::endl;
+                        }
+                    }
+                }
+                break;
+            }
+            case SDL_CONTROLLERDEVICEREMOVED: {
+                if (Input::getController() != NULL &&
+                    SDL_GameControllerFromInstanceID(e.adevice.which) == Input::getController()) {
+                    SDL_GameControllerClose(Input::getController());
+                    Input::setController(nullptr);
+                }
+                break;
+            }
         }
     }
 }

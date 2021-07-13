@@ -198,23 +198,23 @@ static void pollEvents() {
             case SDL_CONTROLLERAXISMOTION: {
                 switch (e.jaxis.axis) {
                     case SDL_CONTROLLER_AXIS_LEFTX:
+                        Input::Internal::setJoystickFactor(1.0f);
                         float value = e.caxis.value / 32768.0f;
                         int sign = value < 0 ? -1 : 1;
                         value = (std::abs(value) - 0.2f) / (0.9f - 0.2f);
                         value = (float)sign * std::clamp(value, 0.0f, 1.0f);
-                        Input::Internal::setJoystickFactor(std::abs(value));
-
                         if (value < 0) {
+                            Input::Internal::setJoystickFactor(std::abs(value));
                             Input::Internal::setButtonPressed(ButtonType::LEFT);
+                            Input::Internal::setJoystickControlled(true);
                         } else if (value > 0) {
+                            Input::Internal::setJoystickFactor(std::abs(value));
                             Input::Internal::setButtonPressed(ButtonType::RIGHT);
-                        } else {
-                            Input::Internal::setJoystickFactor(1.0f);
-                            if (e.cbutton.button != SDL_CONTROLLER_BUTTON_DPAD_LEFT &&
-                                e.cbutton.button != SDL_CONTROLLER_BUTTON_DPAD_RIGHT) {
-                                Input::Internal::setButtonReleased(ButtonType::LEFT);
-                                Input::Internal::setButtonReleased(ButtonType::RIGHT);
-                            }
+                            Input::Internal::setJoystickControlled(true);
+                        } else if (Input::Internal::getJoystickControlled() == true) {
+                            Input::Internal::setJoystickControlled(false);
+                            Input::Internal::setButtonReleased(ButtonType::LEFT);
+                            Input::Internal::setButtonReleased(ButtonType::RIGHT);
                         }
                         break;
                 }

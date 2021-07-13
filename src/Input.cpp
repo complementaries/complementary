@@ -8,6 +8,7 @@ static float axes[(size_t)AxisType::MAX];
 
 static float horizontal;
 static float joystickFactor = 1.0f;
+static bool joystickControlled = false;
 static SDL_GameController* controller;
 
 void Input::Internal::setButtonPressed(ButtonType type) {
@@ -26,6 +27,14 @@ void Input::Internal::setButtonReleased(ButtonType type) {
 
 void Input::Internal::setJoystickFactor(float factor) {
     joystickFactor = factor;
+}
+
+void Input::Internal::setJoystickControlled(bool controlled) {
+    joystickControlled = controlled;
+}
+
+bool Input::Internal::getJoystickControlled() {
+    return joystickControlled;
 }
 
 void Input::Internal::setAxis(AxisType type, float value) {

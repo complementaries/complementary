@@ -31,6 +31,8 @@ namespace Input {
         void setButtonPressed(ButtonType type);
         void setButtonReleased(ButtonType type);
         void setJoystickFactor(float factor);
+        void setJoystickControlled(bool controlled);
+        bool getJoystickControlled();
         void setAxis(AxisType type, float value);
         void update();
     }

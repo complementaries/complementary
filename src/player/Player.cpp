@@ -24,6 +24,7 @@ static Vector size{0.8f, 0.8f};
 static Vector velocity;
 static Vector acceleration;
 static float moveSpeed = 0.1f;
+static float joystickExponent = 5.0f;
 static float jumpVelocity = 1.5f;
 static float gravity = 0.04f;
 static Vector drag{0.5f, 0.9f};
@@ -166,7 +167,9 @@ void Player::tick() {
     }
 
     acceleration = Vector();
-    addForce(Face::RIGHT, Input::getHorizontal() * moveSpeed);
+    int sign = Input::getHorizontal() < 0 ? -1 : 1;
+    addForce(Face::RIGHT,
+             powf(std::abs(Input::getHorizontal()), joystickExponent) * moveSpeed * sign);
     addForce(Face::DOWN, gravity);
 
     if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
@@ -216,9 +219,10 @@ void Player::render(float lag) {
 
 void Player::renderImGui() {
     ImGui::DragFloat("Move Speed", &moveSpeed, 0.02f);
+    ImGui::DragFloat("Joystick Exponent", &joystickExponent, 0.05f);
     ImGui::DragFloat("Jump Velocity", &jumpVelocity, 0.1f);
     ImGui::DragFloat("Gravity", &gravity, 0.01f);
-    ImGui::DragFloat2("Drag", drag, 0.1f);
+    ImGui::DragFloat2("Drag", drag, 0.01f);
 
     ImGui::Spacing();
 

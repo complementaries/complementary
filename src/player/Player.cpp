@@ -32,12 +32,14 @@ struct PlayerData {
     float jumpBoost = 0.5f;
     float gravity = 0.04f;
     int maxJumpTicks = 20;
+    int coyoteTicks = 5;
     Vector drag{0.5f, 0.9f};
 };
 
 static PlayerData data;
 static Ability abilities[2] = {Ability::NONE, Ability::NONE};
 static std::array<bool, FACES> collision;
+static int fakeGrounded = 0;
 
 static bool worldType = false;
 static int wallJumpCooldown = 0;
@@ -184,7 +186,7 @@ void Player::tick() {
     addForce(Face::DOWN, data.gravity);
 
     if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
-        if (isColliding(Face::DOWN)) {
+        if (fakeGrounded > 0) {
             addForce(Face::UP, data.jumpInit);
             jumpTicks = data.maxJumpTicks;
             wallJumpCooldown = 10;
@@ -211,6 +213,12 @@ void Player::tick() {
 
     move();
     tickCollision();
+    fakeGrounded = isColliding(Face::DOWN) ? data.coyoteTicks : 0;
+    fakeGrounded -= fakeGrounded > 0;
+
+    if (isColliding(Face::UP)) {
+        jumpTicks = 0;
+    }
 }
 
 void Player::render(float lag) {

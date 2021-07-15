@@ -19,8 +19,8 @@ static constexpr float step = 0.005f;
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
-Vector lastPosition;
-Vector position;
+static Vector lastPosition;
+static Vector position;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -28,15 +28,20 @@ struct PlayerData {
     Vector acceleration;
     float moveSpeed = 0.1f;
     float joystickExponent = 5.0f;
-    float jumpVelocity = 1.5f;
+    float jumpInit = 0.25f;
+    float jumpBoost = 0.5f;
     float gravity = 0.04f;
+    int maxJumpTicks = 20;
     Vector drag{0.5f, 0.9f};
-} data;
+};
+
+static PlayerData data;
 static Ability abilities[2] = {Ability::NONE, Ability::NONE};
 static std::array<bool, FACES> collision;
 
 static bool worldType = false;
 static int wallJumpCooldown = 0;
+static int jumpTicks = 0;
 
 bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
@@ -180,15 +185,23 @@ void Player::tick() {
 
     if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
         if (isColliding(Face::DOWN)) {
-            addForce(Face::UP, data.jumpVelocity);
+            addForce(Face::UP, data.jumpInit);
+            jumpTicks = data.maxJumpTicks;
             wallJumpCooldown = 10;
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
             if (isColliding(Face::LEFT) && Input::getButton(ButtonType::LEFT).pressed) {
-                addForce(Vector(1.5f, -1.0f) * data.jumpVelocity);
+                addForce(Vector(1.5f, -1.0f) * data.jumpInit);
             } else if (isColliding(Face::RIGHT) && Input::getButton(ButtonType::RIGHT).pressed) {
-                addForce(Vector(-1.5f, -1.0f) * data.jumpVelocity);
+                addForce(Vector(-1.5f, -1.0f) * data.jumpInit);
             }
         }
+    }
+    if (!Input::getButton(ButtonType::JUMP).pressed && jumpTicks > 0) {
+        jumpTicks = 0;
+    }
+    if (jumpTicks > 0) {
+        addForce(Face::UP, data.jumpBoost * (1.0f / powf(1.5f, data.maxJumpTicks + 1 - jumpTicks)));
+        jumpTicks--;
     }
 
     wallJumpCooldown -= wallJumpCooldown > 0;
@@ -226,7 +239,9 @@ void Player::render(float lag) {
 void Player::renderImGui() {
     ImGui::DragFloat("Move Speed", &data.moveSpeed, 0.02f);
     ImGui::DragFloat("Joystick Exponent", &data.joystickExponent, 0.05f);
-    ImGui::DragFloat("Jump Velocity", &data.jumpVelocity, 0.1f);
+    ImGui::DragFloat("Jump Init", &data.jumpInit, 0.1f);
+    ImGui::DragFloat("Jump Boost", &data.jumpBoost, 0.1f);
+    ImGui::DragInt("Jump Ticks", &data.maxJumpTicks, 1);
     ImGui::DragFloat("Gravity", &data.gravity, 0.01f);
     ImGui::DragFloat2("Drag", data.drag, 0.1f);
 

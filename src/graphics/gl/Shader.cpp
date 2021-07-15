@@ -79,6 +79,10 @@ void GL::Shader::setFloat(const char* name, float f) {
     glUniform1f(glGetUniformLocation(program, name), f);
 }
 
+void GL::Shader::setVector(const char* name, Vector vec) {
+    glUniform2f(glGetUniformLocation(program, name), vec.x, vec.y);
+}
+
 void GL::Shader::setMatrix(const char* name, const Matrix& matrix) {
     glUniformMatrix4fv(glGetUniformLocation(program, name), 1, false, matrix);
 }

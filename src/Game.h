@@ -10,6 +10,7 @@ namespace Game {
     void renderImGui();
 
     void onWindowResize(int width, int height);
+    void onMouseEvent(void* eventPointer);
 
     extern Matrix viewMatrix;
 }

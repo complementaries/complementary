@@ -247,9 +247,17 @@ static void pollEvents() {
                 }
                 break;
             }
+            case SDL_MOUSEMOTION:
+            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEBUTTONUP:
+            case SDL_MOUSEWHEEL: {
+                Game::onMouseEvent(&e);
+                break;
+            }
         }
     }
 }
+
 static Nanos getNanos() {
     using namespace std::chrono;
     return duration_cast<nanoseconds>(high_resolution_clock::now().time_since_epoch()).count();

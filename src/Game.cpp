@@ -1,19 +1,24 @@
+#include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <imgui.h>
 
 #include "Game.h"
 #include "Input.h"
+#include "graphics/Buffer.h"
+#include "graphics/Window.h"
 #include "graphics/gl/Glew.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "imgui/ImGuiUtils.h"
 #include "math/Matrix.h"
 #include "objects/ColorObject.h"
+#include "objects/ObjectRenderer.h"
 #include "objects/Objects.h"
 #include "particles/Particles.h"
 #include "player/Player.h"
 #include "tilemap/Tilemap.h"
+#include "tilemap/TilemapEditor.h"
 #include "tilemap/Tiles.h"
 
 Matrix Game::viewMatrix;
@@ -21,40 +26,29 @@ Matrix Game::viewMatrix;
 static char levelName[50] = "assets/maps/map0.cmtm";
 static char objectMapName[50] = "assets/maps/map0.cmom";
 
+static TilemapEditor* tilemapEditor;
+
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Player::init() || Objects::init() || Particles::init()) {
         return true;
     }
-    srand(time(nullptr));
-    for (int x = 0; x < Tilemap::getWidth(); x++) {
-        for (int y = 0; y < Tilemap::getHeight(); y++) {
-            Tilemap::setTile(x, y, rand() % 20 ? Tiles::AIR : Tiles::WALL);
-        }
-    }
     Objects::add(new ColorObject(Vector(5.0f, 12.5f), Vector(4.0f, 5.5f), Ability::WALL_JUMP,
                                  Ability::DASH));
     Objects::add(new ColorObject(Vector(10.0f, 16.5f), Vector(3.0f, 0.5f), Ability::GLIDER,
                                  Ability::DOUBLE_JUMP));
-    for (int x = 0; x < 6; x++) {
-        for (int y = 0; y < Tilemap::getHeight() - 3; y++) {
-            Tilemap::setTile(x, y, x != 5 ? Tiles::AIR : Tiles::WALL);
-        }
-    }
-    for (int y = Tilemap::getHeight() - 3; y < Tilemap::getHeight(); y++) {
-        Tilemap::setTile(5, y, Tiles::DOOR);
-    }
-    Tilemap::setTile(15, Tilemap::getHeight() - 1, Tiles::SPIKES);
-    Tilemap::setTile(2, Tilemap::getHeight() - 4, Tiles::KEY);
-    Tilemap::setTile(4, Tilemap::getHeight() - 5, Tiles::KEY);
 
     return false;
 }
 
 void Game::tick() {
-    Objects::tick();
-    Player::tick();
-    Particles::tick();
+    if (tilemapEditor) {
+        tilemapEditor->tick(Window::SECONDS_PER_TICK);
+    } else {
+        Objects::tick();
+        Player::tick();
+        Particles::tick();
+    }
 }
 
 void Game::render(float lag) {
@@ -65,30 +59,48 @@ void Game::render(float lag) {
     }
     glClear(GL_COLOR_BUFFER_BIT);
     MatrixUtils::setTransform(Tilemap::getWidth(), Tilemap::getHeight(), viewMatrix);
+    (void)lag;
     Tilemap::render();
     Objects::render(lag);
     Player::render(lag);
     Particles::render(lag);
+
+    if (tilemapEditor) {
+        tilemapEditor->render();
+    }
 }
 
 void Game::renderImGui() {
     ImGui::Begin("DevGUI");
     if (ImGui::CollapsingHeader("Tilemap")) {
         ImGui::Text("Width: %d, Height: %d", Tilemap::getWidth(), Tilemap::getHeight());
-        ImGui::InputText("Level name", levelName, 30);
 
-        if (ImGui::Button("Load")) {
-            Tilemap::load(levelName);
+        if (!tilemapEditor && ImGui::Button("Open Editor")) {
+            tilemapEditor = new TilemapEditor(Window::getWidth(), Window::getHeight());
         }
 
-        ImGui::SameLine();
-        if (ImGui::Button("Save")) {
-            Tilemap::save(levelName);
+        if (tilemapEditor && ImGui::Button("Close Editor")) {
+            tilemapEditor->flush();
+            delete tilemapEditor;
+            tilemapEditor = nullptr;
         }
 
-        ImGui::InputText("Object map name", objectMapName, 30);
-        if (ImGui::Button("Save objects")) {
-            Objects::save(objectMapName);
+        if (!tilemapEditor) {
+            ImGui::InputText("Level name", levelName, 30);
+
+            if (ImGui::Button("Load")) {
+                Tilemap::load(levelName);
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Save")) {
+                Tilemap::save(levelName);
+            }
+
+            ImGui::InputText("Object map name", objectMapName, 30);
+            if (ImGui::Button("Save objects")) {
+                Objects::save(objectMapName);
+            }
         }
     }
 
@@ -117,4 +129,10 @@ void Game::renderImGui() {
 
 void Game::onWindowResize(int width, int height) {
     glViewport(0, 0, width, height);
+}
+
+void Game::onMouseEvent(void* eventPointer) {
+    if (tilemapEditor) {
+        tilemapEditor->onMouseEvent(eventPointer);
+    }
 }

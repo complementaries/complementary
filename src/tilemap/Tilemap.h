@@ -1,6 +1,7 @@
 #ifndef Tilemap_H
 #define Tilemap_H
 
+#include "graphics/Buffer.h"
 #include "tiles/Tile.h"
 
 namespace Tilemap {
@@ -8,11 +9,14 @@ namespace Tilemap {
 
     int getWidth();
     int getHeight();
+    void setWidth(int newWidth);
+    void setHeight(int newHeight);
 
     const Tile& getTile(int x, int y);
     void setTile(int x, int y, const Tile& tile);
 
     void render();
+    void renderBuffer(Buffer& buffer);
 
     void forceReload();
 

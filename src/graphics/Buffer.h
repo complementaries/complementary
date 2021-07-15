@@ -7,6 +7,7 @@ class Buffer final {
   public:
     const void* getData() const;
     int getSize() const;
+    void clear();
 
     template <typename T>
     Buffer& add(const T& t) {

@@ -33,3 +33,7 @@ const Tile& Tiles::get(char id) {
     }
     return *(tiles[id]);
 }
+
+size_t Tiles::getCount() {
+    return tiles.size();
+}

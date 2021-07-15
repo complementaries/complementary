@@ -1,8 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-class Vector final {
-  public:
+struct Vector final {
     Vector();
     Vector(float x, float y);
 
@@ -24,9 +23,11 @@ class Vector final {
     Vector operator*(const Vector& other) const;
 
     void normalize();
+    const float* data() const;
+    float* data();
 
-  private:
-    float data[2];
+    float x;
+    float y;
 };
 
 Vector operator*(float f, const Vector& v);

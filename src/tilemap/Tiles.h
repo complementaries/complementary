@@ -18,6 +18,7 @@ class Tiles {
 
     static void init();
     static const Tile& get(char id);
+    static size_t getCount();
 
   private:
     static void addTile(Tile& tile);

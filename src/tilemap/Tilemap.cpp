@@ -39,6 +39,14 @@ int Tilemap::getHeight() {
     return height;
 }
 
+void Tilemap::setWidth(int newWidth) {
+    width = newWidth;
+}
+
+void Tilemap::setHeight(int newHeight) {
+    height = newHeight;
+}
+
 const Tile& Tilemap::getTile(int x, int y) {
     return Tiles::get(tiles[width * y + x]);
 }
@@ -69,6 +77,14 @@ void Tilemap::render() {
     shader.use();
     shader.setMatrix("view", Game::viewMatrix);
     prepareRendering();
+    buffer.drawTriangles(vertices);
+}
+
+void Tilemap::renderBuffer(Buffer& data) {
+    shader.use();
+    shader.setMatrix("view", Game::viewMatrix);
+    vertices = data.getSize() / (sizeof(float) * 2 + 4);
+    buffer.setData(data.getData(), data.getSize());
     buffer.drawTriangles(vertices);
 }
 

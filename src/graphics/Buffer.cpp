@@ -7,3 +7,7 @@ const void* Buffer::getData() const {
 int Buffer::getSize() const {
     return data.size();
 }
+
+void Buffer::clear() {
+    data.clear();
+}

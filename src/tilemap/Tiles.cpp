@@ -21,8 +21,8 @@ void Tiles::init() {
     addTile(SPIKES);
 }
 
-const Tile& Tiles::get(int id) {
-    if (id < 0 || static_cast<unsigned int>(id) >= tiles.size()) {
+const Tile& Tiles::get(char id) {
+    if (id < 0 || static_cast<unsigned char>(id) >= tiles.size()) {
         return defaultTile;
     }
     return *(tiles[id]);

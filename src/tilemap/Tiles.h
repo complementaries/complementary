@@ -12,7 +12,7 @@ class Tiles {
     static SpikeTile SPIKES;
 
     static void init();
-    static const Tile& get(int id);
+    static const Tile& get(char id);
 
   private:
     static void addTile(Tile& tile);

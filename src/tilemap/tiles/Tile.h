@@ -10,7 +10,7 @@ class Tile {
     Tile(Color color, bool solid);
     virtual ~Tile() = default;
     Color getColor() const;
-    int getId() const;
+    char getId() const;
 
     virtual void onFaceCollision(Face playerFace) const;
     virtual void onCollision() const;
@@ -19,7 +19,7 @@ class Tile {
 
   private:
     friend class Tiles;
-    int id;
+    char id;
     Color color;
     bool solid;
 };

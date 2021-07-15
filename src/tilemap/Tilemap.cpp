@@ -1,5 +1,8 @@
 #include "Tilemap.h"
 
+#include <cassert>
+#include <cstring>
+#include <fstream>
 #include <vector>
 
 #include "Game.h"
@@ -14,7 +17,7 @@ static int vertices = 0;
 static bool dirty = true;
 static int width = 0;
 static int height = 0;
-static std::vector<int> tiles;
+static std::vector<char> tiles;
 
 bool Tilemap::init(int w, int h) {
     if (shader.compile({"assets/shaders/tilemap.vs", "assets/shaders/tilemap.fs"})) {
@@ -68,4 +71,32 @@ void Tilemap::render() {
 
 void Tilemap::forceReload() {
     dirty = true;
+}
+
+void Tilemap::load(const char* path) {
+    std::ifstream stream;
+    stream.open(path);
+
+    char magic[5];
+    stream.read(magic, 4);
+    magic[4] = 0;
+
+    // File magic must be CMTM
+    assert(strcmp(magic, "CMTM") == 0);
+
+    stream.read((char*)&width, 4);
+    stream.read((char*)&height, 4);
+
+    stream.read(tiles.data(), width * height);
+    forceReload();
+}
+
+void Tilemap::save(const char* path) {
+    std::ofstream stream;
+    stream.open(path);
+
+    stream.write("CMTM", 4);
+    stream.write((const char*)&width, 4);
+    stream.write((const char*)&height, 4);
+    stream.write(tiles.data(), width * height);
 }

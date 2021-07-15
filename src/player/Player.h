@@ -20,6 +20,9 @@ namespace Player {
     void tick();
     void render(float lag);
     void renderImGui();
+
+    void load();
+    void save();
 }
 
 #endif

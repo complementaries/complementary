@@ -11,7 +11,7 @@ Color Tile::getColor() const {
     return color;
 }
 
-int Tile::getId() const {
+char Tile::getId() const {
     return id;
 }
 

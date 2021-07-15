@@ -16,11 +16,14 @@
 
 Matrix Game::viewMatrix;
 
+static char levelName[50] = "assets/maps/map0.cmtm";
+
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(32, 18) || Player::init() || Objects::init()) {
         return true;
     }
+    srand(time(nullptr));
     for (int x = 0; x < Tilemap::getWidth(); x++) {
         for (int y = 0; y < Tilemap::getHeight(); y++) {
             Tilemap::setTile(x, y, rand() % 20 ? Tiles::AIR : Tiles::WALL);
@@ -56,6 +59,16 @@ void Game::renderImGui() {
     ImGui::Begin("DevGUI");
     if (ImGui::CollapsingHeader("Tilemap")) {
         ImGui::Text("Width: %d, Height: %d", Tilemap::getWidth(), Tilemap::getHeight());
+        ImGui::InputText("Level name", levelName, 30);
+
+        if (ImGui::Button("Load")) {
+            Tilemap::load(levelName);
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Save")) {
+            Tilemap::save(levelName);
+        }
     }
 
     if (ImGui::CollapsingHeader("Player")) {

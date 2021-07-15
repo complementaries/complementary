@@ -1,4 +1,5 @@
 #include <cmath>
+#include <fstream>
 #include <iostream>
 
 #include <imgui.h>
@@ -18,19 +19,22 @@ static constexpr float step = 0.005f;
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
-static Vector lastPosition;
-static Vector position;
-static Vector size{0.8f, 0.8f};
-static Vector velocity;
-static Vector acceleration;
-static float moveSpeed = 0.1f;
-static float joystickExponent = 5.0f;
-static float jumpVelocity = 1.5f;
-static float gravity = 0.04f;
-static Vector drag{0.5f, 0.9f};
+Vector lastPosition;
+Vector position;
+
+struct PlayerData {
+    Vector size{0.8f, 0.8f};
+    Vector velocity;
+    Vector acceleration;
+    float moveSpeed = 0.1f;
+    float joystickExponent = 5.0f;
+    float jumpVelocity = 1.5f;
+    float gravity = 0.04f;
+    Vector drag{0.5f, 0.9f};
+} data;
+static Ability abilities[2] = {Ability::NONE, Ability::NONE};
 static std::array<bool, FACES> collision;
 
-static Ability abilities[2] = {Ability::NONE, Ability::NONE};
 static bool worldType = false;
 static int wallJumpCooldown = 0;
 
@@ -39,6 +43,8 @@ bool Player::init() {
         return true;
     }
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
+
+    load();
     return false;
 }
 
@@ -49,8 +55,8 @@ bool Player::isColliding(Face face) {
 static bool isColliding() {
     int minX = floorf(position[0]);
     int minY = floorf(position[1]);
-    int maxX = floorf(position[0] + size[0]);
-    int maxY = floorf(position[1] + size[1]);
+    int maxX = floorf(position[0] + data.size[0]);
+    int maxY = floorf(position[1] + data.size[1]);
     if (minX < 0 || minY < 0 || maxX >= Tilemap::getWidth() || maxY >= Tilemap::getHeight()) {
         return true;
     }
@@ -61,11 +67,11 @@ static bool isColliding() {
             }
         }
     }
-    return Objects::collidesWithAny(position, size);
+    return Objects::collidesWithAny(position, data.size);
 }
 
 void Player::addForce(const Vector& force) {
-    acceleration += force;
+    data.acceleration += force;
 }
 
 void Player::addForce(Face face, float force) {
@@ -75,9 +81,9 @@ void Player::addForce(Face face, float force) {
 static void tickCollision() {
     for (Face face : FaceUtils::getFaces()) {
         Vector min = position + FaceUtils::getDirection(face) * step;
-        Vector max = min + size;
+        Vector max = min + data.size;
 
-        collision[face] = Objects::handleFaceCollision(min, size, face);
+        collision[face] = Objects::handleFaceCollision(min, data.size, face);
 
         int minX = floorf(min[0]);
         int minY = floorf(min[1]);
@@ -99,7 +105,7 @@ static void tickCollision() {
     }
 
     Vector min = position;
-    Vector max = min + size;
+    Vector max = min + data.size;
     int minX = std::max(static_cast<int>(floorf(min[0])), 0);
     int minY = std::max(static_cast<int>(floorf(min[1])), 0);
     int maxX = std::min(static_cast<int>(floorf(max[0])), Tilemap::getWidth() - 1);
@@ -110,11 +116,11 @@ static void tickCollision() {
         }
     }
 
-    Objects::handleCollision(position, size);
+    Objects::handleCollision(position, data.size);
 }
 
 static void move() {
-    Vector energy = velocity;
+    Vector energy = data.velocity;
     while (energy[0] != 0.0f || energy[1] != 0.0f) {
         for (int i = 0; i < 2; i++) {
             if (energy[i] == 0.0f) {
@@ -134,7 +140,7 @@ static void move() {
             if (isColliding()) {
                 energy[i] = 0.0f;
                 position[i] = old;
-                velocity[i] = 0.0f;
+                data.velocity[i] = 0.0f;
             }
         }
     }
@@ -166,29 +172,29 @@ void Player::tick() {
         Tilemap::forceReload();
     }
 
-    acceleration = Vector();
+    data.acceleration = Vector();
     int sign = Input::getHorizontal() < 0 ? -1 : 1;
     addForce(Face::RIGHT,
-             powf(std::abs(Input::getHorizontal()), joystickExponent) * moveSpeed * sign);
-    addForce(Face::DOWN, gravity);
+             powf(std::abs(Input::getHorizontal()), data.joystickExponent) * data.moveSpeed * sign);
+    addForce(Face::DOWN, data.gravity);
 
     if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
         if (isColliding(Face::DOWN)) {
-            addForce(Face::UP, jumpVelocity);
+            addForce(Face::UP, data.jumpVelocity);
             wallJumpCooldown = 10;
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
             if (isColliding(Face::LEFT) && Input::getButton(ButtonType::LEFT).pressed) {
-                addForce(Vector(1.5f, -1.0f) * jumpVelocity);
+                addForce(Vector(1.5f, -1.0f) * data.jumpVelocity);
             } else if (isColliding(Face::RIGHT) && Input::getButton(ButtonType::RIGHT).pressed) {
-                addForce(Vector(-1.5f, -1.0f) * jumpVelocity);
+                addForce(Vector(-1.5f, -1.0f) * data.jumpVelocity);
             }
         }
     }
 
     wallJumpCooldown -= wallJumpCooldown > 0;
 
-    velocity += acceleration;
-    velocity *= drag;
+    data.velocity += data.acceleration;
+    data.velocity *= data.drag;
 
     move();
     tickCollision();
@@ -200,41 +206,76 @@ void Player::render(float lag) {
 
     Vector i = lastPosition + (position - lastPosition) * lag;
 
-    Buffer data;
+    Buffer buf;
     float minX = i[0];
     float minY = i[1];
-    float maxX = minX + size[0];
-    float maxY = minY + size[1];
+    float maxX = minX + data.size[0];
+    float maxY = minY + data.size[1];
     Color color = AbilityUtils::getColor(abilities[worldType]);
-    data.add(minX).add(minY).add(color);
-    data.add(maxX).add(minY).add(color);
-    data.add(minX).add(maxY).add(color);
-    data.add(maxX).add(maxY).add(color);
-    data.add(maxX).add(minY).add(color);
-    data.add(minX).add(maxY).add(color);
+    buf.add(minX).add(minY).add(color);
+    buf.add(maxX).add(minY).add(color);
+    buf.add(minX).add(maxY).add(color);
+    buf.add(maxX).add(maxY).add(color);
+    buf.add(maxX).add(minY).add(color);
+    buf.add(minX).add(maxY).add(color);
 
-    buffer.setData(data.getData(), data.getSize());
+    buffer.setData(buf.getData(), buf.getSize());
     buffer.drawTriangles(6);
 }
 
 void Player::renderImGui() {
-    ImGui::DragFloat("Move Speed", &moveSpeed, 0.02f);
-    ImGui::DragFloat("Joystick Exponent", &joystickExponent, 0.05f);
-    ImGui::DragFloat("Jump Velocity", &jumpVelocity, 0.1f);
-    ImGui::DragFloat("Gravity", &gravity, 0.01f);
-    ImGui::DragFloat2("Drag", drag, 0.01f);
+    ImGui::DragFloat("Move Speed", &data.moveSpeed, 0.02f);
+    ImGui::DragFloat("Joystick Exponent", &data.joystickExponent, 0.05f);
+    ImGui::DragFloat("Jump Velocity", &data.jumpVelocity, 0.1f);
+    ImGui::DragFloat("Gravity", &data.gravity, 0.01f);
+    ImGui::DragFloat2("Drag", data.drag, 0.1f);
 
     ImGui::Spacing();
 
     ImGui::DragFloat2("Position", position);
-    ImGui::DragFloat2("Size", size);
-    ImGui::DragFloat2("Velocity", velocity);
+    ImGui::DragFloat2("Size", data.size);
+    ImGui::DragFloat2("Velocity", data.velocity);
 
     ImGui::PushDisabled();
-    ImGui::DragFloat2("Acceleration", acceleration);
+    ImGui::DragFloat2("Acceleration", data.acceleration);
     ImGui::Checkbox("Left", &(collision[Face::LEFT]));
     ImGui::Checkbox("Right", &(collision[Face::RIGHT]));
     ImGui::Checkbox("Up", &(collision[Face::UP]));
     ImGui::Checkbox("Down", &(collision[Face::DOWN]));
     ImGui::PopDisabled();
+
+    if (ImGui::Button("Load")) {
+        load();
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("Save")) {
+        printf("hello\n");
+        save();
+    }
+}
+
+void Player::load() {
+    std::ifstream stream;
+    stream.open("assets/player.cmpl");
+    if (!stream.good()) {
+        printf("Failed to load player data.\n");
+        return;
+    }
+
+    char magic[5];
+    stream.read(magic, 4);
+    magic[4] = 0;
+
+    // File magic must be CMPL
+    assert(strcmp(magic, "CMPL") == 0);
+    stream.read((char*)&data, sizeof(PlayerData));
+}
+
+void Player::save() {
+    std::ofstream stream;
+    stream.open("assets/player.cmpl");
+
+    stream.write("CMPL", 4);
+    stream.write((char*)&data, sizeof(PlayerData));
 }

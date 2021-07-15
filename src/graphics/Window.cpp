@@ -188,10 +188,12 @@ static void pollEvents() {
                         if (value < 0) {
                             Input::Internal::setJoystickFactor(std::abs(value));
                             Input::Internal::setButtonPressed(ButtonType::LEFT);
+                            Input::Internal::setButtonReleased(ButtonType::RIGHT);
                             Input::Internal::setJoystickControlled(true);
                         } else if (value > 0) {
                             Input::Internal::setJoystickFactor(std::abs(value));
                             Input::Internal::setButtonPressed(ButtonType::RIGHT);
+                            Input::Internal::setButtonReleased(ButtonType::LEFT);
                             Input::Internal::setJoystickControlled(true);
                         } else if (Input::Internal::getJoystickControlled() == true) {
                             Input::Internal::setJoystickControlled(false);

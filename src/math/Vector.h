@@ -23,6 +23,8 @@ class Vector final {
     Vector& operator*=(const Vector& other);
     Vector operator*(const Vector& other) const;
 
+    void normalize();
+
   private:
     float data[2];
 };

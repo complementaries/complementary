@@ -26,14 +26,20 @@ struct PlayerData {
     Vector size{0.8f, 0.8f};
     Vector velocity;
     Vector acceleration;
-    float moveSpeed = 0.1f;
+    float moveSpeed = 0.04f;
     float joystickExponent = 5.0f;
-    float jumpInit = 0.25f;
-    float jumpBoost = 0.5f;
-    float gravity = 0.04f;
-    int maxJumpTicks = 20;
-    int coyoteTicks = 5;
-    Vector drag{0.5f, 0.9f};
+    float jumpInit = 0.3f;
+    float jumpBoost = 0.1f;
+    int maxJumpTicks = 40;
+    Vector wallJumpInit{0.5f, 0.4f};
+    float wallJumpBoost = 0.1f;
+    int maxWallJumpTicks = 40;
+    float wallJumpDrag = 0.2f;
+    int wallJumpMoveCooldown = 15;
+    float gravity = 0.03f;
+    int coyoteTicks = 13;
+    Vector drag{0.7f, 0.9f};
+    int maxJumpBufferTicks = 10;
 };
 
 static PlayerData data;
@@ -44,6 +50,11 @@ static int fakeGrounded = 0;
 static bool worldType = false;
 static int wallJumpCooldown = 0;
 static int jumpTicks = 0;
+static int wallJumpTicks = 0;
+static Vector wallJumpDirection;
+static int leftWallJumpCooldown = 0;
+static int rightWallJumpCooldown = 0;
+static int jumpBufferTicks = 0;
 
 bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
@@ -179,22 +190,41 @@ void Player::tick() {
         Tilemap::forceReload();
     }
 
+    leftWallJumpCooldown -= leftWallJumpCooldown > 0;
+    rightWallJumpCooldown -= rightWallJumpCooldown > 0;
+
     data.acceleration = Vector();
-    int sign = Input::getHorizontal() < 0 ? -1 : 1;
+    int sign = Input::getHorizontal() < 0
+                   ? -1 + static_cast<float>(leftWallJumpCooldown) / data.wallJumpMoveCooldown
+                   : 1 - static_cast<float>(rightWallJumpCooldown) / data.wallJumpMoveCooldown;
     addForce(Face::RIGHT,
              powf(std::abs(Input::getHorizontal()), data.joystickExponent) * data.moveSpeed * sign);
     addForce(Face::DOWN, data.gravity);
 
     if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
+        jumpBufferTicks = data.maxJumpBufferTicks;
+    }
+    jumpBufferTicks -= jumpBufferTicks > 0;
+
+    if (jumpBufferTicks > 0) {
         if (fakeGrounded > 0) {
             addForce(Face::UP, data.jumpInit);
             jumpTicks = data.maxJumpTicks;
             wallJumpCooldown = 10;
+            jumpBufferTicks = 0;
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
             if (isColliding(Face::LEFT) && Input::getButton(ButtonType::LEFT).pressed) {
-                addForce(Vector(1.5f, -1.0f) * data.jumpInit);
+                wallJumpDirection = Vector(1.0f, -1.0f);
+                addForce(wallJumpDirection * data.wallJumpInit);
+                wallJumpTicks = data.maxWallJumpTicks;
+                leftWallJumpCooldown = data.wallJumpMoveCooldown;
+                jumpBufferTicks = 0;
             } else if (isColliding(Face::RIGHT) && Input::getButton(ButtonType::RIGHT).pressed) {
-                addForce(Vector(-1.5f, -1.0f) * data.jumpInit);
+                wallJumpDirection = Vector(-1.0f, -1.0f);
+                addForce(wallJumpDirection * data.wallJumpInit);
+                wallJumpTicks = data.maxWallJumpTicks;
+                rightWallJumpCooldown = data.wallJumpMoveCooldown;
+                jumpBufferTicks = 0;
             }
         }
     }
@@ -205,19 +235,38 @@ void Player::tick() {
         addForce(Face::UP, data.jumpBoost * (1.0f / powf(1.1f, data.maxJumpTicks + 1 - jumpTicks)));
         jumpTicks--;
     }
+    if (!Input::getButton(ButtonType::JUMP).pressed && wallJumpTicks > 0) {
+        wallJumpTicks = 0;
+    }
+    if (wallJumpTicks > 0) {
+        Vector angle = data.wallJumpInit;
+        angle.normalize();
+        addForce(wallJumpDirection * angle * data.wallJumpBoost *
+                 (1.0f / powf(1.1f, data.maxWallJumpTicks + 1 - wallJumpTicks)));
+        wallJumpTicks--;
+    }
 
     wallJumpCooldown -= wallJumpCooldown > 0;
 
     data.velocity += data.acceleration;
-    data.velocity *= data.drag;
+    Vector actualDrag = data.drag;
+    if (((isColliding(Face::LEFT) && Input::getButton(ButtonType::LEFT).pressed) ||
+         (isColliding(Face::RIGHT) && Input::getButton(ButtonType::RIGHT).pressed)) &&
+        hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
+        actualDrag[1] *= data.wallJumpDrag;
+    }
+    data.velocity *= actualDrag;
 
     move();
     tickCollision();
-    fakeGrounded = isColliding(Face::DOWN) ? data.coyoteTicks : 0;
+    if (isColliding(Face::DOWN)) {
+        fakeGrounded = data.coyoteTicks;
+    }
     fakeGrounded -= fakeGrounded > 0;
 
     if (isColliding(Face::UP)) {
         jumpTicks = 0;
+        wallJumpTicks = 0;
     }
 }
 
@@ -250,8 +299,15 @@ void Player::renderImGui() {
     ImGui::DragFloat("Jump Init", &data.jumpInit, 0.1f);
     ImGui::DragFloat("Jump Boost", &data.jumpBoost, 0.1f);
     ImGui::DragInt("Jump Ticks", &data.maxJumpTicks, 1);
+    ImGui::DragFloat2("Wall Jump Init", data.wallJumpInit, 0.1f);
+    ImGui::DragFloat("Wall Jump Boost", &data.wallJumpBoost, 0.1f);
+    ImGui::DragFloat("Wall Jump Drag", &data.wallJumpDrag, 0.01f);
+    ImGui::DragInt("Wall Jump Ticks", &data.maxWallJumpTicks, 1);
+    ImGui::DragInt("Wall Jump Move Cooldown", &data.wallJumpMoveCooldown, 1);
     ImGui::DragFloat("Gravity", &data.gravity, 0.01f);
     ImGui::DragFloat2("Drag", data.drag, 0.1f);
+    ImGui::DragInt("Coyote Time", &data.coyoteTicks, 1);
+    ImGui::DragInt("Jump Buffer Ticks", &data.maxJumpBufferTicks, 1);
 
     ImGui::Spacing();
 

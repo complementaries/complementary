@@ -1,5 +1,7 @@
 #include "Vector.h"
 
+#include <cmath>
+
 Vector::Vector(float x, float y) {
     data[0] = x;
     data[1] = y;
@@ -74,4 +76,8 @@ Vector Vector::operator*(const Vector& other) const {
     Vector v = *this;
     v *= other;
     return v;
+}
+
+void Vector::normalize() {
+    *this *= 1.0f / sqrtf(data[0] * data[0] + data[1] * data[1]);
 }

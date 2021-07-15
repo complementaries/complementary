@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <ctime>
 #include <imgui.h>
 
 #include "Game.h"

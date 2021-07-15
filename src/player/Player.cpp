@@ -200,7 +200,7 @@ void Player::tick() {
         jumpTicks = 0;
     }
     if (jumpTicks > 0) {
-        addForce(Face::UP, data.jumpBoost * (1.0f / powf(1.5f, data.maxJumpTicks + 1 - jumpTicks)));
+        addForce(Face::UP, data.jumpBoost * (1.0f / powf(1.1f, data.maxJumpTicks + 1 - jumpTicks)));
         jumpTicks--;
     }
 

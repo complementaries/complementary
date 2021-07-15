@@ -21,7 +21,7 @@ static char levelName[50] = "assets/maps/map0.cmtm";
 
 bool Game::init() {
     Tiles::init();
-    if (Tilemap::init(32, 18) || Player::init() || Objects::init()) {
+    if (Tilemap::init(48, 27) || Player::init() || Objects::init()) {
         return true;
     }
     srand(time(nullptr));

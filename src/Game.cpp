@@ -18,6 +18,7 @@
 Matrix Game::viewMatrix;
 
 static char levelName[50] = "assets/maps/map0.cmtm";
+static char objectMapName[50] = "assets/maps/map0.cmom";
 
 bool Game::init() {
     Tiles::init();
@@ -69,6 +70,11 @@ void Game::renderImGui() {
         ImGui::SameLine();
         if (ImGui::Button("Save")) {
             Tilemap::save(levelName);
+        }
+
+        ImGui::InputText("Object map name", objectMapName, 30);
+        if (ImGui::Button("Save objects")) {
+            Objects::save(objectMapName);
         }
     }
 

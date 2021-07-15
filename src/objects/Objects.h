@@ -7,7 +7,7 @@ namespace Objects {
     bool init();
 
     void clear();
-    void add(Object* o);
+    void add(ObjectBase* o);
 
     bool collidesWithAny(const Vector& position, const Vector& size);
     bool handleFaceCollision(const Vector& position, const Vector& size, Face face);
@@ -15,6 +15,9 @@ namespace Objects {
 
     void tick();
     void render(float lag);
+
+    void load(const char* path);
+    void save(const char* path);
 }
 
 #endif

@@ -1,28 +1,28 @@
 #include "Object.h"
 
-Object::Object() {
+ObjectBase::ObjectBase() {
 }
 
-void Object::onFaceCollision(Face playerFace) {
+void ObjectBase::onFaceCollision(Face playerFace) {
     (void)playerFace;
 }
 
-void Object::onCollision() {
+void ObjectBase::onCollision() {
 }
 
-bool Object::isSolid() const {
+bool ObjectBase::isSolid() const {
     return false;
 }
 
-bool Object::collidesWith(const Vector& position, const Vector& size) const {
+bool ObjectBase::collidesWith(const Vector& position, const Vector& size) const {
     (void)position;
     (void)size;
     return false;
 }
 
-void Object::tick() {
+void ObjectBase::tick() {
 }
 
-void Object::render(float lag) const {
+void ObjectBase::render(float lag) const {
     (void)lag;
 }

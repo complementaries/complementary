@@ -17,16 +17,17 @@ class ObjectBase {
     virtual void tick();
     virtual void render(float lag) const;
     virtual char* getDataPointer() = 0;
-    virtual size_t getDataSize() = 0;
+    virtual size_t getDataSize() const = 0;
 };
 
 template <typename T>
 class Object : public ObjectBase {
   public:
     char* getDataPointer() {
-        return (char*)&data;
+        return reinterpret_cast<char*>(&data);
     }
-    size_t getDataSize() {
+
+    size_t getDataSize() const {
         return sizeof(T);
     }
 

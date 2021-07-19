@@ -11,6 +11,7 @@
 #include "math/Matrix.h"
 #include "objects/ColorObject.h"
 #include "objects/Objects.h"
+#include "particles/Particles.h"
 #include "player/Player.h"
 #include "tilemap/Tilemap.h"
 #include "tilemap/Tiles.h"
@@ -22,7 +23,7 @@ static char objectMapName[50] = "assets/maps/map0.cmom";
 
 bool Game::init() {
     Tiles::init();
-    if (Tilemap::init(48, 27) || Player::init() || Objects::init()) {
+    if (Tilemap::init(48, 27) || Player::init() || Objects::init() || Particles::init()) {
         return true;
     }
     srand(time(nullptr));
@@ -53,6 +54,7 @@ bool Game::init() {
 void Game::tick() {
     Objects::tick();
     Player::tick();
+    Particles::tick();
 }
 
 void Game::render(float lag) {
@@ -66,6 +68,7 @@ void Game::render(float lag) {
     Tilemap::render();
     Objects::render(lag);
     Player::render(lag);
+    Particles::render(lag);
 }
 
 void Game::renderImGui() {

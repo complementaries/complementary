@@ -7,3 +7,11 @@ Color ColorUtils::rgba(int red, int green, int blue, int alpha) {
 Color ColorUtils::invert(Color c) {
     return 0xFFFFFFFFu - (c & 0xFFFFFF);
 }
+
+Color ColorUtils::mix(Color a, Color b, float factor) {
+    float iFactor = 1.0f - factor;
+    return rgba((a & 0xFF) * iFactor + (b & 0xFF) * factor,
+                ((a >> 8) & 0xFF) * iFactor + ((b >> 8) & 0xFF) * factor,
+                ((a >> 16) & 0xFF) * iFactor + ((b >> 16) & 0xFF) * factor,
+                ((a >> 24) & 0xFF) * iFactor + ((b >> 24) & 0xFF) * factor);
+}

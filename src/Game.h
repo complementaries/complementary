@@ -9,6 +9,8 @@ namespace Game {
     void render(float lag);
     void renderImGui();
 
+    void onWindowResize(int width, int height);
+
     extern Matrix viewMatrix;
 }
 

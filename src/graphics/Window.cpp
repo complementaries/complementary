@@ -18,6 +18,8 @@ static constexpr Nanos NANOS_PER_TICK = 1'000'000'000L * Window::SECONDS_PER_TIC
 
 static SDL_Window* window = nullptr;
 static bool running = false;
+static int width = 850;
+static int height = 480;
 
 bool Window::init() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -31,7 +33,7 @@ bool Window::init() {
     SDL_GL_SetSwapInterval(1);
 
     window = SDL_CreateWindow("Complementary", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                              850, 480, SDL_WINDOW_OPENGL);
+                              width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (window == nullptr) {
         fprintf(stderr, "SDL window failed to initialise: %s\n", SDL_GetError());
         return true;
@@ -237,6 +239,14 @@ static void pollEvents() {
                 }
                 break;
             }
+            case SDL_WINDOWEVENT: {
+                if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
+                    Game::onWindowResize(e.window.data1, e.window.data2);
+                    width = e.window.data1;
+                    height = e.window.data2;
+                }
+                break;
+            }
         }
     }
 }
@@ -289,4 +299,12 @@ void Window::exit() {
     Input::setController(nullptr);
     SDL_DestroyWindow(window);
     SDL_Quit();
+}
+
+int Window::getWidth() {
+    return width;
+}
+
+int Window::getHeight() {
+    return height;
 }

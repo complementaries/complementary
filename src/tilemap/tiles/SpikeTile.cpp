@@ -2,7 +2,7 @@
 
 #include "player/Player.h"
 
-SpikeTile::SpikeTile() : Tile(ColorUtils::rgba(0xFF, 0x00, 0x00), true) {
+SpikeTile::SpikeTile() : Tile(ColorUtils::GRAY, true) {
 }
 
 void SpikeTile::onFaceCollision(Face playerFace) const {

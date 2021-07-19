@@ -13,9 +13,11 @@ class Tile {
     char getId() const;
 
     virtual void onFaceCollision(Face playerFace) const;
-    virtual void onCollision() const;
+    virtual void onCollision(int x, int y) const;
     virtual bool isSolid() const;
     virtual void render(Buffer& buffer, float x, float y) const;
+
+    bool operator==(const Tile& other) const;
 
   private:
     friend class Tiles;

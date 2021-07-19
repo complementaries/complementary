@@ -18,6 +18,9 @@ namespace Tilemap {
 
     void load(const char* path);
     void save(const char* path);
+
+    void reset();
+    int getKeys();
 }
 
 #endif

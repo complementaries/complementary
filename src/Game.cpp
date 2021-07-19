@@ -31,17 +31,21 @@ bool Game::init() {
             Tilemap::setTile(x, y, rand() % 20 ? Tiles::AIR : Tiles::WALL);
         }
     }
-    Tilemap::setTile(15, Tilemap::getHeight() - 1, Tiles::SPIKES);
     Objects::add(new ColorObject(Vector(5.0f, 12.5f), Vector(4.0f, 5.5f), Ability::WALL_JUMP,
                                  Ability::DASH));
     Objects::add(new ColorObject(Vector(10.0f, 16.5f), Vector(3.0f, 0.5f), Ability::GLIDER,
                                  Ability::DOUBLE_JUMP));
-
-    for (int x = 0; x < 7; x++) {
+    for (int x = 0; x < 6; x++) {
         for (int y = 0; y < Tilemap::getHeight() - 3; y++) {
-            Tilemap::setTile(x, y, x != 6 ? Tiles::AIR : Tiles::WALL);
+            Tilemap::setTile(x, y, x != 5 ? Tiles::AIR : Tiles::WALL);
         }
     }
+    for (int y = Tilemap::getHeight() - 3; y < Tilemap::getHeight(); y++) {
+        Tilemap::setTile(5, y, Tiles::DOOR);
+    }
+    Tilemap::setTile(15, Tilemap::getHeight() - 1, Tiles::SPIKES);
+    Tilemap::setTile(2, Tilemap::getHeight() - 4, Tiles::KEY);
+    Tilemap::setTile(4, Tilemap::getHeight() - 5, Tiles::KEY);
 
     return false;
 }

@@ -130,7 +130,7 @@ static void tickCollision() {
     int maxY = std::min(static_cast<int>(floorf(max[1])), Tilemap::getHeight() - 1);
     for (int x = minX; x <= maxX; x++) {
         for (int y = minY; y <= maxY; y++) {
-            Tilemap::getTile(x, y).onCollision();
+            Tilemap::getTile(x, y).onCollision(x, y);
         }
     }
 
@@ -167,6 +167,7 @@ static void move() {
 void Player::kill() {
     position = Vector();
     lastPosition = position;
+    Tilemap::reset();
 }
 
 void Player::setAbilities(Ability dark, Ability light) {

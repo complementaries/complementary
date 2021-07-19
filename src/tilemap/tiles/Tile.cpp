@@ -19,7 +19,9 @@ void Tile::onFaceCollision(Face playerFace) const {
     (void)playerFace;
 }
 
-void Tile::onCollision() const {
+void Tile::onCollision(int x, int y) const {
+    (void)x;
+    (void)y;
 }
 
 bool Tile::isSolid() const {
@@ -30,4 +32,8 @@ void Tile::render(Buffer& buffer, float x, float y) const {
     (void)buffer;
     (void)x;
     (void)y;
+}
+
+bool Tile::operator==(const Tile& other) const {
+    return this == &other;
 }

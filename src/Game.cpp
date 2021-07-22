@@ -35,7 +35,7 @@ bool Game::init() {
     }
 
     ColorObject* orange =
-        new ColorObject(Vector(8.0f, 21.5f), Vector(3.0f, 1.5f), Ability::WALL_JUMP, Ability::DASH);
+        new ColorObject(Vector(9.0f, 21.5f), Vector(3.0f, 1.5f), Ability::WALL_JUMP, Ability::DASH);
     orange->hasWall = false;
     Objects::add(orange);
     Objects::add(new ColorObject(Vector(18.0f, 21.5f), Vector(3.0f, 1.5f), Ability::GLIDER,

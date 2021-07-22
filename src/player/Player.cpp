@@ -40,6 +40,9 @@ struct PlayerData {
     int coyoteTicks = 13;
     Vector drag{0.7f, 0.9f};
     int maxJumpBufferTicks = 10;
+    int maxDashTicks = 24;
+    int maxDashCooldown = 24;
+    float dashStrength = 0.35f;
 };
 
 static PlayerData data;
@@ -57,6 +60,12 @@ static Vector wallJumpDirection;
 static int leftWallJumpCooldown = 0;
 static int rightWallJumpCooldown = 0;
 static int jumpBufferTicks = 0;
+
+static int dashTicks = 0;
+static int dashCoolDown = 0;
+static Vector dashVelocity;
+static float dashDirection = 1.0f;
+static bool dashUseable = false;
 
 bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
@@ -237,6 +246,12 @@ void Player::tick() {
              powf(std::abs(Input::getHorizontal()), data.joystickExponent) * data.moveSpeed * sign);
     addForce(Face::DOWN, data.gravity);
 
+    if (Input::getHorizontal() > 0.0f) {
+        dashDirection = 1.0f;
+    } else if (Input::getHorizontal() < 0.0f) {
+        dashDirection = -1.0f;
+    }
+
     if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
         jumpBufferTicks = data.maxJumpBufferTicks;
     }
@@ -280,6 +295,7 @@ void Player::tick() {
         addForce(wallJumpDirection * angle * data.wallJumpBoost *
                  (1.0f / powf(1.1f, data.maxWallJumpTicks + 1 - wallJumpTicks)));
         wallJumpTicks--;
+        dashDirection = wallJumpDirection.x;
     }
 
     wallJumpCooldown -= wallJumpCooldown > 0;
@@ -291,12 +307,35 @@ void Player::tick() {
         hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
         actualDrag[1] *= data.wallJumpDrag;
     }
-    data.velocity *= actualDrag;
+    if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
+        dashTicks == 0 && dashCoolDown == 0 && dashUseable) {
+        dashTicks = data.maxDashTicks;
+        dashUseable = false;
+        dashCoolDown = data.maxDashCooldown + dashTicks;
+        dashVelocity = Vector(data.dashStrength * dashDirection, 0.0f);
+    }
+    if (leftWall || rightWall) {
+        dashUseable = true;
+    }
+    dashTicks -= dashTicks > 0;
+    dashCoolDown -= dashCoolDown > 0;
+    if (isColliding(Face::LEFT) || isColliding(Face::RIGHT)) {
+        dashCoolDown -= dashTicks;
+        dashTicks = 0;
+    }
+    if (dashTicks > 0) {
+        data.velocity =
+            dashVelocity * cosf(static_cast<float>(M_PI) * 0.5f *
+                                (1.0f - static_cast<float>(dashTicks) / data.maxDashTicks));
+    } else {
+        data.velocity *= actualDrag;
+    }
 
     move();
     tickCollision();
     if (isColliding(Face::DOWN)) {
         fakeGrounded = data.coyoteTicks;
+        dashUseable = true;
     }
     fakeGrounded -= fakeGrounded > 0;
 
@@ -344,6 +383,9 @@ void Player::renderImGui() {
     ImGui::DragFloat2("Drag", data.drag, 0.1f);
     ImGui::DragInt("Coyote Time", &data.coyoteTicks, 1);
     ImGui::DragInt("Jump Buffer Ticks", &data.maxJumpBufferTicks, 1);
+    ImGui::DragInt("Dash Ticks", &data.maxDashTicks, 1);
+    ImGui::DragInt("Dash Cooldown", &data.maxDashCooldown, 1);
+    ImGui::DragFloat("Dash Strength", &data.dashStrength, 0.05f);
 
     ImGui::Spacing();
 

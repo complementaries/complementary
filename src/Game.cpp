@@ -33,9 +33,9 @@ bool Game::init() {
     if (Tilemap::init(48, 27) || Player::init() || Objects::init() || Particles::init()) {
         return true;
     }
-    Objects::add(new ColorObject(Vector(5.0f, 12.5f), Vector(4.0f, 5.5f), Ability::WALL_JUMP,
+    Objects::add(new ColorObject(Vector(8.0f, 21.5f), Vector(3.0f, 0.5f), Ability::WALL_JUMP,
                                  Ability::DASH));
-    Objects::add(new ColorObject(Vector(10.0f, 16.5f), Vector(3.0f, 0.5f), Ability::GLIDER,
+    Objects::add(new ColorObject(Vector(10.0f, 26.5f), Vector(3.0f, 0.5f), Ability::GLIDER,
                                  Ability::DOUBLE_JUMP));
 
     return false;

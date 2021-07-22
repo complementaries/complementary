@@ -168,6 +168,7 @@ void Player::kill() {
     position = Vector();
     lastPosition = position;
     Tilemap::reset();
+    setAbilities(Ability::NONE, Ability::NONE);
 }
 
 void Player::setAbilities(Ability dark, Ability light) {

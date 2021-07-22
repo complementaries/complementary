@@ -10,6 +10,7 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
 #define STB_TILEMAP_EDITOR_IMPLEMENTATION
 #include <SDL.h>
 #define _SDL_H
+#include <cstdio>
 #include <stb_tilemap_editor.h>
 #undef STB_TILEMAP_EDITOR_IMPLEMENTATION
 #pragma GCC diagnostic pop

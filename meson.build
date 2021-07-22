@@ -58,7 +58,7 @@ args = ['-Wall']
 if host_machine.system() == 'windows'
     args += []
 elif host_machine.system() == 'darwin' or host_machine.system() == 'linux'
-    args += ['-Werror', '-Wextra', '-pedantic']
+    args += ['-Werror', '-Wextra', '-pedantic', '-Wno-comment']
 endif
 
 if host_machine.system() == 'darwin'

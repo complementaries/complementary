@@ -359,6 +359,10 @@ void Player::renderImGui() {
     ImGui::Checkbox("Down", &(collision[Face::DOWN]));
     ImGui::PopDisabled();
 
+    if (ImGui::Button("Respawn")) {
+        kill();
+    }
+
     if (ImGui::Button("Load")) {
         load();
     }

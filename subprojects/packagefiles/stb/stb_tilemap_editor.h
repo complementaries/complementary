@@ -3696,7 +3696,7 @@ static void stbte__tile_in_palette(stbte_tilemap* tm, int x, int y, int slot) {
         case STBTE__paint:
             stbte__draw_rect(x, y, x + tm->palette_spacing_x - 1, y + tm->palette_spacing_x - 1,
                              STBTE_COLOR_TILEPALETTE_BACKGROUND);
-            STBTE_DRAW_TILE(x, y, slot, slot == tm->cur_tile, 0);
+            STBTE_DRAW_TILE(x, y, t->id, slot == tm->cur_tile, 0);
             if (slot == tm->cur_tile)
                 stbte__draw_frame_delayed(x - 1, y - 1, x + tm->palette_spacing_x,
                                           y + tm->palette_spacing_y,

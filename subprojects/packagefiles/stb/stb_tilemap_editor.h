@@ -1022,7 +1022,6 @@ static int stbte__color_table[STBTE__num_color_modes][STBTE__num_color_aspects]
                                  },
 };
 
-#define STBTE_COLOR_TILEMAP_BACKGROUND 0x000000
 #define STBTE_COLOR_TILEMAP_BORDER 0x203060
 #define STBTE_COLOR_TILEMAP_HIGHLIGHT 0xffffff
 #define STBTE_COLOR_GRID 0x404040
@@ -4260,7 +4259,6 @@ void stbte_mouse_move(stbte_tilemap* tm, int x, int y, int shifted, int scrollke
 
 void stbte_mouse_button(stbte_tilemap* tm, int x, int y, int right, int down, int shifted,
                         int scrollkey) {
-    printf("mouse %d, %d\n", x, y);
     static int events[2][2] = {{STBTE__leftup, STBTE__leftdown},
                                {STBTE__rightup, STBTE__rightdown}};
     stbte__set_event(events[right][down], x, y);

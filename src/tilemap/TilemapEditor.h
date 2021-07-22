@@ -11,6 +11,9 @@ class TilemapEditor final : private NonCopyable {
     void tick(float dt);
     void render();
     void onMouseEvent(void* eventPointer);
+    void onScreenResize(int width, int height);
+    void setZoom(float zoom);
+    float getZoom();
     void flush();
 
   private:

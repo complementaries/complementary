@@ -72,6 +72,22 @@ void Game::render(float lag) {
 
 void Game::renderImGui() {
     ImGui::Begin("DevGUI");
+
+    if (tilemapEditor) {
+        if (ImGui::Button("Close Editor")) {
+            tilemapEditor->flush();
+            delete tilemapEditor;
+            tilemapEditor = nullptr;
+        }
+
+        int zoom = tilemapEditor->getZoom();
+        ImGui::SliderInt("Zoom", &zoom, 1, 3);
+        tilemapEditor->setZoom(zoom);
+
+        ImGui::End();
+        return;
+    }
+
     if (ImGui::CollapsingHeader("Tilemap")) {
         ImGui::Text("Width: %d, Height: %d", Tilemap::getWidth(), Tilemap::getHeight());
 
@@ -79,28 +95,20 @@ void Game::renderImGui() {
             tilemapEditor = new TilemapEditor(Window::getWidth(), Window::getHeight());
         }
 
-        if (tilemapEditor && ImGui::Button("Close Editor")) {
-            tilemapEditor->flush();
-            delete tilemapEditor;
-            tilemapEditor = nullptr;
+        ImGui::InputText("Level name", levelName, 30);
+
+        if (ImGui::Button("Load")) {
+            Tilemap::load(levelName);
         }
 
-        if (!tilemapEditor) {
-            ImGui::InputText("Level name", levelName, 30);
+        ImGui::SameLine();
+        if (ImGui::Button("Save")) {
+            Tilemap::save(levelName);
+        }
 
-            if (ImGui::Button("Load")) {
-                Tilemap::load(levelName);
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Button("Save")) {
-                Tilemap::save(levelName);
-            }
-
-            ImGui::InputText("Object map name", objectMapName, 30);
-            if (ImGui::Button("Save objects")) {
-                Objects::save(objectMapName);
-            }
+        ImGui::InputText("Object map name", objectMapName, 30);
+        if (ImGui::Button("Save objects")) {
+            Objects::save(objectMapName);
         }
     }
 
@@ -129,6 +137,9 @@ void Game::renderImGui() {
 
 void Game::onWindowResize(int width, int height) {
     glViewport(0, 0, width, height);
+    if (tilemapEditor) {
+        tilemapEditor->onScreenResize(width, height);
+    }
 }
 
 void Game::onMouseEvent(void* eventPointer) {

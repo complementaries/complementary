@@ -13,6 +13,7 @@ namespace Player {
     void addForce(Face face, float force);
     void kill();
     bool invertColors();
+    void setPosition(const Vector& pos);
 
     void setAbilities(Ability dark, Ability light);
     bool hasAbility(Ability a);

@@ -23,11 +23,12 @@ src = [
   'src/tilemap/tiles/SpikeTile.cpp',
   'src/tilemap/tiles/Tile.cpp',
   'src/tilemap/Tilemap.cpp',
-'src/tilemap/TilemapEditor.cpp',
+  'src/tilemap/TilemapEditor.cpp',
   'src/tilemap/Tiles.cpp',
   'src/Game.cpp',
   'src/Input.cpp',
-  'src/Main.cpp'
+  'src/Main.cpp',
+  'src/tilemap/tiles/SpawnTile.cpp'
 ]
 
 zlib_proj = subproject('zlib')

@@ -12,6 +12,7 @@ SpikeTile Tiles::SPIKES;
 KeyTile Tiles::KEY;
 Tile Tiles::COLLECTED_KEY = AIR;
 DoorTile Tiles::DOOR;
+SpawnTile Tiles::SPAWN_POINT;
 
 void Tiles::addTile(Tile& tile) {
     tile.id = tiles.size();
@@ -25,6 +26,7 @@ void Tiles::init() {
     addTile(KEY);
     addTile(COLLECTED_KEY);
     addTile(DOOR);
+    addTile(SPAWN_POINT);
 }
 
 const Tile& Tiles::get(char id) {

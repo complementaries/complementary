@@ -10,6 +10,7 @@
 #include "graphics/Buffer.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
+#include "player/Player.h"
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
@@ -113,6 +114,18 @@ void Tilemap::load(const char* path) {
     for (char c : tiles) {
         keys += c == Tiles::KEY.getId();
     }
+    Player::setPosition(getSpawnPoint());
+}
+
+Vector Tilemap::getSpawnPoint() {
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            if (getTile(x, y) == Tiles::SPAWN_POINT) {
+                return Vector(x, y);
+            }
+        }
+    }
+    return Vector();
 }
 
 void Tilemap::save(const char* path) {

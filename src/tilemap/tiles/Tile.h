@@ -9,7 +9,7 @@ class Tile {
   public:
     Tile(Color color, bool solid, const char* editorGroup);
     virtual ~Tile() = default;
-    Color getColor() const;
+    virtual Color getColor() const;
     char getId() const;
 
     virtual void onFaceCollision(Face playerFace) const;

@@ -98,6 +98,11 @@ void Player::addForce(Face face, float force) {
     addForce(FaceUtils::getDirection(face) * force);
 }
 
+void Player::setPosition(const Vector& pos) {
+    position = pos;
+    lastPosition = pos;
+}
+
 static void tickWallJumpCollision(Face face, bool& wall) {
     Vector min = position + FaceUtils::getDirection(face) * step;
     Vector max = min + data.size;
@@ -194,7 +199,7 @@ static void move() {
 }
 
 void Player::kill() {
-    position = Vector();
+    position = Tilemap::getSpawnPoint();
     lastPosition = position;
     Tilemap::reset();
     setAbilities(Ability::NONE, Ability::NONE);

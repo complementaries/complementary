@@ -2,6 +2,7 @@
 #define Tilemap_H
 
 #include "graphics/Buffer.h"
+#include "math/Vector.h"
 #include "tiles/Tile.h"
 
 namespace Tilemap {
@@ -14,6 +15,7 @@ namespace Tilemap {
 
     const Tile& getTile(int x, int y);
     void setTile(int x, int y, const Tile& tile);
+    Vector getSpawnPoint();
 
     void render();
     void renderBuffer(Buffer& buffer);

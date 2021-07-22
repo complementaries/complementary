@@ -4,6 +4,7 @@
 #include "tiles/BoxTile.h"
 #include "tiles/DoorTile.h"
 #include "tiles/KeyTile.h"
+#include "tiles/SpawnTile.h"
 #include "tiles/SpikeTile.h"
 #include "tiles/Tile.h"
 
@@ -15,6 +16,7 @@ class Tiles {
     static KeyTile KEY;
     static Tile COLLECTED_KEY;
     static DoorTile DOOR;
+    static SpawnTile SPAWN_POINT;
 
     static void init();
     static const Tile& get(char id);

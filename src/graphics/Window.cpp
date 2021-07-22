@@ -140,8 +140,10 @@ static void pollEvents() {
                         Input::Internal::setButtonPressed(ButtonType::JUMP);
                         break;
                     case SDL_CONTROLLER_BUTTON_X:
-                        Input::Internal::setButtonPressed(ButtonType::SWITCH);
+                        Input::Internal::setButtonPressed(ButtonType::ABILITY);
+                        break;
                     case SDL_CONTROLLER_BUTTON_Y:
+                        Input::Internal::setButtonPressed(ButtonType::SWITCH);
                         Input::Internal::setButtonPressed(ButtonType::ABILITY);
                         break;
                     case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
@@ -164,8 +166,10 @@ static void pollEvents() {
                         Input::Internal::setButtonReleased(ButtonType::JUMP);
                         break;
                     case SDL_CONTROLLER_BUTTON_X:
-                        Input::Internal::setButtonReleased(ButtonType::SWITCH);
+                        Input::Internal::setButtonReleased(ButtonType::ABILITY);
+                        break;
                     case SDL_CONTROLLER_BUTTON_Y:
+                        Input::Internal::setButtonReleased(ButtonType::SWITCH);
                         Input::Internal::setButtonReleased(ButtonType::ABILITY);
                         break;
                     case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:

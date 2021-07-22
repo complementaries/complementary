@@ -7,20 +7,49 @@
 #include <unordered_map>
 #include <vector>
 
+#include "objects/ColorObject.h"
 #include "objects/ObjectRenderer.h"
+#include "player/Player.h"
 
-static std::vector<std::unique_ptr<ObjectBase>> objects;
+static std::vector<std::shared_ptr<ObjectBase>> objects;
+static std::vector<std::shared_ptr<ObjectBase>> prototypes;
 
 bool Objects::init() {
+    addPrototype(std::make_shared<ColorObject>(Vector(), Vector(3.0f, 1.5f), Ability::WALL_JUMP,
+                                               Ability::DASH));
     return ObjectRenderer::init();
+}
+
+void Objects::addPrototype(std::shared_ptr<ObjectBase> prototype) {
+    prototype->prototypeId = prototypes.size();
+    prototypes.push_back(std::move(prototype));
+}
+
+std::shared_ptr<ObjectBase> Objects::getPrototype(int id) {
+    return prototypes[id];
+}
+
+size_t Objects::getPrototypeCount() {
+    return prototypes.size();
 }
 
 void Objects::clear() {
     objects.clear();
 }
 
-void Objects::add(ObjectBase* o) {
+void Objects::add(std::shared_ptr<ObjectBase> o) {
     objects.emplace_back(o);
+}
+
+std::vector<std::shared_ptr<ObjectBase>> Objects::getObjects() {
+    return objects;
+}
+
+std::shared_ptr<ObjectBase> Objects::instantiateObject(int prototypeId) {
+    auto object = prototypes[prototypeId]->clone();
+    object->prototypeId = prototypeId;
+    add(object);
+    return objects[objects.size() - 1];
 }
 
 bool Objects::collidesWithAny(const Vector& position, const Vector& size) {
@@ -83,6 +112,34 @@ void Objects::load(const char* path) {
 
     // File magic must be CMOM
     assert(strcmp(magic, "CMOM") == 0);
+
+    long startPointer;
+    stream.read((char*)&startPointer, 8);
+    stream.seekg(startPointer, std::ios_base::beg);
+
+    int objectNum;
+    stream.read((char*)&objectNum, 4);
+    printf("Reading %d objects\n", objectNum);
+
+    for (int i = 0; i < objectNum; i++) {
+        int prototypeId;
+        stream.read((char*)&prototypeId, 4);
+        assert(prototypeId > -1);
+
+        int dataPosition;
+        stream.read((char*)&dataPosition, 4);
+        printf("Loading object %d with prototypeId %d at position %d\n", i, prototypeId,
+               dataPosition);
+
+        auto object = instantiateObject(prototypeId);
+
+        int lastPos = stream.tellg();
+        stream.seekg(dataPosition, std::ios_base::beg);
+        stream.read((char*)object->getDataPointer(), object->getDataSize());
+        stream.seekg(lastPos, std::ios_base::beg);
+    }
+
+    stream.close();
 }
 
 void Objects::save(const char* path) {
@@ -124,9 +181,13 @@ void Objects::save(const char* path) {
     stream.seekp(dataPos, std::ios_base::beg);
     stream.write((char*)&objectNum, 4);
     for (size_t i = 0; i < objectNum; i++) {
-        size_t typeId = typeid(objects[i]).hash_code();
-        stream.write((char*)&typeId, 8);
+        int prototypeId = objects[i]->prototypeId;
+        assert(prototypeId > -1);
+        stream.write((char*)&prototypeId, 4);
         stream.write((char*)&positions[i], 4);
-        printf("Saving object %zu with typeId %zu at position %d\n", i, typeId, positions[i]);
+        printf("Saving object %zu with prototypeId %d at position %d\n", i, prototypeId,
+               positions[i]);
     }
+
+    stream.close();
 }

@@ -34,13 +34,6 @@ bool Game::init() {
         return true;
     }
 
-    ColorObject* orange =
-        new ColorObject(Vector(9.0f, 21.5f), Vector(3.0f, 1.5f), Ability::WALL_JUMP, Ability::DASH);
-    orange->hasWall = false;
-    Objects::add(orange);
-    Objects::add(new ColorObject(Vector(18.0f, 21.5f), Vector(3.0f, 1.5f), Ability::GLIDER,
-                                 Ability::DOUBLE_JUMP));
-
     return false;
 }
 
@@ -112,6 +105,11 @@ void Game::renderImGui() {
         ImGui::InputText("Object map name", objectMapName, 30);
         if (ImGui::Button("Save objects")) {
             Objects::save(objectMapName);
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Load objects")) {
+            Objects::load(objectMapName);
         }
     }
 

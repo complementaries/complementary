@@ -59,4 +59,5 @@ with open(path + ".cpp", "w") as file:
         file.writelines("""#include \"{file_camel}.h\"
 """.format(file_upper = file_upper, file_camel = name))
 
-os.system("meson rewrite target complementary add {}".format(path + ".cpp"))
+os.system("meson rewrite target complementary add {}".format(
+    path.replace("\\", "/") + ".cpp"))

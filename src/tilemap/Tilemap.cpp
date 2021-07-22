@@ -108,12 +108,15 @@ void Tilemap::load(const char* path) {
     stream.read((char*)&height, 4);
 
     stream.read(tiles.data(), width * height);
+    stream.close();
+
     forceReload();
 
     keys = 0;
     for (char c : tiles) {
         keys += c == Tiles::KEY.getId();
     }
+
     Player::setPosition(getSpawnPoint());
 }
 
@@ -136,6 +139,8 @@ void Tilemap::save(const char* path) {
     stream.write((const char*)&width, 4);
     stream.write((const char*)&height, 4);
     stream.write(tiles.data(), width * height);
+
+    stream.close();
 }
 
 void Tilemap::reset() {

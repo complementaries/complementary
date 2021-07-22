@@ -399,6 +399,7 @@ void Player::renderImGui() {
     ImGui::Checkbox("Right", &(collision[Face::RIGHT]));
     ImGui::Checkbox("Up", &(collision[Face::UP]));
     ImGui::Checkbox("Down", &(collision[Face::DOWN]));
+
     ImGui::PopDisabled();
 
     if (ImGui::Button("Respawn")) {

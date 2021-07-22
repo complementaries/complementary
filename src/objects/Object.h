@@ -18,8 +18,11 @@ class ObjectBase {
     virtual void render(float lag) const;
     virtual char* getDataPointer() = 0;
     virtual size_t getDataSize() const = 0;
+    virtual std::shared_ptr<ObjectBase> clone() = 0;
 
     bool hasWall;
+    int prototypeId = -1;
+    Vector position;
 };
 
 template <typename T>
@@ -33,7 +36,6 @@ class Object : public ObjectBase {
         return sizeof(T);
     }
 
-  protected:
     T data;
 };
 

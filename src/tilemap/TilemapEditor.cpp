@@ -1,7 +1,19 @@
 #include "TilemapEditor.h"
 
+#include "objects/ColorObject.h"
+
 void STBTE_DRAW_RECT(int x0, int y0, int x1, int y1, unsigned int color);
 void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* data);
+
+static int getPropType(int n, short* tiledata, float* params);
+static const char* getPropName(int n, short* tiledata, float* params);
+static float getPropMin(int n, short* tiledata, float* params);
+static float getPropMax(int n, short* tiledata, float* params);
+
+#define STBTE_PROP_TYPE getPropType
+#define STBTE_PROP_NAME getPropName
+#define STBTE_PROP_MIN getPropMin
+#define STBTE_PROP_MAX getPropMax
 
 static int tilemapBackgroundColor;
 static int globalScreenWidth;
@@ -24,6 +36,7 @@ static float globalZoom = 1.f;
 #include "Tilemap.h"
 #include "Tiles.h"
 #include "objects/ObjectRenderer.h"
+#include "objects/Objects.h"
 #include "player/Player.h"
 
 static int getZoomedWidth() {
@@ -48,6 +61,10 @@ TilemapEditor::TilemapEditor(int screenWidth, int screenHeight) {
         }
     }
 
+    for (size_t i = 0; i < Objects::getPrototypeCount(); i++) {
+        stbte_define_tile(stbTileMap, 1000 + i, 0xFFFFFFFF, "Objects");
+    }
+
     stbte_set_display(0, 0, getZoomedWidth(), getZoomedHeight());
 
     for (int y = 0; y < Tilemap::getHeight(); y++) {
@@ -56,6 +73,20 @@ TilemapEditor::TilemapEditor(int screenWidth, int screenHeight) {
             if (tile.getId() != Tiles::AIR.getId()) {
                 stbte_set_tile(stbTileMap, x, y, 0, tile.getId());
             }
+        }
+    }
+
+    for (auto& object : Objects::getObjects()) {
+        int x = object->position.x;
+        int y = object->position.y;
+        stbte_set_tile(stbTileMap, x, y, 0, object->prototypeId + 1000);
+
+        if (object->prototypeId == 0) {
+            auto colorObject = std::dynamic_pointer_cast<ColorObject>(object);
+            stbte_set_property(stbTileMap, x, y, 0, colorObject->data.size.x);
+            stbte_set_property(stbTileMap, x, y, 1, colorObject->data.size.y);
+            stbte_set_property(stbTileMap, x, y, 2, (int)colorObject->data.abilities[0]);
+            stbte_set_property(stbTileMap, x, y, 3, (int)colorObject->data.abilities[1]);
         }
     }
 }
@@ -96,11 +127,71 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
         tilemapBuffer.add(maxX).add(maxY).add(color);
         tilemapBuffer.add(maxX).add(minY).add(color);
         tilemapBuffer.add(minX).add(maxY).add(color);
-    } else {
+    } else if (id < 1000) {
         Tiles::get(id).renderEditor(tilemapBuffer, tileSpaceX, tileSpaceY);
+    } else {
+        // IDs >= 1000 identify object prototypes
+        int prototypeIndex = id - 1000;
+        auto prototype = Objects::getPrototype(prototypeIndex)->clone();
+        prototype->position = Vector(tileSpaceX, tileSpaceY);
+        prototype->render(0.f);
     }
 
     Tilemap::renderBuffer(tilemapBuffer);
+}
+
+static int getPropType(int n, short* tiledata, float* params) {
+    short tile = tiledata[0];
+    if (tile < 1000) {
+        return 0;
+    }
+
+    int prototypeIndex = tile - 1000;
+    if (prototypeIndex == 0) { // ColorObject
+        switch (n) {
+            case 0: return STBTE_PROP_float;
+            case 1: return STBTE_PROP_float;
+            case 2: return STBTE_PROP_int;
+            case 3: return STBTE_PROP_int;
+        }
+    }
+
+    return 0;
+}
+
+static const char* getPropName(int n, short* tiledata, float* params) {
+    short tile = tiledata[0];
+    if (tile < 1000) {
+        return "";
+    }
+
+    int prototypeIndex = tile - 1000;
+    if (prototypeIndex == 0) { // ColorObject
+        switch (n) {
+            case 0: return "Size X";
+            case 1: return "Size Y";
+            case 2: return "Ability 1";
+            case 3: return "Ability 2";
+        }
+    }
+
+    return "";
+}
+
+static float getPropMin(int n, short* tiledata, float* params) {
+    short tile = tiledata[0];
+    if (tile < 1000) {
+        return 0.f;
+    }
+    return 1.f;
+}
+
+static float getPropMax(int n, short* tiledata, float* params) {
+    short tile = tiledata[0];
+    if (tile < 1000) {
+        return 0.f;
+    }
+    return 100.f;
 }
 
 void TilemapEditor::tick(float dt) {
@@ -140,12 +231,29 @@ void TilemapEditor::flush() {
     Tilemap::setHeight(height);
     Tilemap::reset();
 
+    Objects::clear();
+
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             auto tiles = stbte_get_tile(stbTileMap, x, y);
-            short tile = tiles[0];
+            short id = tiles[0];
 
-            Tilemap::setTile(x, y, Tiles::get(tile));
+            if (id < 1000) {
+                Tilemap::setTile(x, y, Tiles::get(id));
+            } else {
+                int prototypeIndex = id - 1000;
+                auto obj = Objects::instantiateObject(prototypeIndex);
+                obj->position = Vector(x, y);
+
+                if (prototypeIndex == 0) {
+                    auto colorObject = std::dynamic_pointer_cast<ColorObject>(obj);
+                    float* props = stbte_get_properties(stbTileMap, x, y);
+                    colorObject->data.size.x = props[0];
+                    colorObject->data.size.y = props[1];
+                    colorObject->data.abilities[0] = (Ability)props[2];
+                    colorObject->data.abilities[1] = (Ability)props[3];
+                }
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 #define OBJECT_H
 
 #include <cstddef>
+#include <memory>
 
 #include "player/Face.h"
 

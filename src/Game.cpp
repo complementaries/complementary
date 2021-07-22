@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <imgui.h>
+#include <string>
 
 #include "Game.h"
 #include "Input.h"
@@ -23,8 +24,7 @@
 
 Matrix Game::viewMatrix;
 
-static char levelName[50] = "assets/maps/map0.cmtm";
-static char objectMapName[50] = "assets/maps/map0.cmom";
+static char levelName[50] = "assets/maps/map0";
 
 static TilemapEditor* tilemapEditor;
 
@@ -40,10 +40,23 @@ bool Game::init() {
 void Game::tick() {
     if (tilemapEditor) {
         tilemapEditor->tick(Window::SECONDS_PER_TICK);
+        if (Input::getButton(ButtonType::ABILITY).pressedFirstFrame) {
+            tilemapEditor->flush();
+            delete tilemapEditor;
+            tilemapEditor = nullptr;
+        }
+
+        float zoom = tilemapEditor->getZoom();
+        if (Input::getButton(ButtonType::RIGHT).pressed) {
+            zoom += 0.02f;
+        }
+        if (Input::getButton(ButtonType::LEFT).pressed) {
+            zoom -= 0.02f;
+        }
+        tilemapEditor->setZoom(zoom);
     } else {
         Objects::tick();
         Player::tick();
-        Particles::tick();
     }
 }
 
@@ -59,7 +72,6 @@ void Game::render(float lag) {
     Tilemap::render();
     Objects::render(lag);
     Player::render(lag);
-    Particles::render(lag);
 
     if (tilemapEditor) {
         tilemapEditor->render();
@@ -67,22 +79,11 @@ void Game::render(float lag) {
 }
 
 void Game::renderImGui() {
-    ImGui::Begin("DevGUI");
-
     if (tilemapEditor) {
-        if (ImGui::Button("Close Editor")) {
-            tilemapEditor->flush();
-            delete tilemapEditor;
-            tilemapEditor = nullptr;
-        }
-
-        int zoom = tilemapEditor->getZoom();
-        ImGui::SliderInt("Zoom", &zoom, 1, 3);
-        tilemapEditor->setZoom(zoom);
-
-        ImGui::End();
         return;
     }
+
+    ImGui::Begin("DevGUI");
 
     if (ImGui::CollapsingHeader("Tilemap")) {
         ImGui::Text("Width: %d, Height: %d", Tilemap::getWidth(), Tilemap::getHeight());
@@ -91,25 +92,21 @@ void Game::renderImGui() {
             tilemapEditor = new TilemapEditor(Window::getWidth(), Window::getHeight());
         }
 
-        ImGui::InputText("Level name", levelName, 30);
+        ImGui::InputText("Level name", levelName, 50);
+        static char tileMapName[60];
+        sprintf(tileMapName, "%s.cmtm", levelName);
+        static char objectMapName[60];
+        sprintf(objectMapName, "%s.cmom", levelName);
 
         if (ImGui::Button("Load")) {
-            Tilemap::load(levelName);
+            Tilemap::load(tileMapName);
+            Objects::load(objectMapName);
         }
 
         ImGui::SameLine();
         if (ImGui::Button("Save")) {
-            Tilemap::save(levelName);
-        }
-
-        ImGui::InputText("Object map name", objectMapName, 30);
-        if (ImGui::Button("Save objects")) {
+            Tilemap::save(tileMapName);
             Objects::save(objectMapName);
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Load objects")) {
-            Objects::load(objectMapName);
         }
     }
 

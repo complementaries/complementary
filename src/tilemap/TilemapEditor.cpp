@@ -183,6 +183,9 @@ static float getPropMin(int n, short* tiledata, float* params) {
     if (tile < 1000) {
         return 0.f;
     }
+    if (n >= 2) {
+        return 0.f;
+    }
     return 1.f;
 }
 
@@ -190,6 +193,10 @@ static float getPropMax(int n, short* tiledata, float* params) {
     short tile = tiledata[0];
     if (tile < 1000) {
         return 0.f;
+    }
+
+    if (n >= 2) {
+        return 5.f;
     }
     return 100.f;
 }
@@ -245,14 +252,14 @@ void TilemapEditor::flush() {
                 auto obj = Objects::instantiateObject(prototypeIndex);
                 obj->position = Vector(x, y);
 
-                if (prototypeIndex == 0) {
+                /*if (prototypeIndex == 0) {
                     auto colorObject = std::dynamic_pointer_cast<ColorObject>(obj);
                     float* props = stbte_get_properties(stbTileMap, x, y);
                     colorObject->data.size.x = props[0];
                     colorObject->data.size.y = props[1];
                     colorObject->data.abilities[0] = (Ability)props[2];
                     colorObject->data.abilities[1] = (Ability)props[3];
-                }
+                }*/
             }
         }
     }

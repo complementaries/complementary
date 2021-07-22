@@ -15,8 +15,10 @@ static std::vector<std::shared_ptr<ObjectBase>> objects;
 static std::vector<std::shared_ptr<ObjectBase>> prototypes;
 
 bool Objects::init() {
-    addPrototype(std::make_shared<ColorObject>(Vector(), Vector(3.0f, 1.5f), Ability::WALL_JUMP,
+    addPrototype(std::make_shared<ColorObject>(Vector(), Vector(1.0f, 1.0f), Ability::WALL_JUMP,
                                                Ability::DASH));
+    addPrototype(std::make_shared<ColorObject>(Vector(), Vector(1.0f, 1.0f), Ability::DOUBLE_JUMP,
+                                               Ability::GLIDER));
     return ObjectRenderer::init();
 }
 
@@ -113,7 +115,7 @@ void Objects::load(const char* path) {
     // File magic must be CMOM
     assert(strcmp(magic, "CMOM") == 0);
 
-    long startPointer;
+    uint64_t startPointer;
     stream.read((char*)&startPointer, 8);
     stream.seekg(startPointer, std::ios_base::beg);
 
@@ -125,21 +127,20 @@ void Objects::load(const char* path) {
         int prototypeId;
         stream.read((char*)&prototypeId, 4);
         assert(prototypeId > -1);
+        auto object = instantiateObject(prototypeId);
+
+        stream.read((char*)&object->position, sizeof(Vector));
 
         int dataPosition;
         stream.read((char*)&dataPosition, 4);
         printf("Loading object %d with prototypeId %d at position %d\n", i, prototypeId,
                dataPosition);
 
-        auto object = instantiateObject(prototypeId);
-
         int lastPos = stream.tellg();
         stream.seekg(dataPosition, std::ios_base::beg);
         stream.read((char*)object->getDataPointer(), object->getDataSize());
         stream.seekg(lastPos, std::ios_base::beg);
     }
-
-    stream.close();
 }
 
 void Objects::save(const char* path) {
@@ -152,11 +153,11 @@ void Objects::save(const char* path) {
     stream.write("CMOM", 4);
     stream.write(empty, 8);
 
-    std::vector<int> positions;
+    std::vector<int> pointers;
 
     for (size_t i = 0; i < objects.size(); i++) {
         int filePos = stream.tellp();
-        positions.push_back(filePos);
+        pointers.push_back(filePos);
         stream.write(objects[i]->getDataPointer(), objects[i]->getDataSize());
 
         filePos = stream.tellp();
@@ -184,10 +185,9 @@ void Objects::save(const char* path) {
         int prototypeId = objects[i]->prototypeId;
         assert(prototypeId > -1);
         stream.write((char*)&prototypeId, 4);
-        stream.write((char*)&positions[i], 4);
+        stream.write((char*)&objects[i]->position, sizeof(Vector));
+        stream.write((char*)&pointers[i], 4);
         printf("Saving object %zu with prototypeId %d at position %d\n", i, prototypeId,
-               positions[i]);
+               pointers[i]);
     }
-
-    stream.close();
 }

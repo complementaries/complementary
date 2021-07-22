@@ -21,7 +21,7 @@ class ColorObject : public Object<ColorObjectData> {
     void onFaceCollision(Face playerFace) override;
     bool collidesWith(const Vector& position, const Vector& size) const override;
     void render(float lag) const override;
-    virtual std::shared_ptr<ObjectBase> clone() override;
+    std::shared_ptr<ObjectBase> clone() override;
 };
 
 #endif

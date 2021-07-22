@@ -5,6 +5,10 @@
 SpikeTile::SpikeTile() : Tile(ColorUtils::GRAY, true) {
 }
 
+bool SpikeTile::isWall() const {
+    return false;
+}
+
 void SpikeTile::onFaceCollision(Face playerFace) const {
     if (playerFace == Face::DOWN) {
         Player::kill();

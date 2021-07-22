@@ -15,6 +15,7 @@ class Tile {
     virtual void onFaceCollision(Face playerFace) const;
     virtual void onCollision(int x, int y) const;
     virtual bool isSolid() const;
+    virtual bool isWall() const;
     virtual void render(Buffer& buffer, float x, float y) const;
 
     bool operator==(const Tile& other) const;

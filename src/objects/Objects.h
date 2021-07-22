@@ -11,6 +11,7 @@ namespace Objects {
 
     bool collidesWithAny(const Vector& position, const Vector& size);
     bool handleFaceCollision(const Vector& position, const Vector& size, Face face);
+    bool hasWallCollision(const Vector& position, const Vector& size, Face face);
     void handleCollision(const Vector& position, const Vector& size);
 
     void tick();

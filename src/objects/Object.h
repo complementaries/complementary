@@ -18,6 +18,8 @@ class ObjectBase {
     virtual void render(float lag) const;
     virtual char* getDataPointer() = 0;
     virtual size_t getDataSize() const = 0;
+
+    bool hasWall;
 };
 
 template <typename T>

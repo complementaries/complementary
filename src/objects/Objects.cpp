@@ -43,6 +43,15 @@ bool Objects::handleFaceCollision(const Vector& position, const Vector& size, Fa
     return r;
 }
 
+bool Objects::hasWallCollision(const Vector& position, const Vector& size, Face face) {
+    for (auto& o : objects) {
+        if (o->isSolid() && o->hasWall && o->collidesWith(position, size)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Objects::handleCollision(const Vector& position, const Vector& size) {
     for (auto& o : objects) {
         if (o->collidesWith(position, size)) {

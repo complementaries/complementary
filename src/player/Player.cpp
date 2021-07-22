@@ -46,6 +46,8 @@ static PlayerData data;
 static Ability abilities[2] = {Ability::NONE, Ability::NONE};
 static std::array<bool, FACES> collision;
 static int fakeGrounded = 0;
+static bool leftWall = false;
+static bool rightWall = false;
 
 static bool worldType = false;
 static int wallJumpCooldown = 0;
@@ -96,6 +98,30 @@ void Player::addForce(Face face, float force) {
     addForce(FaceUtils::getDirection(face) * force);
 }
 
+static void tickWallJumpCollision(Face face, bool& wall) {
+    Vector min = position + FaceUtils::getDirection(face) * step;
+    Vector max = min + data.size;
+
+    wall = Objects::hasWallCollision(min, data.size, face);
+
+    int minX = floorf(min[0]);
+    int minY = floorf(min[1]);
+    int maxX = floorf(max[0]);
+    int maxY = floorf(max[1]);
+    if (minX < 0 || minY < 0 || maxX >= Tilemap::getWidth() || maxY >= Tilemap::getHeight()) {
+        wall = true;
+        return;
+    }
+    for (int x = minX; x <= maxX; x++) {
+        for (int y = minY; y <= maxY; y++) {
+            const Tile& tile = Tilemap::getTile(x, y);
+            if (tile.isSolid() && tile.isWall()) {
+                wall = true;
+            }
+        }
+    }
+}
+
 static void tickCollision() {
     for (Face face : FaceUtils::getFaces()) {
         Vector min = position + FaceUtils::getDirection(face) * step;
@@ -121,6 +147,9 @@ static void tickCollision() {
             }
         }
     }
+
+    tickWallJumpCollision(Face::LEFT, leftWall);
+    tickWallJumpCollision(Face::RIGHT, rightWall);
 
     Vector min = position;
     Vector max = min + data.size;
@@ -215,13 +244,13 @@ void Player::tick() {
             wallJumpCooldown = 10;
             jumpBufferTicks = 0;
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
-            if (isColliding(Face::LEFT) && Input::getButton(ButtonType::LEFT).pressed) {
+            if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
                 wallJumpDirection = Vector(1.0f, -1.0f);
                 addForce(wallJumpDirection * data.wallJumpInit);
                 wallJumpTicks = data.maxWallJumpTicks;
                 leftWallJumpCooldown = data.wallJumpMoveCooldown;
                 jumpBufferTicks = 0;
-            } else if (isColliding(Face::RIGHT) && Input::getButton(ButtonType::RIGHT).pressed) {
+            } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed) {
                 wallJumpDirection = Vector(-1.0f, -1.0f);
                 addForce(wallJumpDirection * data.wallJumpInit);
                 wallJumpTicks = data.maxWallJumpTicks;
@@ -252,8 +281,8 @@ void Player::tick() {
 
     data.velocity += data.acceleration;
     Vector actualDrag = data.drag;
-    if (((isColliding(Face::LEFT) && Input::getButton(ButtonType::LEFT).pressed) ||
-         (isColliding(Face::RIGHT) && Input::getButton(ButtonType::RIGHT).pressed)) &&
+    if (((leftWall && Input::getButton(ButtonType::LEFT).pressed) ||
+         (rightWall && Input::getButton(ButtonType::RIGHT).pressed)) &&
         hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
         actualDrag[1] *= data.wallJumpDrag;
     }

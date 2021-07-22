@@ -1,6 +1,6 @@
 #include "Object.h"
 
-ObjectBase::ObjectBase() {
+ObjectBase::ObjectBase() : hasWall(true) {
 }
 
 void ObjectBase::onFaceCollision(Face playerFace) {

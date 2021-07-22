@@ -28,6 +28,10 @@ bool Tile::isSolid() const {
     return solid;
 }
 
+bool Tile::isWall() const {
+    return true;
+}
+
 void Tile::render(Buffer& buffer, float x, float y) const {
     (void)buffer;
     (void)x;

@@ -41,8 +41,11 @@ TilemapEditor::TilemapEditor(int screenWidth, int screenHeight) {
                                   getZoomedWidth() / Tilemap::getWidth(),
                                   getZoomedHeight() / Tilemap::getHeight(), 255);
 
-    for (size_t i = 1; i < Tiles::getCount(); i++) {
-        stbte_define_tile(stbTileMap, i, 0xFFFFFFFF, "Default");
+    for (size_t i = 0; i < Tiles::getCount(); i++) {
+        const char* group = Tiles::get(i).getEditorGroup();
+        if (group != nullptr) {
+            stbte_define_tile(stbTileMap, i, 0xFFFFFFFF, group);
+        }
     }
 
     stbte_set_display(0, 0, getZoomedWidth(), getZoomedHeight());
@@ -94,7 +97,7 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
         tilemapBuffer.add(maxX).add(minY).add(color);
         tilemapBuffer.add(minX).add(maxY).add(color);
     } else {
-        Tiles::get(id).render(tilemapBuffer, tileSpaceX, tileSpaceY);
+        Tiles::get(id).renderEditor(tilemapBuffer, tileSpaceX, tileSpaceY);
     }
 
     Tilemap::renderBuffer(tilemapBuffer);

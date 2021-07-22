@@ -2,7 +2,7 @@
 
 #include "player/Player.h"
 
-SpikeTile::SpikeTile() : Tile(ColorUtils::GRAY, true) {
+SpikeTile::SpikeTile() : Tile(ColorUtils::GRAY, true, "default") {
 }
 
 bool SpikeTile::isWall() const {

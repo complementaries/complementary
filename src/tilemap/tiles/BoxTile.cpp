@@ -1,6 +1,6 @@
 #include "BoxTile.h"
 
-BoxTile::BoxTile(Color color, bool solid) : Tile(color, solid) {
+BoxTile::BoxTile(Color color, bool solid) : Tile(color, solid, "default") {
 }
 
 void BoxTile::render(Buffer& buffer, float x, float y) const {

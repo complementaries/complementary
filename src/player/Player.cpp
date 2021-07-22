@@ -102,7 +102,7 @@ static void tickWallJumpCollision(Face face, bool& wall) {
     Vector min = position + FaceUtils::getDirection(face) * step;
     Vector max = min + data.size;
 
-    wall = Objects::hasWallCollision(min, data.size, face);
+    wall = Objects::hasWallCollision(min, data.size);
 
     int minX = floorf(min[0]);
     int minY = floorf(min[1]);

@@ -4,7 +4,7 @@
 #include "tilemap/Tilemap.h"
 #include "tilemap/Tiles.h"
 
-DoorTile::DoorTile() : Tile(ColorUtils::GRAY, true) {
+DoorTile::DoorTile() : Tile(ColorUtils::GRAY, true, "key") {
 }
 
 bool DoorTile::isSolid() const {

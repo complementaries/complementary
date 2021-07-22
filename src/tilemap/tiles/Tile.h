@@ -7,7 +7,7 @@
 
 class Tile {
   public:
-    Tile(Color color, bool solid);
+    Tile(Color color, bool solid, const char* editorGroup);
     virtual ~Tile() = default;
     Color getColor() const;
     char getId() const;
@@ -16,7 +16,9 @@ class Tile {
     virtual void onCollision(int x, int y) const;
     virtual bool isSolid() const;
     virtual bool isWall() const;
+    virtual const char* getEditorGroup() const;
     virtual void render(Buffer& buffer, float x, float y) const;
+    virtual void renderEditor(Buffer& buffer, float x, float y) const;
 
     bool operator==(const Tile& other) const;
 
@@ -25,6 +27,7 @@ class Tile {
     char id;
     Color color;
     bool solid;
+    const char* editorGroup;
 };
 
 #endif

@@ -3,10 +3,10 @@
 
 #include "Tiles.h"
 
-static Tile defaultTile{ColorUtils::rgba(0xFF, 0x66, 0x00), false};
+static Tile defaultTile{ColorUtils::rgba(0xFF, 0x66, 0x00), false, nullptr};
 static std::vector<Tile*> tiles;
 
-Tile Tiles::AIR{ColorUtils::rgba(0xFF, 0xFF, 0xFF), false};
+Tile Tiles::AIR{ColorUtils::rgba(0xFF, 0xFF, 0xFF), false, nullptr};
 BoxTile Tiles::WALL{ColorUtils::rgba(0x00, 0x00, 0x00), true};
 SpikeTile Tiles::SPIKES;
 KeyTile Tiles::KEY;

@@ -1,7 +1,8 @@
 #include "Tile.h"
 #include "player/Player.h"
 
-Tile::Tile(Color color, bool solid) : id(-1), color(color), solid(solid) {
+Tile::Tile(Color color, bool solid, const char* editorGroup)
+    : id(-1), color(color), solid(solid), editorGroup(editorGroup) {
 }
 
 Color Tile::getColor() const {
@@ -32,10 +33,18 @@ bool Tile::isWall() const {
     return true;
 }
 
+const char* Tile::getEditorGroup() const {
+    return editorGroup;
+}
+
 void Tile::render(Buffer& buffer, float x, float y) const {
     (void)buffer;
     (void)x;
     (void)y;
+}
+
+void Tile::renderEditor(Buffer& buffer, float x, float y) const {
+    render(buffer, x, y);
 }
 
 bool Tile::operator==(const Tile& other) const {

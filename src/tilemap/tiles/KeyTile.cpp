@@ -4,7 +4,7 @@
 #include "tilemap/Tilemap.h"
 #include "tilemap/Tiles.h"
 
-KeyTile::KeyTile() : Tile(ColorUtils::GRAY, false) {
+KeyTile::KeyTile() : Tile(ColorUtils::GRAY, false, "key") {
 }
 
 void KeyTile::onCollision(int x, int y) const {

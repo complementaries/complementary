@@ -34,12 +34,9 @@ src = [
 zlib_proj = subproject('zlib')
 libjpeg_proj = subproject('libjpeg')
 libpng_proj = subproject('libpng')
-libogg_proj = subproject('libogg')
-vorbis_proj = subproject('vorbis')
 
 sdl2_proj = subproject('sdl2')
 sdl2_image_proj = subproject('sdl2_image')
-sdl2_mixer_proj = subproject('sdl2_mixer')
 glew_proj = subproject('glew')
 imgui_proj = subproject('imgui')
 rapidjson_proj = subproject('rapidjson')
@@ -49,12 +46,9 @@ dependencies = [
     zlib_proj.get_variable('zlib_dep'),
     libjpeg_proj.get_variable('jpeg_dep'),
     libpng_proj.get_variable('libpng_dep'),
-	libogg_proj.get_variable('libogg_dep'),
-	vorbis_proj.get_variable('vorbis_dep'),
 
     sdl2_proj.get_variable('sdl2_dep'),
     sdl2_image_proj.get_variable('sdl2_image_dep'),
-	sdl2_mixer_proj.get_variable('sdl2_mixer_dep'),
     glew_proj.get_variable('glew_dep'),
     imgui_proj.get_variable('imgui_dep'),
     rapidjson_proj.get_variable('rapidjson_dep'),

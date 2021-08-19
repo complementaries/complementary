@@ -6,6 +6,6 @@ incdir = include_directories('include')
 subdir('lib')
 if host_machine.system() != 'windows'
   # These don't seem to build on Windows.
-  subdir('vq')
+  #subdir('vq')
 endif
 subdir('test')

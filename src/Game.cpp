@@ -1,4 +1,3 @@
-#include <alloca.h>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -48,12 +47,13 @@ void Game::nextLevel() {
 
     printf("Loading level %s\n", level);
 
-    int size = snprintf(nullptr, 0, "assets/maps/%s.cmtm", level) + 1;
-    char* formattedTilemapName = (char*)alloca(size);
-    char* formattedObjectmapName = (char*)alloca(size);
+    char formattedTilemapName[100];
+    char formattedObjectmapName[100];
 
-    snprintf(formattedTilemapName, size, "assets/maps/%s.cmtm", level);
-    snprintf(formattedObjectmapName, size, "assets/maps/%s.cmom", level);
+    if (snprintf(formattedTilemapName, 100, "assets/maps/%s.cmtm", level) > 99) {
+        puts("The level file name is too long!");
+    }
+    snprintf(formattedObjectmapName, 100, "assets/maps/%s.cmom", level);
     snprintf(currentLevelName, 100, "assets/maps/%s", level);
 
     Tilemap::load(formattedTilemapName);

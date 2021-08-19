@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <algorithm>
 #include <cmath>
 #include <imgui_impl_opengl3.h>
@@ -21,8 +22,16 @@ static bool running = false;
 static int width = 850;
 static int height = 480;
 
+static Mix_Chunk* wave;
+static Mix_Chunk* music;
+
 bool Window::init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+        fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
+        return true;
+    }
+
+    if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
         fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
         return true;
     }
@@ -85,6 +94,14 @@ bool Window::init() {
     if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) != 1) SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
 
     SDL_GameControllerEventState(SDL_ENABLE);
+
+    music = Mix_LoadWAV("assets/sounds/Not Giving Up.ogg");
+    if (music == NULL) return -1;
+
+    wave = Mix_LoadWAV("assets/sounds/snap.ogg");
+    if (wave == NULL) return -1;
+
+    if (Mix_PlayChannel(-1, music, -1) == -1) return -1;
     return false;
 }
 
@@ -102,7 +119,14 @@ static void pollEvents() {
             case SDL_KEYDOWN: {
                 if (!e.key.repeat) {
                     switch (e.key.keysym.sym) {
-                        case SDLK_SPACE: Input::Internal::setButtonPressed(ButtonType::JUMP); break;
+                        case SDLK_SPACE: {
+                            Input::Internal::setButtonPressed(ButtonType::JUMP);
+                            int channel = Mix_PlayChannel(-1, wave, 0);
+                            if (channel != -1) {
+                                Mix_Volume(channel, MIX_MAX_VOLUME / 2);
+                            }
+                            break;
+                        }
                         case SDLK_RETURN:
                             Input::Internal::setButtonPressed(ButtonType::SWITCH);
                             break;
@@ -313,6 +337,13 @@ void Window::exit() {
     Input::setController(nullptr);
     SDL_DestroyWindow(window);
     SDL_Quit();
+
+    // clean up our resources
+    Mix_FreeChunk(wave);
+    Mix_FreeChunk(music);
+
+    // quit SDL_mixer
+    Mix_CloseAudio();
 }
 
 int Window::getWidth() {

@@ -8,6 +8,7 @@ namespace Game {
     void tick();
     void render(float lag);
     void renderImGui();
+    void nextLevel();
 
     void onWindowResize(int width, int height);
     void onMouseEvent(void* eventPointer);

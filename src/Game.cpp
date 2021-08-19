@@ -1,8 +1,10 @@
+#include <alloca.h>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <imgui.h>
 #include <string>
+#include <vector>
 
 #include "Game.h"
 #include "Input.h"
@@ -24,7 +26,10 @@
 
 Matrix Game::viewMatrix;
 
-static char levelName[50] = "assets/maps/map0";
+static std::vector<const char*> levelNames = {"map0", "map1"};
+static int levelIndex = 0;
+// TODO: make the level list configurable in the UI and get rid of this
+static char currentLevelName[100] = "assets/maps/map0";
 
 static TilemapEditor* tilemapEditor;
 
@@ -34,7 +39,27 @@ bool Game::init() {
         return true;
     }
 
+    nextLevel();
     return false;
+}
+
+void Game::nextLevel() {
+    const char* level = levelNames[levelIndex];
+
+    printf("Loading level %s\n", level);
+
+    int size = snprintf(nullptr, 0, "assets/maps/%s.cmtm", level) + 1;
+    char* formattedTilemapName = (char*)alloca(size);
+    char* formattedObjectmapName = (char*)alloca(size);
+
+    snprintf(formattedTilemapName, size, "assets/maps/%s.cmtm", level);
+    snprintf(formattedObjectmapName, size, "assets/maps/%s.cmom", level);
+    snprintf(currentLevelName, 100, "assets/maps/%s", level);
+
+    Tilemap::load(formattedTilemapName);
+    Objects::load(formattedObjectmapName);
+
+    levelIndex = (levelIndex + 1) % levelNames.size();
 }
 
 void Game::tick() {
@@ -85,6 +110,10 @@ void Game::renderImGui() {
 
     ImGui::Begin("DevGUI");
 
+    if (ImGui::Button("Next level")) {
+        nextLevel();
+    }
+
     if (ImGui::CollapsingHeader("Tilemap")) {
         ImGui::Text("Width: %d, Height: %d", Tilemap::getWidth(), Tilemap::getHeight());
 
@@ -92,11 +121,11 @@ void Game::renderImGui() {
             tilemapEditor = new TilemapEditor(Window::getWidth(), Window::getHeight());
         }
 
-        ImGui::InputText("Level name", levelName, 50);
+        ImGui::InputText("Level name", currentLevelName, 50);
         static char tileMapName[60];
-        sprintf(tileMapName, "%s.cmtm", levelName);
+        sprintf(tileMapName, "%s.cmtm", currentLevelName);
         static char objectMapName[60];
-        sprintf(objectMapName, "%s.cmom", levelName);
+        sprintf(objectMapName, "%s.cmom", currentLevelName);
 
         if (ImGui::Button("Load")) {
             Tilemap::load(tileMapName);

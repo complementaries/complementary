@@ -96,6 +96,7 @@ void Tilemap::forceReload() {
 void Tilemap::load(const char* path) {
     std::ifstream stream;
     stream.open(path, std::ios::binary);
+    assert(stream.is_open());
 
     char magic[5];
     stream.read(magic, 4);

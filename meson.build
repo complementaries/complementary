@@ -21,6 +21,7 @@ src = [
   'src/tilemap/tiles/DoorTile.cpp',
   'src/tilemap/tiles/KeyTile.cpp',
   'src/tilemap/tiles/SpikeTile.cpp',
+  'src/tilemap/tiles/GoalTile.cpp',
   'src/tilemap/tiles/Tile.cpp',
   'src/tilemap/Tilemap.cpp',
   'src/tilemap/TilemapEditor.cpp',

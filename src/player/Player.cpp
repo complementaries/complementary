@@ -392,29 +392,50 @@ void Player::render(float lag) {
 }
 
 void Player::renderImGui() {
-    ImGui::DragFloat("Move Speed", &data.moveSpeed, 0.02f);
-    ImGui::DragFloat("Joystick Exponent", &data.joystickExponent, 0.05f);
-    ImGui::DragFloat("Jump Init", &data.jumpInit, 0.1f);
-    ImGui::DragFloat("Jump Boost", &data.jumpBoost, 0.1f);
-    ImGui::DragInt("Jump Ticks", &data.maxJumpTicks, 1);
-    ImGui::DragFloat2("Wall Jump Init", data.wallJumpInit, 0.1f);
-    ImGui::DragFloat("Wall Jump Boost", &data.wallJumpBoost, 0.1f);
-    ImGui::DragFloat("Wall Jump Drag", &data.wallJumpDrag, 0.01f);
-    ImGui::DragInt("Wall Jump Ticks", &data.maxWallJumpTicks, 1);
-    ImGui::DragInt("Wall Jump Move Cooldown", &data.wallJumpMoveCooldown, 1);
-    ImGui::DragFloat("Gravity", &data.gravity, 0.01f);
-    ImGui::DragFloat2("Drag", data.drag, 0.1f);
-    ImGui::DragInt("Coyote Time", &data.coyoteTicks, 1);
-    ImGui::DragInt("Jump Buffer Ticks", &data.maxJumpBufferTicks, 1);
-    ImGui::DragInt("Dash Ticks", &data.maxDashTicks, 1);
-    ImGui::DragInt("Dash Cooldown", &data.maxDashCooldown, 1);
-    ImGui::DragFloat("Dash Strength", &data.dashStrength, 0.05f);
-
-    ImGui::Spacing();
+    ImGui::Indent();
 
     ImGui::DragFloat2("Position", position);
     ImGui::DragFloat2("Size", data.size);
     ImGui::DragFloat2("Velocity", data.velocity);
+
+    ImGui::Spacing();
+
+    ImGui::DragFloat("Move Speed", &data.moveSpeed, 0.02f);
+    ImGui::DragFloat("Joystick Exponent", &data.joystickExponent, 0.05f);
+    ImGui::DragFloat("Gravity", &data.gravity, 0.01f);
+    ImGui::DragFloat2("Drag", data.drag, 0.1f);
+
+    ImGui::Spacing();
+
+    if (ImGui::CollapsingHeader("Jump")) {
+        ImGui::Indent();
+        ImGui::DragFloat("Jump Init", &data.jumpInit, 0.1f);
+        ImGui::DragFloat("Jump Boost", &data.jumpBoost, 0.1f);
+        ImGui::DragInt("Jump Ticks", &data.maxJumpTicks, 1);
+        ImGui::DragInt("Coyote Time", &data.coyoteTicks, 1);
+        ImGui::DragInt("Jump Buffer Ticks", &data.maxJumpBufferTicks, 1);
+        ImGui::Unindent();
+    }
+
+    if (ImGui::CollapsingHeader("Wall Jump")) {
+        ImGui::Indent();
+        ImGui::DragFloat2("Init", data.wallJumpInit, 0.1f);
+        ImGui::DragFloat("Boost", &data.wallJumpBoost, 0.1f);
+        ImGui::DragFloat("Drag", &data.wallJumpDrag, 0.01f);
+        ImGui::DragInt("Ticks", &data.maxWallJumpTicks, 1);
+        ImGui::DragInt("Move Cooldown", &data.wallJumpMoveCooldown, 1);
+        ImGui::Unindent();
+    }
+
+    if (ImGui::CollapsingHeader("Dash")) {
+        ImGui::Indent();
+        ImGui::DragInt("Dash Ticks", &data.maxDashTicks, 1);
+        ImGui::DragInt("Dash Cooldown", &data.maxDashCooldown, 1);
+        ImGui::DragFloat("Dash Strength", &data.dashStrength, 0.05f);
+        ImGui::Unindent();
+    }
+
+    ImGui::Spacing();
 
     ImGui::PushDisabled();
     ImGui::DragFloat2("Acceleration", data.acceleration);
@@ -422,7 +443,6 @@ void Player::renderImGui() {
     ImGui::Checkbox("Right", &(collision[Face::RIGHT]));
     ImGui::Checkbox("Up", &(collision[Face::UP]));
     ImGui::Checkbox("Down", &(collision[Face::DOWN]));
-
     ImGui::PopDisabled();
 
     if (ImGui::Button("Respawn")) {
@@ -438,6 +458,7 @@ void Player::renderImGui() {
         printf("hello\n");
         save();
     }
+    ImGui::Unindent();
 }
 
 void Player::load() {

@@ -12,7 +12,6 @@
 #include "Game.h"
 #include "Input.h"
 #include "graphics/gl/Glew.h"
-#include "sound/audio.h"
 
 typedef long long int Nanos;
 static constexpr Nanos NANOS_PER_TICK = 1'000'000'000L * Window::SECONDS_PER_TICK;
@@ -27,19 +26,6 @@ bool Window::init() {
         fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
         return true;
     }
-
-    // Initialize Simple-SDL2-Audio
-    initAudio();
-
-    // Play music and a sound
-    playMusic("assets/sounds/snap.wav", SDL_MIX_MAXVOLUME);
-    // playSound("sounds/door1.wav", SDL_MIX_MAXVOLUME / 2);
-
-    // Let play for 1 second
-    SDL_Delay(1000);
-
-    // End Simple-SDL2-Audio
-    endAudio();
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);

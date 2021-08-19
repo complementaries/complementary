@@ -28,7 +28,8 @@ src = [
   'src/Game.cpp',
   'src/Input.cpp',
   'src/Main.cpp',
-  'src/tilemap/tiles/SpawnTile.cpp'
+  'src/tilemap/tiles/SpawnTile.cpp',
+  'src/sound/audio.c'
 ]
 
 zlib_proj = subproject('zlib')

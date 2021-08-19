@@ -45,7 +45,7 @@ vorbisfile_lib = static_library('vorbisfile', vorbisfile_sources,
 vorbisfile_dep = declare_dependency(link_with : vorbisfile_lib,
   include_directories : incdir)
 
-vorbisenc_lib = library('vorbisenc', vorbisenc_sources,
+vorbisenc_lib = static_library('vorbisenc', vorbisenc_sources,
   include_directories : [incdir],
   link_with: vorbis_lib,
   dependencies : [ogg_dep, math_dep],

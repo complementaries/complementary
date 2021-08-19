@@ -106,7 +106,7 @@ void Objects::render(float lag) {
 
 void Objects::load(const char* path) {
     std::ifstream stream;
-    stream.open(path);
+    stream.open(path, std::ios::binary);
 
     char magic[5];
     stream.read(magic, 4);
@@ -148,7 +148,7 @@ void Objects::save(const char* path) {
     size_t objectNum = objects.size();
 
     std::ofstream stream;
-    stream.open(path);
+    stream.open(path, std::ios::binary);
 
     stream.write("CMOM", 4);
     stream.write(empty, 8);

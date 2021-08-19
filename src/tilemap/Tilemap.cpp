@@ -95,7 +95,7 @@ void Tilemap::forceReload() {
 
 void Tilemap::load(const char* path) {
     std::ifstream stream;
-    stream.open(path);
+    stream.open(path, std::ios::binary);
 
     char magic[5];
     stream.read(magic, 4);
@@ -133,7 +133,7 @@ Vector Tilemap::getSpawnPoint() {
 
 void Tilemap::save(const char* path) {
     std::ofstream stream;
-    stream.open(path);
+    stream.open(path, std::ios::binary);
 
     stream.write("CMTM", 4);
     stream.write((const char*)&width, 4);

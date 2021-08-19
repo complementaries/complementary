@@ -45,6 +45,29 @@ struct PlayerData {
     float dashStrength = 0.35f;
 };
 
+struct PlayerDataTest {
+    Vector size{0.8f, 0.8f};
+    Vector velocity;
+    Vector acceleration;
+    float moveSpeed = 0.04f;
+    /*float joystickExponent = 5.0f;
+    float jumpInit = 0.3f;
+    float jumpBoost = 0.1f;
+    int maxJumpTicks = 40;
+    Vector wallJumpInit{0.5f, 0.4f};
+    float wallJumpBoost = 0.1f;
+    int maxWallJumpTicks = 40;
+    float wallJumpDrag = 0.2f;
+    int wallJumpMoveCooldown = 15;
+    float gravity = 0.03f;
+    int coyoteTicks = 13;
+    Vector drag{0.7f, 0.9f};
+    int maxJumpBufferTicks = 10;
+    int maxDashTicks = 24;
+    int maxDashCooldown = 24;
+    float dashStrength = 0.35f;*/
+};
+
 static PlayerData data;
 static Ability abilities[2] = {Ability::NONE, Ability::NONE};
 static std::array<bool, FACES> collision;
@@ -419,7 +442,7 @@ void Player::renderImGui() {
 
 void Player::load() {
     std::ifstream stream;
-    stream.open("assets/player.cmpl");
+    stream.open("assets/player.cmpl", std::ios::binary);
     if (!stream.good()) {
         printf("Failed to load player data.\n");
         return;
@@ -436,7 +459,7 @@ void Player::load() {
 
 void Player::save() {
     std::ofstream stream;
-    stream.open("assets/player.cmpl");
+    stream.open("assets/player.cmpl", std::ios::binary);
 
     stream.write("CMPL", 4);
     stream.write((char*)&data, sizeof(PlayerData));

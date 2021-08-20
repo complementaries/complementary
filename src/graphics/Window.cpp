@@ -22,8 +22,11 @@ static bool running = false;
 static int width = 850;
 static int height = 480;
 
-static Mix_Chunk* wave;
-static Mix_Chunk* music;
+static Mix_Chunk* light;
+static Mix_Chunk* dark;
+static Mix_Chunk* jump;
+static Mix_Chunk* world_switch;
+static int curTrack = 0;
 
 bool Window::init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
@@ -95,13 +98,25 @@ bool Window::init() {
 
     SDL_GameControllerEventState(SDL_ENABLE);
 
-    music = Mix_LoadWAV("assets/sounds/Not Giving Up.ogg");
-    if (music == NULL) return -1;
+    light = Mix_LoadWAV("assets/sounds/light.ogg");
+    if (light == NULL) return -1;
 
-    wave = Mix_LoadWAV("assets/sounds/snap.ogg");
-    if (wave == NULL) return -1;
+    dark = Mix_LoadWAV("assets/sounds/dark.ogg");
+    if (dark == NULL) return -1;
 
-    if (Mix_PlayChannel(-1, music, -1) == -1) return -1;
+    jump = Mix_LoadWAV("assets/sounds/jump.ogg");
+    if (jump == NULL) return -1;
+
+    world_switch = Mix_LoadWAV("assets/sounds/switch.ogg");
+    if (jump == NULL) return -1;
+
+    if (Mix_PlayChannel(curTrack, light, -1) == -1) return -1;
+    Mix_Volume(curTrack, MIX_MAX_VOLUME / 2);
+
+    curTrack = 1 - curTrack;
+
+    if (Mix_PlayChannel(curTrack, dark, -1) == -1) return -1;
+    Mix_Volume(curTrack, 0);
     return false;
 }
 
@@ -121,15 +136,20 @@ static void pollEvents() {
                     switch (e.key.keysym.sym) {
                         case SDLK_SPACE: {
                             Input::Internal::setButtonPressed(ButtonType::JUMP);
-                            int channel = Mix_PlayChannel(-1, wave, 0);
+                            int channel = Mix_PlayChannel(-1, jump, 0);
                             if (channel != -1) {
                                 Mix_Volume(channel, MIX_MAX_VOLUME / 2);
                             }
                             break;
                         }
-                        case SDLK_RETURN:
+                        case SDLK_RETURN: {
                             Input::Internal::setButtonPressed(ButtonType::SWITCH);
+                            Mix_PlayChannel(-1, world_switch, 0);
+                            Mix_Volume(curTrack, MIX_MAX_VOLUME / 2);
+                            curTrack = 1 - curTrack;
+                            Mix_Volume(curTrack, 0);
                             break;
+                        }
                         case SDLK_LSHIFT:
                         case SDLK_RSHIFT:
                             Input::Internal::setButtonPressed(ButtonType::ABILITY);
@@ -339,8 +359,9 @@ void Window::exit() {
     SDL_Quit();
 
     // clean up our resources
-    Mix_FreeChunk(wave);
-    Mix_FreeChunk(music);
+    Mix_FreeChunk(light);
+    Mix_FreeChunk(dark);
+    Mix_FreeChunk(jump);
 
     // quit SDL_mixer
     Mix_CloseAudio();

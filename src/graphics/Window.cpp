@@ -144,7 +144,7 @@ static void pollEvents() {
                         }
                         case SDLK_RETURN: {
                             Input::Internal::setButtonPressed(ButtonType::SWITCH);
-                            Mix_PlayChannel(-1, world_switch, 0);
+                            //Mix_PlayChannel(-1, world_switch, 0);
                             Mix_Volume(curTrack, MIX_MAX_VOLUME / 2);
                             curTrack = 1 - curTrack;
                             Mix_Volume(curTrack, 0);

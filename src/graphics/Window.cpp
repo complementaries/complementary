@@ -34,7 +34,7 @@ bool Window::init() {
         return true;
     }
 
-    if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
         fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
         return true;
     }
@@ -144,7 +144,7 @@ static void pollEvents() {
                         }
                         case SDLK_RETURN: {
                             Input::Internal::setButtonPressed(ButtonType::SWITCH);
-                            //Mix_PlayChannel(-1, world_switch, 0);
+                            Mix_PlayChannel(-1, world_switch, 0);
                             Mix_Volume(curTrack, MIX_MAX_VOLUME / 2);
                             curTrack = 1 - curTrack;
                             Mix_Volume(curTrack, 0);

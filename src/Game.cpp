@@ -25,10 +25,12 @@
 
 Matrix Game::viewMatrix;
 
+static constexpr int MAX_LEVEL_NAME_LENGTH = 100;
+
 static std::vector<const char*> levelNames = {"map0", "map1"};
 static int levelIndex = 0;
 // TODO: make the level list configurable in the UI and get rid of this
-static char currentLevelName[100] = "assets/maps/map0";
+static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "assets/maps/map0";
 
 static TilemapEditor* tilemapEditor;
 
@@ -47,14 +49,14 @@ void Game::nextLevel() {
 
     printf("Loading level %s\n", level);
 
-    char formattedTilemapName[100];
-    char formattedObjectmapName[100];
+    char formattedTilemapName[MAX_LEVEL_NAME_LENGTH];
+    char formattedObjectmapName[MAX_LEVEL_NAME_LENGTH];
 
-    if (snprintf(formattedTilemapName, 100, "assets/maps/%s.cmtm", level) > 99) {
+    if (snprintf(formattedTilemapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmtm", level) > 99) {
         puts("The level file name is too long!");
     }
-    snprintf(formattedObjectmapName, 100, "assets/maps/%s.cmom", level);
-    snprintf(currentLevelName, 100, "assets/maps/%s", level);
+    snprintf(formattedObjectmapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmom", level);
+    snprintf(currentLevelName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s", level);
 
     Tilemap::load(formattedTilemapName);
     Objects::load(formattedObjectmapName);
@@ -122,10 +124,10 @@ void Game::renderImGui() {
         }
 
         ImGui::InputText("Level name", currentLevelName, 50);
-        static char tileMapName[60];
-        sprintf(tileMapName, "%s.cmtm", currentLevelName);
-        static char objectMapName[60];
-        sprintf(objectMapName, "%s.cmom", currentLevelName);
+        static char tileMapName[MAX_LEVEL_NAME_LENGTH];
+        snprintf(tileMapName, MAX_LEVEL_NAME_LENGTH, "%s.cmtm", currentLevelName);
+        static char objectMapName[MAX_LEVEL_NAME_LENGTH];
+        snprintf(objectMapName, MAX_LEVEL_NAME_LENGTH, "%s.cmom", currentLevelName);
 
         if (ImGui::Button("Load")) {
             Tilemap::load(tileMapName);

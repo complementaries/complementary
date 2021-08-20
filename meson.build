@@ -66,7 +66,11 @@ args = ['-Wall']
 if host_machine.system() == 'windows'
     args += []
 elif host_machine.system() == 'darwin' or host_machine.system() == 'linux'
-    args += ['-Werror', '-Wextra', '-pedantic', '-Wno-comment', '-Wno-unused-parameter', '-Wno-format-truncation']
+    args += ['-Werror', '-Wextra', '-pedantic', '-Wno-comment', '-Wno-unused-parameter']
+endif
+
+if host_machine.system() == 'linux'
+    args += ['-Wno-format-truncation']
 endif
 
 if host_machine.system() == 'darwin'

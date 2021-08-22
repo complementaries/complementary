@@ -368,6 +368,9 @@ void Player::render(float lag) {
     shader.use();
     shader.setMatrix("view", Game::viewMatrix);
 
+    Matrix model;
+    shader.setMatrix("model", model);
+
     Vector i = lastPosition + (position - lastPosition) * lag;
 
     Buffer buf;

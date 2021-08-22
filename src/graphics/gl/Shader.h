@@ -33,6 +33,6 @@ namespace GL {
         GLuint fragment;
         GLuint program;
     };
-} // namespace GL
+}
 
 #endif

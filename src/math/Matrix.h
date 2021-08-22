@@ -1,10 +1,23 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-typedef float Matrix[16];
+#include "Vector.h"
 
-namespace MatrixUtils {
-    void setTransform(float width, float height, Matrix& matrix);
-}
+class Matrix final {
+  public:
+    Matrix();
+
+    Matrix& operator*=(const Matrix& other);
+    Matrix operator*(const Matrix& other) const;
+
+    Matrix& unit();
+    Matrix& scale(const Vector& v);
+    Matrix& transform(const Vector& v);
+
+    const float* getData() const;
+
+  private:
+    float data[16];
+};
 
 #endif

@@ -101,8 +101,9 @@ void Game::render(float lag) {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
     glClear(GL_COLOR_BUFFER_BIT);
-    MatrixUtils::setTransform(Tilemap::getWidth(), Tilemap::getHeight(), viewMatrix);
-    (void)lag;
+    viewMatrix.unit()
+        .transform(Vector(-1.0f, 1.0f))
+        .scale(Vector(2.0f / Tilemap::getWidth(), -2.0f / Tilemap::getHeight()));
     Tilemap::render();
 
     glEnable(GL_BLEND);

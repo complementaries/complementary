@@ -15,6 +15,7 @@
 #include "imgui/ImGuiUtils.h"
 #include "math/Matrix.h"
 #include "objects/ColorObject.h"
+#include "objects/MovingObject.h"
 #include "objects/ObjectRenderer.h"
 #include "objects/Objects.h"
 #include "objects/WindObject.h"
@@ -43,6 +44,10 @@ bool Game::init() {
 
     nextLevel();
     Objects::add(std::make_shared<WindObject>(Vector(), Vector(10.0f, 20.0f), Vector(0.01f, 0.0f)));
+    Objects::add(std::make_shared<MovingObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
+                                                Vector(1.0f, 24.0f), 0.025f));
+    Objects::add(std::make_shared<MovingObject>(Vector(2.0f, 1.0f), Vector(5.0f, 25.0f),
+                                                Vector(2.0f, 25.0f), 0.025f));
     return false;
 }
 

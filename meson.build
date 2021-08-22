@@ -11,6 +11,7 @@ src = [
   'src/math/Vector.cpp',
   'src/objects/ColorObject.cpp',
   'src/objects/WindObject.cpp',
+  'src/objects/MovingObject.cpp',
   'src/objects/Object.cpp',
   'src/objects/ObjectRenderer.cpp',
   'src/objects/Objects.cpp',

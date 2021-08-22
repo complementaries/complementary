@@ -2,7 +2,6 @@
 
 #include "ObjectRenderer.h"
 #include "player/Player.h"
-#include <iostream>
 #include <memory>
 
 WindObject::WindObject() {

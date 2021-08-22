@@ -76,8 +76,36 @@ Vector Vector::operator*(const Vector& other) const {
     return v;
 }
 
+Vector& Vector::operator/=(float f) {
+    x /= f;
+    y /= f;
+    return *this;
+}
+
+Vector Vector::operator/(float f) const {
+    Vector v = *this;
+    v /= f;
+    return v;
+}
+
+Vector& Vector::operator/=(const Vector& other) {
+    x /= other.x;
+    y /= other.y;
+    return *this;
+}
+
+Vector Vector::operator/(const Vector& other) const {
+    Vector v = *this;
+    v /= other;
+    return v;
+}
+
+float Vector::getLength() const {
+    return sqrtf(x * x + y * y);
+}
+
 void Vector::normalize() {
-    *this *= 1.0f / sqrtf(x * x + y * y);
+    *this *= 1.0f / getLength();
 }
 
 const float* Vector::data() const {

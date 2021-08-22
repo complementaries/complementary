@@ -21,6 +21,7 @@ static GL::Shader shader;
 static GL::VertexBuffer buffer;
 static Vector lastPosition;
 static Vector position;
+static Vector baseVelocity;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -43,29 +44,6 @@ struct PlayerData {
     int maxDashTicks = 24;
     int maxDashCooldown = 24;
     float dashStrength = 0.35f;
-};
-
-struct PlayerDataTest {
-    Vector size{0.8f, 0.8f};
-    Vector velocity;
-    Vector acceleration;
-    float moveSpeed = 0.04f;
-    /*float joystickExponent = 5.0f;
-    float jumpInit = 0.3f;
-    float jumpBoost = 0.1f;
-    int maxJumpTicks = 40;
-    Vector wallJumpInit{0.5f, 0.4f};
-    float wallJumpBoost = 0.1f;
-    int maxWallJumpTicks = 40;
-    float wallJumpDrag = 0.2f;
-    int wallJumpMoveCooldown = 15;
-    float gravity = 0.03f;
-    int coyoteTicks = 13;
-    Vector drag{0.7f, 0.9f};
-    int maxJumpBufferTicks = 10;
-    int maxDashTicks = 24;
-    int maxDashCooldown = 24;
-    float dashStrength = 0.35f;*/
 };
 
 static PlayerData data;
@@ -104,6 +82,10 @@ bool Player::isColliding(Face face) {
     return collision[face];
 }
 
+bool Player::isColliding(const ObjectBase& o) {
+    return o.collidesWith(position, data.size);
+}
+
 static bool isColliding() {
     int minX = floorf(position[0]);
     int minY = floorf(position[1]);
@@ -128,6 +110,14 @@ void Player::addForce(const Vector& force) {
 
 void Player::addForce(Face face, float force) {
     addForce(FaceUtils::getDirection(face) * force);
+}
+
+void Player::addBaseVelocity(const Vector& v) {
+    baseVelocity += v;
+}
+
+void Player::moveForced(const Vector& v) {
+    position += v;
 }
 
 void Player::setPosition(const Vector& pos) {
@@ -356,6 +346,8 @@ void Player::tick() {
                                 (1.0f - static_cast<float>(dashTicks) / data.maxDashTicks));
     } else {
         data.velocity *= actualDrag;
+        data.velocity += (Vector(1.0f, 1.0f) - actualDrag) * baseVelocity;
+        baseVelocity = Vector();
     }
 
     move();

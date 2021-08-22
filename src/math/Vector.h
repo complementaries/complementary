@@ -16,6 +16,7 @@ struct Vector final {
 
     Vector& operator-=(const Vector& other);
     Vector operator-(const Vector& other) const;
+    Vector operator-() const;
 
     Vector& operator*=(float f);
     Vector operator*(float f) const;

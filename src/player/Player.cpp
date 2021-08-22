@@ -22,6 +22,8 @@ static GL::VertexBuffer buffer;
 static Vector lastPosition;
 static Vector position;
 static Vector baseVelocity;
+static float renderForce;
+static Vector renderOffset;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -49,6 +51,7 @@ struct PlayerData {
 static PlayerData data;
 static Ability abilities[2] = {Ability::NONE, Ability::NONE};
 static std::array<bool, FACES> collision;
+static std::array<bool, FACES> lastCollision;
 static int fakeGrounded = 0;
 static bool leftWall = false;
 static bool rightWall = false;
@@ -76,6 +79,10 @@ bool Player::init() {
 
     load();
     return false;
+}
+
+static bool wasColliding(Face face) {
+    return lastCollision[face];
 }
 
 bool Player::isColliding(Face face) {
@@ -110,6 +117,11 @@ void Player::addForce(const Vector& force) {
 
 void Player::addForce(Face face, float force) {
     addForce(FaceUtils::getDirection(face) * force);
+}
+
+static void addRenderForce(float force, Face face) {
+    renderForce += force;
+    renderOffset = (FaceUtils::getDirection(face) + Vector(1.0f, 1.0f)) * 0.5f;
 }
 
 void Player::addBaseVelocity(const Vector& v) {
@@ -150,6 +162,8 @@ static void tickWallJumpCollision(Face face, bool& wall) {
 }
 
 static void tickCollision() {
+    lastCollision = collision;
+
     for (Face face : FaceUtils::getFaces()) {
         Vector min = position + FaceUtils::getDirection(face) * step;
         Vector max = min + data.size;
@@ -279,6 +293,7 @@ void Player::tick() {
             jumpTicks = data.maxJumpTicks;
             wallJumpCooldown = 10;
             jumpBufferTicks = 0;
+            addRenderForce(1.0f, Face::UP);
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
             if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
                 wallJumpDirection = Vector(1.0f, -1.0f);
@@ -286,12 +301,14 @@ void Player::tick() {
                 wallJumpTicks = data.maxWallJumpTicks;
                 leftWallJumpCooldown = data.wallJumpMoveCooldown;
                 jumpBufferTicks = 0;
+                addRenderForce(-0.5f, Face::LEFT);
             } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed) {
                 wallJumpDirection = Vector(-1.0f, -1.0f);
                 addForce(wallJumpDirection * data.wallJumpInit);
                 wallJumpTicks = data.maxWallJumpTicks;
                 rightWallJumpCooldown = data.wallJumpMoveCooldown;
                 jumpBufferTicks = 0;
+                addRenderForce(-0.5f, Face::RIGHT);
             }
         }
     }
@@ -330,6 +347,7 @@ void Player::tick() {
         dashUseable = false;
         dashCoolDown = data.maxDashCooldown + dashTicks;
         dashVelocity = Vector(data.dashStrength * dashDirection, 0.0f);
+        addRenderForce(-0.5f, dashDirection < 0.0f ? Face::LEFT : Face::RIGHT);
     }
     if (leftWall || rightWall) {
         dashUseable = true;
@@ -350,6 +368,8 @@ void Player::tick() {
         baseVelocity = Vector();
     }
 
+    float fallStrenght = data.velocity.y;
+
     move();
     tickCollision();
     if (isColliding(Face::DOWN)) {
@@ -362,6 +382,20 @@ void Player::tick() {
         jumpTicks = 0;
         wallJumpTicks = 0;
     }
+
+    if (!wasColliding(Face::DOWN) && isColliding(Face::DOWN)) {
+        addRenderForce(-2.0f * fallStrenght, Face::DOWN);
+    }
+    if (!wasColliding(Face::UP) && isColliding(Face::UP)) {
+        addRenderForce(2.0f * fallStrenght, Face::UP);
+    }
+    if (!wasColliding(Face::RIGHT) && isColliding(Face::RIGHT)) {
+        addRenderForce(0.25f, Face::RIGHT);
+    }
+    if (!wasColliding(Face::LEFT) && isColliding(Face::LEFT)) {
+        addRenderForce(0.25f, Face::LEFT);
+    }
+    renderForce *= 0.95f;
 }
 
 void Player::render(float lag) {
@@ -369,22 +403,22 @@ void Player::render(float lag) {
     shader.setMatrix("view", Game::viewMatrix);
 
     Matrix model;
+    model.transform(lastPosition + (position - lastPosition) * lag);
+    model.scale(data.size);
+    float wobble = 1.0f + renderForce;
+    model.transform(renderOffset);
+    model.scale(Vector(1.0f / wobble, wobble));
+    model.transform(-renderOffset);
     shader.setMatrix("model", model);
 
-    Vector i = lastPosition + (position - lastPosition) * lag;
-
     Buffer buf;
-    float minX = i[0];
-    float minY = i[1];
-    float maxX = minX + data.size[0];
-    float maxY = minY + data.size[1];
     Color color = AbilityUtils::getColor(abilities[worldType]);
-    buf.add(minX).add(minY).add(color);
-    buf.add(maxX).add(minY).add(color);
-    buf.add(minX).add(maxY).add(color);
-    buf.add(maxX).add(maxY).add(color);
-    buf.add(maxX).add(minY).add(color);
-    buf.add(minX).add(maxY).add(color);
+    buf.add(0.0f).add(0.0f).add(color);
+    buf.add(1.0f).add(0.0f).add(color);
+    buf.add(0.0f).add(1.0f).add(color);
+    buf.add(1.0f).add(1.0f).add(color);
+    buf.add(1.0f).add(0.0f).add(color);
+    buf.add(0.0f).add(1.0f).add(color);
 
     buffer.setData(buf.getData(), buf.getSize());
     buffer.drawTriangles(6);

@@ -48,6 +48,10 @@ Vector Vector::operator-(const Vector& other) const {
     return v;
 }
 
+Vector Vector::operator-() const {
+    return Vector(-x, -y);
+}
+
 Vector& Vector::operator*=(float f) {
     x *= f;
     y *= f;

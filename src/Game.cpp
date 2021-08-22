@@ -104,6 +104,7 @@ void Game::render(float lag) {
     viewMatrix.unit()
         .transform(Vector(-1.0f, 1.0f))
         .scale(Vector(2.0f / Tilemap::getWidth(), -2.0f / Tilemap::getHeight()));
+    Player::render(lag);
     Tilemap::render();
 
     glEnable(GL_BLEND);
@@ -111,8 +112,6 @@ void Game::render(float lag) {
     glBlendEquation(GL_FUNC_ADD);
     Objects::render(lag);
     glDisable(GL_BLEND);
-
-    Player::render(lag);
 
     if (tilemapEditor) {
         tilemapEditor->render();

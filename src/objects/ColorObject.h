@@ -2,7 +2,6 @@
 #define COLOROBJECT_H
 
 #include "Object.h"
-#include "graphics/Color.h"
 #include "math/Vector.h"
 #include "player/Ability.h"
 

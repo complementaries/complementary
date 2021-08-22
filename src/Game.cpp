@@ -17,6 +17,7 @@
 #include "objects/ColorObject.h"
 #include "objects/ObjectRenderer.h"
 #include "objects/Objects.h"
+#include "objects/WindObject.h"
 #include "particles/Particles.h"
 #include "player/Player.h"
 #include "tilemap/Tilemap.h"
@@ -41,6 +42,7 @@ bool Game::init() {
     }
 
     nextLevel();
+    Objects::add(std::make_shared<WindObject>(Vector(), Vector(10.0f, 20.0f), Vector(0.01f, 0.0f)));
     return false;
 }
 
@@ -97,7 +99,13 @@ void Game::render(float lag) {
     MatrixUtils::setTransform(Tilemap::getWidth(), Tilemap::getHeight(), viewMatrix);
     (void)lag;
     Tilemap::render();
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquation(GL_FUNC_ADD);
     Objects::render(lag);
+    glDisable(GL_BLEND);
+
     Player::render(lag);
 
     if (tilemapEditor) {

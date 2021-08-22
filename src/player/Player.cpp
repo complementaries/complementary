@@ -246,6 +246,10 @@ bool Player::hasAbility(Ability a) {
     return abilities[worldType] == a;
 }
 
+bool Player::isGliding() {
+    return true;
+}
+
 bool Player::invertColors() {
     return worldType;
 }
@@ -261,7 +265,6 @@ void Player::tick() {
     leftWallJumpCooldown -= leftWallJumpCooldown > 0;
     rightWallJumpCooldown -= rightWallJumpCooldown > 0;
 
-    data.acceleration = Vector();
     int sign = Input::getHorizontal() < 0
                    ? -1 + static_cast<float>(leftWallJumpCooldown) / data.wallJumpMoveCooldown
                    : 1 - static_cast<float>(rightWallJumpCooldown) / data.wallJumpMoveCooldown;
@@ -324,6 +327,7 @@ void Player::tick() {
     wallJumpCooldown -= wallJumpCooldown > 0;
 
     data.velocity += data.acceleration;
+    data.acceleration = Vector();
     Vector actualDrag = data.drag;
     if (((leftWall && Input::getButton(ButtonType::LEFT).pressed) ||
          (rightWall && Input::getButton(ButtonType::RIGHT).pressed)) &&

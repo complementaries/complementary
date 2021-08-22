@@ -17,6 +17,7 @@ namespace Player {
 
     void setAbilities(Ability dark, Ability light);
     bool hasAbility(Ability a);
+    bool isGliding();
 
     void tick();
     void render(float lag);

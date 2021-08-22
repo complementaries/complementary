@@ -104,7 +104,7 @@ bool Window::init() {
     dark = Mix_LoadWAV("assets/sounds/dark.ogg");
     if (dark == NULL) return -1;
 
-    jump = Mix_LoadWAV("assets/sounds/jump.ogg");
+    jump = Mix_LoadWAV("assets/sounds/jump2.ogg");
     if (jump == NULL) return -1;
 
     world_switch = Mix_LoadWAV("assets/sounds/switch.ogg");

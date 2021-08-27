@@ -46,6 +46,8 @@ struct PlayerData {
     int maxDashTicks = 24;
     int maxDashCooldown = 24;
     float dashStrength = 0.35f;
+    float gliderGravity = 0.005f;
+    int maxJumpCount = 2;
 };
 
 static PlayerData data;
@@ -70,6 +72,8 @@ static int dashCoolDown = 0;
 static Vector dashVelocity;
 static float dashDirection = 1.0f;
 static bool dashUseable = false;
+
+static int jumpCount = 0;
 
 bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
@@ -274,7 +278,13 @@ void Player::tick() {
                    : 1 - static_cast<float>(rightWallJumpCooldown) / data.wallJumpMoveCooldown;
     addForce(Face::RIGHT,
              powf(std::abs(Input::getHorizontal()), data.joystickExponent) * data.moveSpeed * sign);
-    addForce(Face::DOWN, data.gravity);
+
+    if (hasAbility(Ability::GLIDER) && jumpTicks == 0 &&
+        Input::getButton(ButtonType::ABILITY).pressed) {
+        addForce(Face::DOWN, data.gliderGravity);
+    } else {
+        addForce(Face::DOWN, data.gravity);
+    }
 
     if (Input::getHorizontal() > 0.0f) {
         dashDirection = 1.0f;
@@ -288,12 +298,15 @@ void Player::tick() {
     jumpBufferTicks -= jumpBufferTicks > 0;
 
     if (jumpBufferTicks > 0) {
-        if (fakeGrounded > 0) {
+        if (fakeGrounded > 0 ||
+            (hasAbility(Ability::DOUBLE_JUMP) && jumpCount < data.maxJumpCount)) {
             addForce(Face::UP, data.jumpInit);
             jumpTicks = data.maxJumpTicks;
             wallJumpCooldown = 10;
             jumpBufferTicks = 0;
             addRenderForce(1.0f, Face::UP);
+            jumpCount++;
+            fakeGrounded = 0;
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
             if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
                 wallJumpDirection = Vector(1.0f, -1.0f);
@@ -377,6 +390,10 @@ void Player::tick() {
         dashUseable = true;
     }
     fakeGrounded -= fakeGrounded > 0;
+
+    if (fakeGrounded > 0) {
+        jumpCount = 0;
+    }
 
     if (isColliding(Face::UP)) {
         jumpTicks = 0;
@@ -466,6 +483,14 @@ void Player::renderImGui() {
         ImGui::DragInt("Dash Cooldown", &data.maxDashCooldown, 1);
         ImGui::DragFloat("Dash Strength", &data.dashStrength, 0.05f);
         ImGui::Unindent();
+    }
+
+    if (ImGui::CollapsingHeader("Glider")) {
+        ImGui::DragFloat("Glider Gravity", &data.gliderGravity, 0.01f);
+    }
+
+    if (ImGui::CollapsingHeader("Double Jump")) {
+        ImGui::DragInt("Maximum Jump Count", &data.maxJumpCount, 1);
     }
 
     ImGui::Spacing();

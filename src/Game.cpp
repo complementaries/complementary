@@ -43,11 +43,6 @@ bool Game::init() {
     }
 
     nextLevel();
-    Objects::add(std::make_shared<WindObject>(Vector(), Vector(10.0f, 20.0f), Vector(0.01f, 0.0f)));
-    Objects::add(std::make_shared<MovingObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
-                                                Vector(1.0f, 24.0f), 0.025f));
-    Objects::add(std::make_shared<MovingObject>(Vector(2.0f, 1.0f), Vector(5.0f, 25.0f),
-                                                Vector(2.0f, 25.0f), 0.025f));
     return false;
 }
 
@@ -72,6 +67,10 @@ void Game::nextLevel() {
 }
 
 void Game::tick() {
+    if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
+        Player::toggleWorld();
+    }
+
     if (tilemapEditor) {
         tilemapEditor->tick(Window::SECONDS_PER_TICK);
         if (Input::getButton(ButtonType::ABILITY).pressedFirstFrame) {
@@ -81,11 +80,11 @@ void Game::tick() {
         }
 
         float zoom = tilemapEditor->getZoom();
-        if (Input::getButton(ButtonType::RIGHT).pressed) {
-            zoom += 0.02f;
+        if (Input::getButton(ButtonType::RIGHT).pressedFirstFrame) {
+            zoom++;
         }
-        if (Input::getButton(ButtonType::LEFT).pressed) {
-            zoom -= 0.02f;
+        if (Input::getButton(ButtonType::LEFT).pressedFirstFrame) {
+            zoom--;
         }
         tilemapEditor->setZoom(zoom);
     } else {
@@ -129,12 +128,17 @@ void Game::renderImGui() {
         nextLevel();
     }
 
-    if (ImGui::CollapsingHeader("Tilemap")) {
+    if (ImGui::CollapsingHeader("Tilemap", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::Text("Width: %d, Height: %d", Tilemap::getWidth(), Tilemap::getHeight());
 
         if (!tilemapEditor && ImGui::Button("Open Editor")) {
             tilemapEditor = new TilemapEditor(Window::getWidth(), Window::getHeight());
         }
+
+        int zoom = static_cast<int>(tilemapEditor->getZoom());
+        ImGui::SameLine();
+        ImGui::SliderInt("Zoom", &zoom, 1, 3);
+        tilemapEditor->setZoom(zoom);
 
         ImGui::InputText("Level name", currentLevelName, 50);
         static char tileMapName[MAX_LEVEL_NAME_LENGTH];
@@ -154,7 +158,7 @@ void Game::renderImGui() {
         }
     }
 
-    if (ImGui::CollapsingHeader("Player")) {
+    if (ImGui::CollapsingHeader("Player", ImGuiTreeNodeFlags_DefaultOpen)) {
         Player::renderImGui();
     }
 

@@ -17,6 +17,7 @@ namespace Player {
     void moveForced(const Vector& v);
     void kill();
     bool invertColors();
+    void toggleWorld();
     void setPosition(const Vector& pos);
 
     void setAbilities(Ability dark, Ability light);

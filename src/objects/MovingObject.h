@@ -25,6 +25,11 @@ class MovingObject : public Object<MovingObjectData> {
     void render(float lag) const override;
     std::shared_ptr<ObjectBase> clone() override;
 
+#ifndef NDEBUG
+    void initTileEditorData(std::vector<TileEditorProp>& props) override;
+    void applyTileEditorData(float* props) override;
+#endif
+
   private:
     Vector lastPosition;
     Vector velocity;

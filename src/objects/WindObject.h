@@ -20,6 +20,11 @@ class WindObject : public Object<WindObjectData> {
     bool collidesWith(const Vector& position, const Vector& size) const override;
     void render(float lag) const override;
     std::shared_ptr<ObjectBase> clone() override;
+
+#ifndef NDEBUG
+    void initTileEditorData(std::vector<TileEditorProp>& props) override;
+    void applyTileEditorData(float* props) override;
+#endif
 };
 
 #endif

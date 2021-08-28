@@ -69,3 +69,27 @@ void MovingObject::render(float lag) const {
 std::shared_ptr<ObjectBase> MovingObject::clone() {
     return std::make_shared<MovingObject>(data);
 }
+
+#ifndef NDEBUG
+void MovingObject::initTileEditorData(std::vector<TileEditorProp>& props) {
+    props.insert(props.end(), {
+                                  TileEditorProp::Int("Size X", data.size.x, 0, 5),
+                                  TileEditorProp::Int("Size Y", data.size.y, 0, 5),
+                                  TileEditorProp::Float("Goal 1 X", data.goalA.x, 0.f, 200.f),
+                                  TileEditorProp::Float("Goal 1 Y", data.goalA.y, 0.f, 200.f),
+                                  TileEditorProp::Float("Goal 2 X", data.goalB.x, 0.f, 200.f),
+                                  TileEditorProp::Float("Goal 2 Y", data.goalB.y, 0.f, 200.f),
+                                  TileEditorProp::Float("Speed", data.speed, 0.f, 0.5f),
+                              });
+}
+
+void MovingObject::applyTileEditorData(float* props) {
+    data.size.x = props[0];
+    data.size.y = props[1];
+    data.goalA.x = props[2];
+    data.goalA.y = props[3];
+    data.goalB.x = props[4];
+    data.goalB.y = props[5];
+    data.speed = props[6];
+}
+#endif

@@ -8,7 +8,9 @@
 #include <vector>
 
 #include "objects/ColorObject.h"
+#include "objects/MovingObject.h"
 #include "objects/ObjectRenderer.h"
+#include "objects/WindObject.h"
 #include "player/Player.h"
 
 static std::vector<std::shared_ptr<ObjectBase>> objects;
@@ -19,11 +21,17 @@ bool Objects::init() {
                                                Ability::DASH));
     addPrototype(std::make_shared<ColorObject>(Vector(), Vector(1.0f, 1.0f), Ability::DOUBLE_JUMP,
                                                Ability::GLIDER));
+    addPrototype(std::make_shared<WindObject>(Vector(), Vector(1.0f, 1.0f), Vector(0.02f, 0.0f)));
+    addPrototype(std::make_shared<MovingObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
+                                                Vector(1.0f, 24.0f), 0.025f));
     return ObjectRenderer::init();
 }
 
 void Objects::addPrototype(std::shared_ptr<ObjectBase> prototype) {
     prototype->prototypeId = prototypes.size();
+#ifndef NDEBUG
+    prototype->initTileEditorData(prototype->getTileEditorProps());
+#endif
     prototypes.push_back(std::move(prototype));
 }
 
@@ -40,6 +48,9 @@ void Objects::clear() {
 }
 
 void Objects::add(std::shared_ptr<ObjectBase> o) {
+#ifndef NDEBUG
+    o->initTileEditorData(o->getTileEditorProps());
+#endif
     objects.emplace_back(o);
 }
 
@@ -140,6 +151,11 @@ void Objects::load(const char* path) {
         stream.seekg(dataPosition, std::ios_base::beg);
         stream.read((char*)object->getDataPointer(), object->getDataSize());
         stream.seekg(lastPos, std::ios_base::beg);
+
+#ifndef NDEBUG
+        object->getTileEditorProps().clear();
+        object->initTileEditorData(object->getTileEditorProps());
+#endif
     }
 }
 

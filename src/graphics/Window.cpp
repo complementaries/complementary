@@ -110,13 +110,13 @@ bool Window::init() {
     world_switch = Mix_LoadWAV("assets/sounds/switch.ogg");
     if (jump == NULL) return -1;
 
-    if (Mix_PlayChannel(curTrack, light, -1) == -1) return -1;
-    Mix_Volume(curTrack, MIX_MAX_VOLUME / 2);
+    // if (Mix_PlayChannel(curTrack, light, -1) == -1) return -1;
+    // Mix_Volume(curTrack, MIX_MAX_VOLUME / 2);
 
     curTrack = 1 - curTrack;
 
-    if (Mix_PlayChannel(curTrack, dark, -1) == -1) return -1;
-    Mix_Volume(curTrack, 0);
+    // if (Mix_PlayChannel(curTrack, dark, -1) == -1) return -1;
+    // Mix_Volume(curTrack, 0);
     return false;
 }
 

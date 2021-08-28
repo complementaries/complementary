@@ -255,20 +255,20 @@ bool Player::hasAbility(Ability a) {
 }
 
 bool Player::isGliding() {
-    return true;
+    return hasAbility(Ability::GLIDER) && Input::getButton(ButtonType::ABILITY).pressed;
 }
 
 bool Player::invertColors() {
     return worldType;
 }
 
+void Player::toggleWorld() {
+    worldType = !worldType;
+    Tilemap::forceReload();
+}
+
 void Player::tick() {
     lastPosition = position;
-
-    if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
-        worldType = !worldType;
-        Tilemap::forceReload();
-    }
 
     leftWallJumpCooldown -= leftWallJumpCooldown > 0;
     rightWallJumpCooldown -= rightWallJumpCooldown > 0;
@@ -430,6 +430,12 @@ void Player::render(float lag) {
 
     Buffer buf;
     Color color = AbilityUtils::getColor(abilities[worldType]);
+
+    // TEMP: indicator if we're gliding
+    // TODO: remove
+    if (abilities[worldType] == Ability::GLIDER && Input::getButton(ButtonType::ABILITY).pressed) {
+        color = ColorUtils::rgba(0, 255, 255);
+    }
     buf.add(0.0f).add(0.0f).add(color);
     buf.add(1.0f).add(0.0f).add(color);
     buf.add(0.0f).add(1.0f).add(color);
@@ -444,18 +450,27 @@ void Player::render(float lag) {
 void Player::renderImGui() {
     ImGui::Indent();
 
-    ImGui::DragFloat2("Position", position);
-    ImGui::DragFloat2("Size", data.size);
-    ImGui::DragFloat2("Velocity", data.velocity);
+    if (ImGui::Button("Switch ability")) {
+        int ability = abilities[worldType];
+        ability++;
+        if (ability >= Ability::MAX) {
+            ability = 0;
+        }
+        abilities[worldType] = static_cast<Ability>(ability);
+    }
 
-    ImGui::Spacing();
+    if (ImGui::CollapsingHeader("Movement")) {
+        ImGui::DragFloat2("Position", position);
+        ImGui::DragFloat2("Size", data.size);
+        ImGui::DragFloat2("Velocity", data.velocity);
 
-    ImGui::DragFloat("Move Speed", &data.moveSpeed, 0.02f);
-    ImGui::DragFloat("Joystick Exponent", &data.joystickExponent, 0.05f);
-    ImGui::DragFloat("Gravity", &data.gravity, 0.01f);
-    ImGui::DragFloat2("Drag", data.drag, 0.1f);
+        ImGui::Spacing();
 
-    ImGui::Spacing();
+        ImGui::DragFloat("Move Speed", &data.moveSpeed, 0.02f);
+        ImGui::DragFloat("Joystick Exponent", &data.joystickExponent, 0.05f);
+        ImGui::DragFloat("Gravity", &data.gravity, 0.01f);
+        ImGui::DragFloat2("Drag", data.drag, 0.1f);
+    }
 
     if (ImGui::CollapsingHeader("Jump")) {
         ImGui::Indent();

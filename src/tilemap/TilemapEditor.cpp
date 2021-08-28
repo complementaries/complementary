@@ -35,6 +35,7 @@ static int tilemapBackgroundColor;
 #include "objects/ObjectRenderer.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
+#include <graphics/gl/Glew.h>
 
 static int globalScreenWidth;
 static int globalScreenHeight;
@@ -140,8 +141,10 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
         tilemapBuffer.add(maxX).add(maxY).add(color);
         tilemapBuffer.add(maxX).add(minY).add(color);
         tilemapBuffer.add(minX).add(maxY).add(color);
+        Tilemap::renderBuffer(tilemapBuffer);
     } else if (id < OBJECT_ID_OFFSET) {
         Tiles::get(id).renderEditor(tilemapBuffer, tileSpaceX, tileSpaceY);
+        Tilemap::renderBuffer(tilemapBuffer);
     } else {
         // IDs >= 1000 identify object prototypes
         int prototypeIndex = id - OBJECT_ID_OFFSET;
@@ -151,10 +154,14 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
             // The first prop is a boolean which stores whether the props have been initialized
             prototype->applyTileEditorData(data + 1);
         }
-        prototype->render(0.f);
-    }
 
-    Tilemap::renderBuffer(tilemapBuffer);
+        // TODO: do we need this for all objects? should the object itself set the blend mode?
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendEquation(GL_FUNC_ADD);
+        prototype->render(0.f);
+        glDisable(GL_BLEND);
+    }
 }
 
 static int getPropType(int n, short* tiledata, float* params) {

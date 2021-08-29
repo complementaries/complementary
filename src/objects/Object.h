@@ -3,43 +3,10 @@
 
 #include <cstddef>
 #include <memory>
-
-#include "player/Face.h"
-
-#ifndef NDEBUG
 #include <vector>
 
-enum class TileEditorPropType { INT, FLOAT, BOOL };
-
-// TODO: refactor into seperate .h and .cpp files
-struct TileEditorProp {
-    const char* name;
-    TileEditorPropType type;
-    float value;
-    float min;
-    float max;
-    bool disabled;
-
-    inline TileEditorProp(const char* name, TileEditorPropType type, float value, float min,
-                          float max, bool disabled = false)
-        : name(name), type(type), value(value), min(min), max(max), disabled(disabled) {
-    }
-
-    static inline TileEditorProp Float(const char* name, float value, float min, float max,
-                                       bool disabled = false) {
-        return TileEditorProp(name, TileEditorPropType::FLOAT, value, min, max, disabled);
-    }
-
-    static inline TileEditorProp Int(const char* name, int value, int min, int max,
-                                     bool disabled = false) {
-        return TileEditorProp(name, TileEditorPropType::INT, value, min, max, disabled);
-    }
-
-    static inline TileEditorProp Bool(const char* name, bool value, bool disabled = false) {
-        return TileEditorProp(name, TileEditorPropType::INT, value, 0, 1, disabled);
-    }
-};
-#endif
+#include "TileEditorProp.h"
+#include "player/Face.h"
 
 class ObjectBase {
   public:

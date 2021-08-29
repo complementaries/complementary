@@ -9,11 +9,13 @@ static int getPropType(int n, short* tiledata, float* params);
 static const char* getPropName(int n, short* tiledata, float* params);
 static float getPropMin(int n, short* tiledata, float* params);
 static float getPropMax(int n, short* tiledata, float* params);
+static float getPropScale(int n, short* tiledata, float* params);
 
 #define STBTE_PROP_TYPE getPropType
 #define STBTE_PROP_NAME getPropName
 #define STBTE_PROP_MIN getPropMin
 #define STBTE_PROP_MAX getPropMax
+#define STBTE_PROP_FLOAT_SCALE getPropScale
 
 static int tilemapBackgroundColor;
 
@@ -246,6 +248,21 @@ static float getPropMax(int n, short* tiledata, float* params) {
     }
 
     return props[n - 1].max;
+}
+
+static float getPropScale(int n, short* tiledata, float* params) {
+    short tile = tiledata[1];
+    if (tile < OBJECT_ID_OFFSET) {
+        return 0.f;
+    }
+
+    int prototypeIndex = tile - OBJECT_ID_OFFSET;
+    auto props = Objects::getPrototype(prototypeIndex)->getTileEditorProps();
+    if (props.size() <= static_cast<size_t>(n - 1)) {
+        return 0;
+    }
+
+    return props[n - 1].scale;
 }
 
 void TilemapEditor::tick(float dt) {

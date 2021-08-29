@@ -24,6 +24,7 @@ bool GL::Shader::readFile(std::vector<GLchar>& code, const char* path) const {
         }
         code.push_back(c);
     }
+    code.pop_back(); // There's a weird character at the end for some reason
     code.push_back('\0');
     return false;
 }
@@ -41,8 +42,8 @@ bool GL::Shader::compileShader(const char* path, GLenum shaderType, GLuint& shad
     GLint error;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &error);
     if (error == GL_FALSE) {
-        GLchar buffer[256];
-        glGetShaderInfoLog(shader, 256, nullptr, buffer);
+        GLchar buffer[512];
+        glGetShaderInfoLog(shader, 512, nullptr, buffer);
         printf("cannot compile shader %s: %s\n", path, buffer);
         return true;
     }

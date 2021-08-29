@@ -30,43 +30,33 @@ static int curTrack = 0;
 
 bool Window::init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
-        fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
+        printf("SDL failed to initialise: %s\n", SDL_GetError());
         return true;
     }
 
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
-        fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
+        printf("SDL failed to initialise: %s\n", SDL_GetError());
         return true;
     }
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetSwapInterval(1);
 
     window = SDL_CreateWindow("Complementary", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                               width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (window == nullptr) {
-        fprintf(stderr, "SDL window failed to initialise: %s\n", SDL_GetError());
+        printf("SDL window failed to initialise: %s\n", SDL_GetError());
         return true;
     }
 
     SDL_GLContext gContext = SDL_GL_CreateContext(window);
     if (gContext == nullptr) {
-        fprintf(stderr, "OpenGL context could not be created! SDL Error: %s\n", SDL_GetError());
+        printf("OpenGL context could not be created! SDL Error: %s\n", SDL_GetError());
         return true;
     }
 
-    std::cout << glGetString(GL_VERSION) << "\n";
-
-    GLenum glewError = glewInit();
-    if (glewError != GLEW_OK) {
-        fprintf(stderr, "Error initializing GLEW! %s\n", glewGetErrorString(glewError));
-        return true;
-    }
-
+    gladLoadGL();
     if (SDL_GL_SetSwapInterval(1) < 0) {
-        fprintf(stderr, "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
+        printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
     }
 
     // Imgui setup
@@ -85,11 +75,11 @@ bool Window::init() {
 
     // Setup Platform/Renderer backends
     if (!ImGui_ImplSDL2_InitForOpenGL(window, gContext)) {
-        fprintf(stderr, "Failed to initialize ImGui");
+        printf("Failed to initialize ImGui");
         return true;
     }
-    if (!ImGui_ImplOpenGL3_Init("#version 410")) {
-        fprintf(stderr, "Failed to initialize ImGui");
+    if (!ImGui_ImplOpenGL3_Init(nullptr)) {
+        printf("Failed to initialize ImGui");
         return true;
     }
 
@@ -97,6 +87,8 @@ bool Window::init() {
     if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) != 1) SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
 
     SDL_GameControllerEventState(SDL_ENABLE);
+
+    printf("I got so far\n");
 
     light = Mix_LoadWAV("assets/sounds/light.ogg");
     if (light == NULL) return -1;
@@ -110,13 +102,13 @@ bool Window::init() {
     world_switch = Mix_LoadWAV("assets/sounds/switch.ogg");
     if (jump == NULL) return -1;
 
-    // if (Mix_PlayChannel(curTrack, light, -1) == -1) return -1;
-    // Mix_Volume(curTrack, MIX_MAX_VOLUME / 2);
+    if (Mix_PlayChannel(curTrack, light, -1) == -1) return -1;
+    Mix_Volume(curTrack, MIX_MAX_VOLUME / 2);
 
     curTrack = 1 - curTrack;
 
-    // if (Mix_PlayChannel(curTrack, dark, -1) == -1) return -1;
-    // Mix_Volume(curTrack, 0);
+    if (Mix_PlayChannel(curTrack, dark, -1) == -1) return -1;
+    Mix_Volume(curTrack, 0);
     return false;
 }
 

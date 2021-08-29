@@ -17,3 +17,8 @@ meson build --backend vs
 
 To install the auto-formatting pre-commit hooks, run `./tools/install-hooks.sh`. To format all files locally, run
 `./tools/format.sh`.
+
+## Switch port
+
+Install [devktPro](https://devkitpro.org/wiki/Getting_Started) and run
+`dpk-pacman -S switch-dev switch-glad switch-sdl2 switch-sdl2_image switch-sdl2_mixer`, then run `mkdir romfs && cp -r assets romfs/assets && make`

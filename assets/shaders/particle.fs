@@ -1,4 +1,5 @@
-#version 410
+#version 320 es
+precision mediump float;
 
 in vec4 varColor;
 

@@ -48,6 +48,8 @@ static float globalZoom = 2.f;
 
 const int OBJECT_ID_OFFSET = 1000;
 
+static Buffer tilemapBuffer;
+
 static int getZoomedWidth() {
     return (int)(globalScreenWidth / globalZoom);
 }
@@ -120,7 +122,13 @@ void STBTE_DRAW_RECT(int x0, int y0, int x1, int y1, unsigned int color) {
     float y0F = (float)y0 * Tilemap::getHeight() / getZoomedHeight();
     float y1F = (float)y1 * Tilemap::getHeight() / getZoomedHeight();
 
-    ObjectRenderer::drawRectangle(Vector(x0F, y0F), Vector(x1F - x0F, y1F - y0F), color);
+    (void)x0F;
+    (void)y0F;
+    (void)x1F;
+    (void)y1F;
+    (void)color;
+
+    // ObjectRenderer::drawRectangle(Vector(x0F, y0F), Vector(x1F - x0F, y1F - y0F), color);
 }
 
 void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* data) {
@@ -130,9 +138,6 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
 
     float tileSpaceX = (float)x0 * Tilemap::getWidth() / getZoomedWidth();
     float tileSpaceY = (float)y0 * Tilemap::getHeight() / getZoomedHeight();
-
-    static Buffer tilemapBuffer;
-    tilemapBuffer.clear();
 
     if (id == Tiles::AIR.getId()) {
         float minX = tileSpaceX;
@@ -146,11 +151,11 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
         tilemapBuffer.add(maxX).add(maxY).add(color);
         tilemapBuffer.add(maxX).add(minY).add(color);
         tilemapBuffer.add(minX).add(maxY).add(color);
-        Tilemap::renderBuffer(tilemapBuffer);
+        // Tilemap::renderBuffer(tilemapBuffer);
     } else if (id < OBJECT_ID_OFFSET) {
         Tiles::get(id).renderEditor(tilemapBuffer, tileSpaceX, tileSpaceY);
-        Tilemap::renderBuffer(tilemapBuffer);
-    } else {
+        // Tilemap::renderBuffer(tilemapBuffer);
+    } /*else {
         // IDs >= 1000 identify object prototypes
         int prototypeIndex = id - OBJECT_ID_OFFSET;
         auto prototype = Objects::getPrototype(prototypeIndex)->clone();
@@ -166,7 +171,7 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
         glBlendEquation(GL_FUNC_ADD);
         prototype->render(0.f);
         glDisable(GL_BLEND);
-    }
+    }*/
 }
 
 static int getPropType(int n, short* tiledata, float* params) {
@@ -276,7 +281,9 @@ void TilemapEditor::tick(float dt) {
 void TilemapEditor::render() {
     ObjectRenderer::prepare();
     long time = -std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    tilemapBuffer.clear();
     stbte_draw(stbTileMap);
+    Tilemap::renderBuffer(tilemapBuffer);
     time += std::chrono::high_resolution_clock::now().time_since_epoch().count();
     std::cout << time / 1000000.0 << "ms\n";
 }

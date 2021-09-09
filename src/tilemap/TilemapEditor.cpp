@@ -1,8 +1,5 @@
 #include "TilemapEditor.h"
 
-#include <chrono>
-#include <iostream>
-
 #include "objects/ColorObject.h"
 
 void STBTE_DRAW_RECT(int x0, int y0, int x1, int y1, unsigned int color);
@@ -296,7 +293,6 @@ void TilemapEditor::tick(float dt) {
 }
 
 void TilemapEditor::render() {
-    long time = -std::chrono::high_resolution_clock::now().time_since_epoch().count();
     renderBuffer.clear();
     zLayer = 0.0f;
     stbte_draw(stbTileMap);
@@ -317,9 +313,6 @@ void TilemapEditor::render() {
     }
     objectQueue.clear();
     glDisable(GL_BLEND);
-
-    time += std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    std::cout << time / 1000000.0 << "ms\n";
 }
 
 void TilemapEditor::onMouseEvent(void* eventPtr) {

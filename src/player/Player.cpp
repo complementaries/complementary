@@ -51,7 +51,7 @@ struct PlayerData {
 };
 
 static PlayerData data;
-static Ability abilities[2] = {Ability::DOUBLE_JUMP, Ability::DOUBLE_JUMP};
+static Ability abilities[2] = {Ability::NONE, Ability::NONE};
 static std::array<bool, FACES> collision;
 static std::array<bool, FACES> lastCollision;
 static int fakeGrounded = 0;
@@ -423,7 +423,14 @@ void Player::render(float lag) {
     Matrix model;
     model.transform(lastPosition + (position - lastPosition) * lag);
     model.scale(data.size);
+    constexpr float maxWobble = 1.5f;
     float wobble = 1.0f + renderForce;
+    if (wobble > maxWobble) {
+        wobble = maxWobble;
+    }
+    if (wobble < 1.0f / maxWobble) {
+        wobble = 1.0f / maxWobble;
+    }
     model.transform(renderOffset);
     model.scale(Vector(1.0f / wobble, wobble));
     model.transform(-renderOffset);

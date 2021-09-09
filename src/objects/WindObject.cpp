@@ -47,12 +47,13 @@ std::shared_ptr<ObjectBase> WindObject::clone() {
 
 #ifndef NDEBUG
 void WindObject::initTileEditorData(std::vector<TileEditorProp>& props) {
-    props.insert(props.end(), {
-                                  TileEditorProp::Int("Size X", data.size.x, 0, 5),
-                                  TileEditorProp::Int("Size Y", data.size.y, 0, 5),
-                                  TileEditorProp::Float("Force X", data.force.x, 0.f, 0.5f, 0.01f),
-                                  TileEditorProp::Float("Force Y", data.force.y, 0.f, 0.5f, 0.01f),
-                              });
+    props.insert(props.end(),
+                 {
+                     TileEditorProp::Int("Size X", data.size.x, 0, 5),
+                     TileEditorProp::Int("Size Y", data.size.y, 0, 5),
+                     TileEditorProp::Float("Force X", data.force.x, -0.5f, 0.5f, 0.01f),
+                     TileEditorProp::Float("Force Y", data.force.y, -0.5f, 0.5f, 0.01f),
+                 });
 }
 
 void WindObject::applyTileEditorData(float* props) {

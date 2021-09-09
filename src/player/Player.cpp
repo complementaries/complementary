@@ -51,7 +51,7 @@ struct PlayerData {
 };
 
 static PlayerData data;
-static Ability abilities[2] = {Ability::NONE, Ability::NONE};
+static Ability abilities[2] = {Ability::DOUBLE_JUMP, Ability::DOUBLE_JUMP};
 static std::array<bool, FACES> collision;
 static std::array<bool, FACES> lastCollision;
 static int fakeGrounded = 0;
@@ -306,6 +306,7 @@ void Player::tick() {
             jumpBufferTicks = 0;
             addRenderForce(1.0f, Face::UP);
             jumpCount++;
+            data.velocity.y = 0;
             fakeGrounded = 0;
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
             if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {

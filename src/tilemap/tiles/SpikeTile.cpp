@@ -21,3 +21,10 @@ void SpikeTile::render(Buffer& buffer, float x, float y) const {
     buffer.add(x + 1.0f).add(y + 1.0f).add(color);
     buffer.add(x).add(y + 1.0f).add(color);
 }
+
+void SpikeTile::renderEditor(Buffer& buffer, float x, float y, float z) const {
+    Color color = getColor();
+    buffer.add(x + 0.5f).add(y).add(z).add(color);
+    buffer.add(x + 1.0f).add(y + 1.0f).add(z).add(color);
+    buffer.add(x).add(y + 1.0f).add(z).add(color);
+}

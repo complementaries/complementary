@@ -38,7 +38,8 @@ static TilemapEditor* tilemapEditor;
 
 bool Game::init() {
     Tiles::init();
-    if (Tilemap::init(48, 27) || Player::init() || Objects::init() || Particles::init()) {
+    if (Tilemap::init(48, 27) || Player::init() || Objects::init() || Particles::init() ||
+        TilemapEditor::init()) {
         return true;
     }
 

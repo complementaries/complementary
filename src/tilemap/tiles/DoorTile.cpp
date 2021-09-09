@@ -24,3 +24,17 @@ void DoorTile::render(Buffer& buffer, float x, float y) const {
     buffer.add(maxX).add(minY + 0.1f).add(color);
     buffer.add(minX + 0.1f).add(maxY).add(color);
 }
+
+void DoorTile::renderEditor(Buffer& buffer, float x, float y, float z) const {
+    float minX = x;
+    float minY = y;
+    float maxX = minX + 1;
+    float maxY = minY + 1;
+    Color color = getColor();
+    buffer.add(minX).add(minY).add(z).add(color);
+    buffer.add(maxX - 0.1f).add(minY).add(z).add(color);
+    buffer.add(minX).add(maxY - 0.1f).add(z).add(color);
+    buffer.add(maxX).add(maxY).add(z).add(color);
+    buffer.add(maxX).add(minY + 0.1f).add(z).add(color);
+    buffer.add(minX + 0.1f).add(maxY).add(z).add(color);
+}

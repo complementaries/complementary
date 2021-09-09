@@ -16,6 +16,8 @@ class TilemapEditor final : private NonCopyable {
     float getZoom();
     void flush();
 
+    static bool init();
+
   private:
     stbte_tilemap* stbTileMap;
 };

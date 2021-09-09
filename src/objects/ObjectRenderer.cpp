@@ -18,6 +18,7 @@ bool ObjectRenderer::init() {
 
 void ObjectRenderer::prepare() {
     shader.use();
+    setZ(0.0f);
     shader.setMatrix("view", Game::viewMatrix);
 }
 
@@ -37,4 +38,8 @@ void ObjectRenderer::drawRectangle(const Vector& position, const Vector& size, C
 
     buffer.setData(data.getData(), data.getSize());
     buffer.drawTriangles(6);
+}
+
+void ObjectRenderer::setZ(float z) {
+    shader.setFloat("zLayer", z);
 }

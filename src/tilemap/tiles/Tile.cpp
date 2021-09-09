@@ -43,8 +43,11 @@ void Tile::render(Buffer& buffer, float x, float y) const {
     (void)y;
 }
 
-void Tile::renderEditor(Buffer& buffer, float x, float y) const {
-    render(buffer, x, y);
+void Tile::renderEditor(Buffer& buffer, float x, float y, float z) const {
+    (void)buffer;
+    (void)x;
+    (void)y;
+    (void)z;
 }
 
 bool Tile::operator==(const Tile& other) const {

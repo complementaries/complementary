@@ -6,7 +6,7 @@
 class SpawnTile : public Tile {
   public:
     SpawnTile();
-    void renderEditor(Buffer& buffer, float x, float y) const override;
+    void renderEditor(Buffer& buffer, float x, float y, float z) const override;
     Color getColor() const override;
 };
 

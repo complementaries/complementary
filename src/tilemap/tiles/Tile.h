@@ -18,7 +18,7 @@ class Tile {
     virtual bool isWall() const;
     virtual const char* getEditorGroup() const;
     virtual void render(Buffer& buffer, float x, float y) const;
-    virtual void renderEditor(Buffer& buffer, float x, float y) const;
+    virtual void renderEditor(Buffer& buffer, float x, float y, float z) const;
 
     bool operator==(const Tile& other) const;
 

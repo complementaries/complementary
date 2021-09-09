@@ -35,8 +35,11 @@ static int tilemapBackgroundColor;
 #undef STB_TILEMAP_EDITOR_IMPLEMENTATION
 #pragma GCC diagnostic pop
 
+#include "Game.h"
 #include "Tilemap.h"
 #include "Tiles.h"
+#include "graphics/gl/Shader.h"
+#include "graphics/gl/VertexBuffer.h"
 #include "objects/ObjectRenderer.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
@@ -49,6 +52,16 @@ static float globalZoom = 2.f;
 const int OBJECT_ID_OFFSET = 1000;
 
 static Buffer renderBuffer;
+static GL::VertexBuffer buffer;
+static GL::Shader shader;
+
+struct QueueData {
+    std::shared_ptr<ObjectBase> object;
+    float zLayer;
+};
+
+static std::vector<QueueData> objectQueue;
+static float zLayer;
 
 static int getZoomedWidth() {
     return (int)(globalScreenWidth / globalZoom);
@@ -56,6 +69,14 @@ static int getZoomedWidth() {
 
 static int getZoomedHeight() {
     return (int)(globalScreenHeight / globalZoom);
+}
+
+bool TilemapEditor::init() {
+    if (shader.compile({"assets/shaders/editor.vs", "assets/shaders/editor.fs"})) {
+        return true;
+    }
+    buffer.init(GL::VertexBuffer::Attributes().addVector3().addRGBA());
+    return false;
 }
 
 TilemapEditor::TilemapEditor(int screenWidth, int screenHeight) {
@@ -122,12 +143,13 @@ void STBTE_DRAW_RECT(int x0, int y0, int x1, int y1, unsigned int color) {
     float minY = (float)y0 * Tilemap::getHeight() / getZoomedHeight();
     float maxY = (float)y1 * Tilemap::getHeight() / getZoomedHeight();
 
-    renderBuffer.add(minX).add(minY).add(color);
-    renderBuffer.add(maxX).add(minY).add(color);
-    renderBuffer.add(minX).add(maxY).add(color);
-    renderBuffer.add(maxX).add(maxY).add(color);
-    renderBuffer.add(maxX).add(minY).add(color);
-    renderBuffer.add(minX).add(maxY).add(color);
+    renderBuffer.add(minX).add(minY).add(zLayer).add(color);
+    renderBuffer.add(maxX).add(minY).add(zLayer).add(color);
+    renderBuffer.add(minX).add(maxY).add(zLayer).add(color);
+    renderBuffer.add(maxX).add(maxY).add(zLayer).add(color);
+    renderBuffer.add(maxX).add(minY).add(zLayer).add(color);
+    renderBuffer.add(minX).add(maxY).add(zLayer).add(color);
+    zLayer -= 0.0001f;
 }
 
 void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* data) {
@@ -144,16 +166,14 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
         float maxX = minX + 1.0f;
         float maxY = minY + 1.0f;
         Color color = ColorUtils::invert(Tiles::WALL.getColor());
-        renderBuffer.add(minX).add(minY).add(color);
-        renderBuffer.add(maxX).add(minY).add(color);
-        renderBuffer.add(minX).add(maxY).add(color);
-        renderBuffer.add(maxX).add(maxY).add(color);
-        renderBuffer.add(maxX).add(minY).add(color);
-        renderBuffer.add(minX).add(maxY).add(color);
-        // Tilemap::renderBuffer(renderBuffer);
+        renderBuffer.add(minX).add(minY).add(zLayer).add(color);
+        renderBuffer.add(maxX).add(minY).add(zLayer).add(color);
+        renderBuffer.add(minX).add(maxY).add(zLayer).add(color);
+        renderBuffer.add(maxX).add(maxY).add(zLayer).add(color);
+        renderBuffer.add(maxX).add(minY).add(zLayer).add(color);
+        renderBuffer.add(minX).add(maxY).add(zLayer).add(color);
     } else if (id < OBJECT_ID_OFFSET) {
-        Tiles::get(id).renderEditor(renderBuffer, tileSpaceX, tileSpaceY);
-        // Tilemap::renderBuffer(renderBuffer);
+        Tiles::get(id).renderEditor(renderBuffer, tileSpaceX, tileSpaceY, zLayer);
     } else {
         // IDs >= 1000 identify object prototypes
         int prototypeIndex = id - OBJECT_ID_OFFSET;
@@ -163,14 +183,9 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
             // The first prop is a boolean which stores whether the props have been initialized
             prototype->applyTileEditorData(data + 1);
         }
-
-        // TODO: do we need this for all objects? should the object itself set the blend mode?
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBlendEquation(GL_FUNC_ADD);
-        prototype->render(0.f);
-        glDisable(GL_BLEND);
+        objectQueue.push_back({prototype, zLayer});
     }
+    zLayer -= 0.0001f;
 }
 
 static int getPropType(int n, short* tiledata, float* params) {
@@ -278,11 +293,28 @@ void TilemapEditor::tick(float dt) {
 }
 
 void TilemapEditor::render() {
-    ObjectRenderer::prepare();
     long time = -std::chrono::high_resolution_clock::now().time_since_epoch().count();
     renderBuffer.clear();
+    zLayer = 0.0f;
     stbte_draw(stbTileMap);
-    Tilemap::renderBuffer(renderBuffer);
+
+    shader.use();
+    shader.setMatrix("view", Game::viewMatrix);
+    int vertices = renderBuffer.getSize() / (sizeof(float) * 2 + 4);
+    buffer.setData(renderBuffer.getData(), renderBuffer.getSize());
+    buffer.drawTriangles(vertices);
+
+    ObjectRenderer::prepare();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquation(GL_FUNC_ADD);
+    for (unsigned int i = 0; i < objectQueue.size(); i++) {
+        ObjectRenderer::setZ(objectQueue[i].zLayer);
+        objectQueue[i].object->render(0.f);
+    }
+    objectQueue.clear();
+    glDisable(GL_BLEND);
+
     time += std::chrono::high_resolution_clock::now().time_since_epoch().count();
     std::cout << time / 1000000.0 << "ms\n";
 }
@@ -331,8 +363,8 @@ void TilemapEditor::flush() {
                 float* props = stbte_get_properties(stbTileMap, x, y);
                 obj->applyTileEditorData(props + 1);
 
-                // initTileEditorData() was already called with the prototype's values, overwrite
-                // them with the new values
+                // initTileEditorData() was already called with the prototype's values,
+                // overwrite them with the new values
                 obj->getTileEditorProps().clear();
                 obj->initTileEditorData(obj->getTileEditorProps());
             }

@@ -28,7 +28,7 @@ bool WindObject::collidesWith(const Vector& pPosition, const Vector& pSize) cons
            position[1] < pPosition[1] + pSize[1] && position[1] + data.size[1] > pPosition[1];
 }
 
-void WindObject::render(float lag) const {
+void WindObject::render(float lag) {
     (void)lag;
     ObjectRenderer::drawRectangle(position, data.size, ColorUtils::rgba(255, 0, 0, 100));
 

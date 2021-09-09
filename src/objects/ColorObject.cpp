@@ -29,7 +29,7 @@ bool ColorObject::collidesWith(const Vector& pPosition, const Vector& pSize) con
            position[1] < pPosition[1] + pSize[1] && position[1] + data.size[1] > pPosition[1];
 }
 
-void ColorObject::render(float lag) const {
+void ColorObject::render(float lag) {
     (void)lag;
     ObjectRenderer::drawRectangle(position, data.size,
                                   AbilityUtils::getColor(data.abilities[Player::invertColors()]));

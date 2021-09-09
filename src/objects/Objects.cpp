@@ -51,6 +51,7 @@ void Objects::add(std::shared_ptr<ObjectBase> o) {
 #ifndef NDEBUG
     o->initTileEditorData(o->getTileEditorProps());
 #endif
+    o->postInit();
     objects.emplace_back(o);
 }
 
@@ -106,6 +107,13 @@ void Objects::tick() {
     for (auto& o : objects) {
         o->tick();
     }
+
+    for (size_t i = objects.size() - 1; i > 0; i--) {
+        auto object = objects[i];
+        if (object->shouldDestroy) {
+            objects.erase(objects.begin() + i);
+        }
+    }
 }
 
 void Objects::render(float lag) {
@@ -156,6 +164,7 @@ void Objects::load(const char* path) {
         object->getTileEditorProps().clear();
         object->initTileEditorData(object->getTileEditorProps());
 #endif
+        object->postInit();
     }
 }
 

@@ -50,7 +50,7 @@ bool MovingObject::isSolid() const {
 }
 
 void MovingObject::onFaceCollision(Face playerFace) {
-    if (playerFace == Face::DOWN) {
+    if (playerFace != Face::UP) {
         Player::addBaseVelocity(velocity);
     }
 }
@@ -60,9 +60,15 @@ bool MovingObject::collidesWith(const Vector& pPosition, const Vector& pSize) co
            position[1] < pPosition[1] + pSize[1] && position[1] + data.size[1] > pPosition[1];
 }
 
-void MovingObject::render(float lag) const {
+void MovingObject::render(float lag) {
     Vector oversize(0.05f, 0.05f);
     Vector i = lastPosition + (position - lastPosition) * lag;
+    ObjectRenderer::drawRectangle(i - oversize, data.size + oversize * 2.0f, ColorUtils::GRAY);
+}
+
+void MovingObject::renderEditor(float lag) {
+    Vector oversize(0.05f, 0.05f);
+    Vector i = position;
     ObjectRenderer::drawRectangle(i - oversize, data.size + oversize * 2.0f, ColorUtils::GRAY);
 }
 
@@ -72,15 +78,13 @@ std::shared_ptr<ObjectBase> MovingObject::clone() {
 
 #ifndef NDEBUG
 void MovingObject::initTileEditorData(std::vector<TileEditorProp>& props) {
-    props.insert(props.end(), {
-                                  TileEditorProp::Int("Size X", data.size.x, 0, 5),
-                                  TileEditorProp::Int("Size Y", data.size.y, 0, 5),
-                                  TileEditorProp::Float("Goal 1 X", data.goalA.x, 0.f, 200.f),
-                                  TileEditorProp::Float("Goal 1 Y", data.goalA.y, 0.f, 200.f),
-                                  TileEditorProp::Float("Goal 2 X", data.goalB.x, 0.f, 200.f),
-                                  TileEditorProp::Float("Goal 2 Y", data.goalB.y, 0.f, 200.f),
-                                  TileEditorProp::Float("Speed", data.speed, 0.f, 0.5f),
-                              });
+    props.insert(props.end(), {TileEditorProp::Int("Size X", data.size.x, 0, 5),
+                               TileEditorProp::Int("Size Y", data.size.y, 0, 5),
+                               TileEditorProp::Float("Goal 1 X", data.goalA.x, 0.f, 200.f),
+                               TileEditorProp::Float("Goal 1 Y", data.goalA.y, 0.f, 200.f),
+                               TileEditorProp::Float("Goal 2 X", data.goalB.x, 0.f, 200.f),
+                               TileEditorProp::Float("Goal 2 Y", data.goalB.y, 0.f, 200.f),
+                               TileEditorProp::Float("Speed", data.speed, 0.f, 0.5f)});
 }
 
 void MovingObject::applyTileEditorData(float* props) {

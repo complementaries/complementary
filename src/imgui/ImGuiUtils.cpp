@@ -13,3 +13,13 @@ void ImGui::PopDisabled() {
     PopItemFlag();
     PopStyleVar();
 }
+
+void ImGuiUtils::ColorPicker(const char* name, Color* color) {
+    if (ImGui::CollapsingHeader(name)) {
+        auto [r, g, b, a] = ColorUtils::unpackFloat(*color);
+        float components[4] = {r, g, b, a};
+        ImGui::ColorPicker4(name, components);
+        printf("%f %f %f %f\n", components[0], components[1], components[2], components[3]);
+        *color = ColorUtils::rgba(components[0], components[1], components[2], components[3]);
+    }
+}

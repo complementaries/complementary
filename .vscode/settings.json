@@ -69,6 +69,7 @@
     "cfenv": "cpp",
     "cinttypes": "cpp",
     "typeinfo": "cpp",
-    "__split_buffer": "cpp"
+    "__split_buffer": "cpp",
+    "__functional_03": "cpp"
   }
 }

@@ -149,7 +149,7 @@ void STBTE_DRAW_RECT(int x0, int y0, int x1, int y1, unsigned int color) {
     renderBuffer.add(maxX).add(maxY).add(zLayer).add(color);
     renderBuffer.add(maxX).add(minY).add(zLayer).add(color);
     renderBuffer.add(minX).add(maxY).add(zLayer).add(color);
-    zLayer -= 0.0001f;
+    zLayer -= 0.0002f;
 }
 
 void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* data) {
@@ -185,7 +185,7 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
         }
         objectQueue.push_back({prototype, zLayer});
     }
-    zLayer -= 0.0001f;
+    zLayer -= 0.0002f;
 }
 
 static int getPropType(int n, short* tiledata, float* params) {
@@ -309,7 +309,7 @@ void TilemapEditor::render() {
     glBlendEquation(GL_FUNC_ADD);
     for (unsigned int i = 0; i < objectQueue.size(); i++) {
         ObjectRenderer::setZ(objectQueue[i].zLayer);
-        objectQueue[i].object->render(0.f);
+        objectQueue[i].object->renderEditor(0.f);
     }
     objectQueue.clear();
     glDisable(GL_BLEND);
@@ -357,7 +357,9 @@ void TilemapEditor::flush() {
                 obj->position = Vector(x, y);
 
                 float* props = stbte_get_properties(stbTileMap, x, y);
-                obj->applyTileEditorData(props + 1);
+                if (props[0] != 0) {
+                    obj->applyTileEditorData(props + 1);
+                }
 
                 // initTileEditorData() was already called with the prototype's values,
                 // overwrite them with the new values

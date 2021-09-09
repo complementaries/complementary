@@ -136,6 +136,10 @@ void Player::moveForced(const Vector& v) {
     position += v;
 }
 
+Vector Player::getPosition() {
+    return position;
+}
+
 void Player::setPosition(const Vector& pos) {
     position = pos;
     lastPosition = pos;
@@ -471,6 +475,7 @@ void Player::renderImGui() {
         ImGui::DragFloat2("Position", position);
         ImGui::DragFloat2("Size", data.size);
         ImGui::DragFloat2("Velocity", data.velocity);
+        ImGui::DragFloat2("Acceleration", data.acceleration);
 
         ImGui::Spacing();
 
@@ -519,7 +524,6 @@ void Player::renderImGui() {
     ImGui::Spacing();
 
     ImGui::PushDisabled();
-    ImGui::DragFloat2("Acceleration", data.acceleration);
     ImGui::Checkbox("Left", &(collision[Face::LEFT]));
     ImGui::Checkbox("Right", &(collision[Face::RIGHT]));
     ImGui::Checkbox("Up", &(collision[Face::UP]));

@@ -16,7 +16,7 @@ TileEditorProp TileEditorProp::Int(const char* name, int value, int min, int max
 }
 
 TileEditorProp TileEditorProp::Bool(const char* name, bool value, bool disabled) {
-    return TileEditorProp(name, TileEditorPropType::INT, value, 0, 1, 1.f, disabled);
+    return TileEditorProp(name, TileEditorPropType::BOOL, value, 0, 1, 1.f, disabled);
 }
 
 #endif

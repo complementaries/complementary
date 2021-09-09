@@ -19,7 +19,7 @@
 #include "objects/ObjectRenderer.h"
 #include "objects/Objects.h"
 #include "objects/WindObject.h"
-#include "particles/Particles.h"
+#include "particles/ParticleSystem.h"
 #include "player/Player.h"
 #include "tilemap/Tilemap.h"
 #include "tilemap/TilemapEditor.h"
@@ -35,11 +35,12 @@ static int levelIndex = 0;
 static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "assets/maps/map0";
 
 static TilemapEditor* tilemapEditor;
+static bool paused;
+static bool singleStep;
 
 bool Game::init() {
     Tiles::init();
-    if (Tilemap::init(48, 27) || Player::init() || Objects::init() || Particles::init() ||
-        TilemapEditor::init()) {
+    if (Tilemap::init(48, 27) || Player::init() || Objects::init() || TilemapEditor::init()) {
         return true;
     }
 
@@ -55,21 +56,49 @@ void Game::nextLevel() {
     char formattedTilemapName[MAX_LEVEL_NAME_LENGTH];
     char formattedObjectmapName[MAX_LEVEL_NAME_LENGTH];
 
-    if (snprintf(formattedTilemapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmtm", level) > 99) {
+    if (snprintf(formattedTilemapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmtm", level) >
+        MAX_LEVEL_NAME_LENGTH - 1) {
         puts("The level file name is too long!");
     }
     snprintf(formattedObjectmapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmom", level);
     snprintf(currentLevelName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s", level);
 
     Tilemap::load(formattedTilemapName);
+    Objects::clear();
     Objects::load(formattedObjectmapName);
 
     levelIndex = (levelIndex + 1) % levelNames.size();
 }
 
 void Game::tick() {
+    if (paused) {
+        if (singleStep) {
+            singleStep = false;
+        } else {
+            return;
+        }
+    }
+
     if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
         Player::toggleWorld();
+
+        auto ps = std::make_shared<ParticleSystem>();
+        Objects::add(ps);
+        ps->position = Player::getPosition();
+
+        ps->data.duration = 100;
+        ps->data.type = ParticleType::SQUARE;
+        ps->data.emissionRate = 1;
+        ps->data.emissionInterval = 15;
+        ps->data.minStartVelocity = Vector(-0.1f, -0.1f);
+        ps->data.maxStartVelocity = Vector(0.1f, 0.1f);
+
+        ps->data.gravity = 0.01f;
+        ps->data.maxLifetime = 60;
+        ps->data.startColor = ColorUtils::rgba(255, 0, 0);
+        ps->data.endColor = ColorUtils::rgba(0, 255, 0, 0);
+        ps->data.startSize = 2;
+        ps->data.endSize = 1;
     }
 
     if (tilemapEditor) {
@@ -131,6 +160,15 @@ void Game::renderImGui() {
         nextLevel();
     }
 
+    ImGui::SameLine();
+    if (ImGui::Button(paused ? "Unpause" : "Pause")) {
+        paused = !paused;
+    }
+
+    if (paused && ImGui::Button("Next frame")) {
+        singleStep = true;
+    }
+
     if (ImGui::CollapsingHeader("Tilemap", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::Text("Width: %d, Height: %d", Tilemap::getWidth(), Tilemap::getHeight());
 
@@ -151,6 +189,7 @@ void Game::renderImGui() {
 
         if (ImGui::Button("Load")) {
             Tilemap::load(tileMapName);
+            Objects::clear();
             Objects::load(objectMapName);
         }
 
@@ -179,6 +218,21 @@ void Game::renderImGui() {
         float horizontal = Input::getHorizontal();
         ImGui::SliderFloat("Horizontal", &horizontal, -1, 1);
         ImGui::PopDisabled();
+    }
+
+    for (size_t i = 0; i < Objects::getObjects().size(); i++) {
+        auto object = Objects::getObjects()[i];
+
+        char header[128];
+        snprintf(header, 128, "#%zu: %s (prototype #%d)", i, object->getTypeName(),
+                 object->prototypeId);
+
+        ImGui::PushID(header);
+        if (ImGui::CollapsingHeader(header)) {
+            ImGui::DragFloat2("Position", object->position.data());
+            object->renderImGui();
+        }
+        ImGui::PopID();
     }
 
     ImGui::End();

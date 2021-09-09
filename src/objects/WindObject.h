@@ -18,7 +18,7 @@ class WindObject : public Object<WindObjectData> {
 
     void onCollision() override;
     bool collidesWith(const Vector& position, const Vector& size) const override;
-    void render(float lag) const override;
+    void render(float lag) override;
     std::shared_ptr<ObjectBase> clone() override;
 
 #ifndef NDEBUG

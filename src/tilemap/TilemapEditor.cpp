@@ -26,7 +26,9 @@ static int tilemapBackgroundColor;
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wunused-variable"
+#ifdef __linux__
 #pragma GCC diagnostic ignored "-Waggressive-loop-optimizations"
+#endif
 #define STB_TILEMAP_EDITOR_IMPLEMENTATION
 #include <SDL.h>
 #define _SDL_H

@@ -94,12 +94,14 @@ void Game::tick() {
 }
 
 void Game::render(float lag) {
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
     if (Player::invertColors()) {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     } else {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     viewMatrix.unit()
         .transform(Vector(-1.0f, 1.0f))
         .scale(Vector(2.0f / Tilemap::getWidth(), -2.0f / Tilemap::getHeight()));

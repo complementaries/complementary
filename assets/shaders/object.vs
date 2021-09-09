@@ -8,6 +8,6 @@ uniform mat4 view;
 out vec4 varColor;
 
 void main() {
-    gl_Position = view * vec4(pos, 0.0, 1.0);
+    gl_Position = view * vec4(pos, -0.1, 1.0);
     varColor = color;
 }

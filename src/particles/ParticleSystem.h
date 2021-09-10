@@ -18,19 +18,20 @@ enum class ParticleType {
 };
 
 struct ParticleSystemData final {
-    int duration;
-    ParticleType type;
-    int emissionInterval;
-    int emissionRate;
+    int duration = 0;
+    ParticleType type = ParticleType::SQUARE;
+    int emissionInterval = 15;
+    int emissionRate = 1;
 
-    Vector minStartVelocity;
-    Vector maxStartVelocity;
-    float gravity;
-    int maxLifetime;
-    Color startColor;
-    Color endColor;
-    float startSize;
-    float endSize;
+    Vector minStartVelocity = Vector(-0.1f, -0.1f);
+    Vector maxStartVelocity = Vector(0.1f, 0.1f);
+    float gravity = 0.f;
+    int maxLifetime = 60;
+    Color startColor = ColorUtils::rgba(255, 0, 0);
+    Color endColor = ColorUtils::rgba(0, 255, 0);
+    float startSize = 2;
+    float endSize = 1;
+    bool followPlayer = false;
 };
 
 struct Particle final {
@@ -43,6 +44,7 @@ struct Particle final {
 class ParticleSystem : public Object<ParticleSystemData> {
   public:
     ParticleSystem();
+    ParticleSystem(Vector position);
     ParticleSystem(const ParticleSystemData& data);
     void tick() override;
     void render(float lag) override;

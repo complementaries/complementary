@@ -33,16 +33,22 @@ static std::vector<const char*> levelNames = {"map0", "map1"};
 static int levelIndex = 0;
 // TODO: make the level list configurable in the UI and get rid of this
 static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "assets/maps/map0";
+static char objectSaveLocation[MAX_LEVEL_NAME_LENGTH] = "assets/subdir/object.cmob";
+static char objectLoadLocation[MAX_LEVEL_NAME_LENGTH] = "assets/subdir/object.cmob";
 
 static TilemapEditor* tilemapEditor;
 static bool paused;
 static bool singleStep;
+
+static std::shared_ptr<ParticleSystem> testParticleSystem;
 
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Player::init() || Objects::init() || TilemapEditor::init()) {
         return true;
     }
+
+    testParticleSystem = Objects::loadObject<ParticleSystem>("assets/particlesystems/test.cmob");
 
     nextLevel();
     return false;
@@ -81,24 +87,7 @@ void Game::tick() {
 
     if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
         Player::toggleWorld();
-
-        auto ps = std::make_shared<ParticleSystem>();
-        Objects::add(ps);
-        ps->position = Player::getPosition();
-
-        ps->data.duration = 100;
-        ps->data.type = ParticleType::SQUARE;
-        ps->data.emissionRate = 1;
-        ps->data.emissionInterval = 15;
-        ps->data.minStartVelocity = Vector(-0.1f, -0.1f);
-        ps->data.maxStartVelocity = Vector(0.1f, 0.1f);
-
-        ps->data.gravity = 0.01f;
-        ps->data.maxLifetime = 60;
-        ps->data.startColor = ColorUtils::rgba(255, 0, 0);
-        ps->data.endColor = ColorUtils::rgba(0, 255, 0, 0);
-        ps->data.startSize = 2;
-        ps->data.endSize = 1;
+        Objects::instantiateClone(testParticleSystem, Player::getPosition());
     }
 
     if (tilemapEditor) {
@@ -200,6 +189,42 @@ void Game::renderImGui() {
         }
     }
 
+    if (ImGui::CollapsingHeader("Prototypes")) {
+        if (ImGui::Button("Load from file")) {
+            auto obj = Objects::loadObject(objectLoadLocation);
+            Objects::addPrototype(obj);
+        }
+        ImGui::SameLine();
+        ImGui::InputText("##loc", objectLoadLocation, MAX_LEVEL_NAME_LENGTH);
+
+        for (size_t i = 0; i < Objects::getPrototypeCount(); i++) {
+            auto prototype = Objects::getPrototype(i);
+
+            char header[128];
+            snprintf(header, 128, "#%zu: %s", i, prototype->getTypeName());
+
+            ImGui::Indent();
+            ImGui::PushID(header);
+            if (ImGui::CollapsingHeader(header)) {
+                ImGui::PushDisabled();
+                prototype->renderImGui();
+                ImGui::PopDisabled();
+
+                if (ImGui::Button("Spawn")) {
+                    Objects::instantiateObject(i);
+                }
+
+                ImGui::SameLine();
+                if (ImGui::Button("Spawn at player position")) {
+                    auto obj = Objects::instantiateObject(i);
+                    obj->position = Player::getPosition();
+                }
+            }
+            ImGui::PopID();
+            ImGui::Unindent();
+        }
+    }
+
     if (ImGui::CollapsingHeader("Player", ImGuiTreeNodeFlags_DefaultOpen)) {
         Player::renderImGui();
     }
@@ -223,14 +248,28 @@ void Game::renderImGui() {
     for (size_t i = 0; i < Objects::getObjects().size(); i++) {
         auto object = Objects::getObjects()[i];
 
-        char header[128];
-        snprintf(header, 128, "#%zu: %s (prototype #%d)", i, object->getTypeName(),
-                 object->prototypeId);
+        const char* destructionInfo = object->shouldDestroy ? "[QUEUED FOR DESTRUCTION] " : "";
+
+        char header[256];
+        snprintf(header, 256, "%s#%zu: %s (prototype #%d)", destructionInfo, i,
+                 object->getTypeName(), object->prototypeId);
 
         ImGui::PushID(header);
         if (ImGui::CollapsingHeader(header)) {
             ImGui::DragFloat2("Position", object->position.data());
+            ImGui::InputInt("Prototype ID (dangerous)", &object->prototypeId);
+            ImGui::Spacing();
+
             object->renderImGui();
+            if (ImGui::Button("Destroy")) {
+                object->destroy();
+            }
+
+            if (ImGui::Button("Save")) {
+                Objects::saveObject(objectSaveLocation, *object);
+            }
+            ImGui::SameLine();
+            ImGui::InputText("##loc", objectSaveLocation, MAX_LEVEL_NAME_LENGTH);
         }
         ImGui::PopID();
     }

@@ -11,6 +11,7 @@
 #include "objects/MovingObject.h"
 #include "objects/ObjectRenderer.h"
 #include "objects/WindObject.h"
+#include "particles/ParticleSystem.h"
 #include "player/Player.h"
 
 static std::vector<std::shared_ptr<ObjectBase>> objects;
@@ -24,6 +25,8 @@ bool Objects::init() {
     addPrototype(std::make_shared<WindObject>(Vector(), Vector(1.0f, 1.0f), Vector(0.02f, 0.0f)));
     addPrototype(std::make_shared<MovingObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
                                                 Vector(1.0f, 24.0f), 0.025f));
+    addPrototype(std::make_shared<ParticleSystem>(Vector(24, 15)));
+
     return ObjectRenderer::init();
 }
 
@@ -126,6 +129,7 @@ void Objects::render(float lag) {
 void Objects::load(const char* path) {
     std::ifstream stream;
     stream.open(path, std::ios::binary);
+    assert(!stream.bad());
 
     char magic[5];
     stream.read(magic, 4);
@@ -152,9 +156,6 @@ void Objects::load(const char* path) {
 
         int dataPosition;
         stream.read((char*)&dataPosition, 4);
-        printf("Loading object %d with prototypeId %d at position %d\n", i, prototypeId,
-               dataPosition);
-
         int lastPos = stream.tellg();
         stream.seekg(dataPosition, std::ios_base::beg);
         stream.read((char*)object->getDataPointer(), object->getDataSize());
@@ -174,6 +175,7 @@ void Objects::save(const char* path) {
 
     std::ofstream stream;
     stream.open(path, std::ios::binary);
+    assert(!stream.bad());
 
     stream.write("CMOM", 4);
     stream.write(empty, 8);
@@ -215,4 +217,40 @@ void Objects::save(const char* path) {
         printf("Saving object %zu with prototypeId %d at position %d\n", i, prototypeId,
                pointers[i]);
     }
+}
+
+std::shared_ptr<ObjectBase> Objects::loadObject(const char* path) {
+    std::ifstream stream;
+    stream.open(path, std::ios::binary);
+    assert(!stream.bad());
+
+    char magic[5];
+    stream.read(magic, 4);
+    magic[4] = 0;
+
+    // File magic must be CMOB
+    assert(strcmp(magic, "CMOB") == 0);
+
+    int prototypeId;
+    stream.read((char*)&prototypeId, 4);
+    assert(prototypeId > -1);
+    auto object = prototypes[prototypeId]->clone();
+    object->prototypeId = prototypeId;
+
+    stream.read((char*)&object->position, sizeof(Vector));
+    stream.read((char*)object->getDataPointer(), object->getDataSize());
+
+    return object;
+}
+
+void Objects::saveObject(const char* path, ObjectBase& object) {
+    std::ofstream stream;
+    stream.open(path, std::ios::binary);
+    assert(!stream.bad());
+
+    stream.write("CMOB", 4);
+    assert(object.prototypeId > -1);
+    stream.write((char*)&object.prototypeId, sizeof(int));
+    stream.write((char*)&object.position, sizeof(Vector));
+    stream.write(object.getDataPointer(), object.getDataSize());
 }

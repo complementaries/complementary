@@ -1,16 +1,21 @@
 #include "ParticleSystem.h"
 
-#include "imgui.h"
-#include "imgui/ImGuiUtils.h"
 #include <cassert>
 #include <cmath>
+#include <imgui.h>
 #include <vector>
 
 #include "Game.h"
+#include "imgui/ImGuiUtils.h"
+#include "player/Player.h"
 
 ParticleSystem::ParticleSystem() {
     assert(!shader.compile({"assets/shaders/particle.vs", "assets/shaders/particle.fs"}));
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
+}
+
+ParticleSystem::ParticleSystem(Vector position) : ParticleSystem() {
+    this->position = position;
 }
 
 ParticleSystem::ParticleSystem(const ParticleSystemData& data) : ParticleSystem() {
@@ -32,7 +37,12 @@ void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
 }
 
 void ParticleSystem::tick() {
-    if (data.emissionInterval <= 0 || currentLifetime % data.emissionInterval == 0) {
+    if (data.followPlayer) {
+        position = Player::getPosition();
+    }
+
+    if ((data.duration <= 0.f || currentLifetime < data.duration) &&
+        (data.emissionInterval <= 0 || currentLifetime % data.emissionInterval == 0)) {
         for (int i = 0; i < data.emissionRate; i++) {
             float startVelocityX =
                 random.nextFloat(data.minStartVelocity.x, data.maxStartVelocity.x);
@@ -40,9 +50,9 @@ void ParticleSystem::tick() {
                 random.nextFloat(data.minStartVelocity.y, data.maxStartVelocity.y);
             Vector startVelocity(startVelocityX, startVelocityY);
             switch (data.type) {
-                case ParticleType::TRIANGLE: spawnTriangle(Vector(), startVelocity); break;
-                case ParticleType::SQUARE: spawnSquare(Vector(), startVelocity); break;
-                case ParticleType::CIRCLE: spawnCircle(Vector(), startVelocity); break;
+                case ParticleType::TRIANGLE: spawnTriangle(position, startVelocity); break;
+                case ParticleType::SQUARE: spawnSquare(position, startVelocity); break;
+                case ParticleType::CIRCLE: spawnCircle(position, startVelocity); break;
             }
         }
     }
@@ -52,7 +62,7 @@ void ParticleSystem::tick() {
     tickParticles(circles);
 
     currentLifetime++;
-    if (data.duration > 0.f && currentLifetime >= data.duration) {
+    if (data.duration > 0.f && currentLifetime >= data.duration + data.maxLifetime) {
         destroy();
     }
 }
@@ -65,7 +75,7 @@ T interpolate(const T& from, const T& to, float factor) {
 int ParticleSystem::renderTriangles(Buffer& buffer, float lag) {
     int vertices = 0;
     for (Particle& p : triangles) {
-        Vector particlePosition = interpolate(p.lastPosition, p.position, lag) + position;
+        Vector particlePosition = interpolate(p.lastPosition, p.position, lag);
         float factor = static_cast<float>(p.lifetime) / data.maxLifetime;
         float size = interpolate(data.startSize, data.endSize, factor);
         float h = 0.866025f * size; // sqrtf(0.75)
@@ -83,10 +93,12 @@ int ParticleSystem::renderTriangles(Buffer& buffer, float lag) {
 int ParticleSystem::renderSquares(Buffer& buffer, float lag) {
     int vertices = 0;
     for (Particle& p : squares) {
-        Vector particlePosition = interpolate(p.lastPosition, p.position, lag) + position;
+        Vector particlePosition = interpolate(p.lastPosition, p.position, lag);
         float factor = static_cast<float>(p.lifetime) / data.maxLifetime;
         float halfSize = 0.5f * interpolate(data.startSize, data.endSize, factor);
         Color c = ColorUtils::mix(data.startColor, data.endColor, factor);
+        auto [r, g, b, a] = ColorUtils::unpack(c);
+        printf("factor=%f, r=%d, g=%d, b=%d, a=%d\n", factor, r, g, b, a);
 
         Vector leftBottom = particlePosition + Vector(-halfSize, halfSize);
         Vector rightTop = particlePosition + Vector(halfSize, -halfSize);
@@ -105,7 +117,7 @@ int ParticleSystem::renderSquares(Buffer& buffer, float lag) {
 int ParticleSystem::renderCircles(Buffer& buffer, float lag) {
     int vertices = 0;
     for (Particle& p : circles) {
-        Vector particlePosition = interpolate(p.lastPosition, p.position, lag) + position;
+        Vector particlePosition = interpolate(p.lastPosition, p.position, lag);
         float factor = static_cast<float>(p.lifetime) / data.maxLifetime;
         float radius = 0.5f * interpolate(data.startSize, data.endSize, factor);
         Color c = ColorUtils::mix(data.startColor, data.endColor, factor);
@@ -164,14 +176,15 @@ void ParticleSystem::renderImGui() {
     ImGui::DragInt("Emission Rate", &data.emissionRate);
     ImGui::Spacing();
 
-    ImGui::InputFloat2("Min start velocity", data.minStartVelocity.data());
-    ImGui::InputFloat2("Max start velocity", data.maxStartVelocity.data());
+    ImGui::DragFloat2("Min start velocity", data.minStartVelocity.data());
+    ImGui::DragFloat2("Max start velocity", data.maxStartVelocity.data());
     ImGui::DragFloat("Gravity", &data.gravity);
     ImGui::DragInt("Particle lifetime", &data.maxLifetime);
 
     ImGuiUtils::ColorPicker("Start color", &data.startColor);
     ImGuiUtils::ColorPicker("End color", &data.endColor);
     ImGui::DragFloat2("Size over lifetime", &data.startSize);
+    ImGui::Checkbox("Follow player", &data.followPlayer);
 
     ImGui::Text("Current duration: %d, particle count: %zu", currentLifetime,
                 triangles.size() + squares.size() + circles.size());

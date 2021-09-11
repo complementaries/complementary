@@ -9,6 +9,7 @@ class Matrix final {
 
     Matrix& operator*=(const Matrix& other);
     Matrix operator*(const Matrix& other) const;
+    Vector operator*(const Vector& other) const;
 
     Matrix& unit();
     Matrix& scale(const Vector& v);

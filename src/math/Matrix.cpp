@@ -46,6 +46,12 @@ Matrix& Matrix::operator*=(const Matrix& other) {
     return *this;
 }
 
+Vector Matrix::operator*(const Vector& other) const {
+    return Vector(data[0] * other.x + data[4] * other.y + data[12] * 1.0f,
+                  data[1] * other.x + data[5] * other.y + data[13] * 1.0f) /
+           (data[3] * other.x + data[7] * other.y + data[15] * 1.0f);
+}
+
 Matrix Matrix::operator*(const Matrix& other) const {
     Matrix m = *this;
     m *= other;

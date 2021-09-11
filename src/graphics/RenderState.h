@@ -11,12 +11,17 @@ namespace RenderState {
     void addShake(const Vector& v);
     void addRandomizedShake(float strength);
     void tick();
+    void resize(int width, int height);
 
     void bindAndClearDefaultFramebuffer();
 
-    void prepareMixer();
+    void prepareEffectFramebuffer();
     void startMixing();
-    void renderMixer(float lag);
+    void startGlowing();
+    void renderEffects(float lag);
+
+    void enableBlending();
+    void disableBlending();
 }
 
 #endif

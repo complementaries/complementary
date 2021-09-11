@@ -20,7 +20,7 @@ namespace Player {
     void toggleWorld();
     Vector getPosition();
     void setPosition(const Vector& pos);
-    Vector getCenter();
+    Vector getCenter(float lag = 0.0f);
 
     void setAbilities(Ability dark, Ability light);
     bool hasAbility(Ability a);

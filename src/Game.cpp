@@ -90,6 +90,7 @@ void Game::tick() {
         Player::toggleWorld();
         RenderState::addRandomizedShake(2.0f);
         RenderState::startMixing();
+        RenderState::startGlowing();
         Objects::instantiateClone(testParticleSystem, Player::getPosition());
     }
 
@@ -124,16 +125,14 @@ void Game::render(float lag) {
         tilemapEditor->render();
         return;
     }
-    RenderState::prepareMixer();
+    RenderState::prepareEffectFramebuffer();
     Player::render(lag);
     Tilemap::render();
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBlendEquation(GL_FUNC_ADD);
+    RenderState::enableBlending();
     Objects::render(lag);
-    glDisable(GL_BLEND);
-    RenderState::renderMixer(lag);
+    RenderState::disableBlending();
+    RenderState::renderEffects(lag);
 }
 
 void Game::renderImGui() {
@@ -280,6 +279,7 @@ void Game::onWindowResize(int width, int height) {
     if (tilemapEditor) {
         tilemapEditor->onScreenResize(width, height);
     }
+    RenderState::resize(width, height);
 }
 
 void Game::onMouseEvent(void* eventPointer) {

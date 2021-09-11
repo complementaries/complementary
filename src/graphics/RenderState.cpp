@@ -17,19 +17,31 @@ static Random rng;
 
 static GLuint texture = 0;
 static GLuint textureDepth = 0;
-static GLuint framebuffer = 0;
+
+struct Framebuffer {
+    GLuint id = 0;
+
+    ~Framebuffer() {
+        glDeleteFramebuffers(1, &id);
+    }
+};
+static Framebuffer framebuffer;
 
 static GL::Shader mixer;
+static GL::Shader glow;
 static GL::VertexBuffer rectangle;
 static Vector mixCenter;
 static float lastMixRadius = 0.0f;
 static float mixRadius = 1000.0f;
 
-// glDeleteFramebuffers(1, &fb);
+static float lastGlowAlpha = 0.0f;
+static float glowAlpha = 0.0f;
+static float lastGlowScale = 1.0f;
+static float glowScale = 1.0f;
 
 bool RenderState::init() {
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glGenFramebuffers(1, &framebuffer.id);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.id);
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -59,7 +71,8 @@ bool RenderState::init() {
     rectangle.init(GL::VertexBuffer::Attributes().addVector2());
     float data[] = {-1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f};
     rectangle.setData(data, sizeof(data));
-    return mixer.compile({"assets/shaders/mixer.vs", "assets/shaders/mixer.fs"});
+    return mixer.compile({"assets/shaders/mixer.vs", "assets/shaders/mixer.fs"}) ||
+           glow.compile({"assets/shaders/glow.vs", "assets/shaders/glow.fs"});
 }
 
 static Vector getShake(float ticks) {
@@ -96,6 +109,18 @@ void RenderState::tick() {
     if (mixRadius > 1000.0f) {
         mixRadius = 1000.0f;
     }
+    lastGlowAlpha = glowAlpha;
+    lastGlowScale = glowScale;
+    glowScale *= 1.01f;
+    glowAlpha *= 0.90f;
+}
+
+void RenderState::resize(int width, int height) {
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+    glBindTexture(GL_TEXTURE_2D, textureDepth);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT,
+                 GL_FLOAT, nullptr);
 }
 
 static void clear() {
@@ -107,8 +132,8 @@ static void clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderState::prepareMixer() {
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+void RenderState::prepareEffectFramebuffer() {
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.id);
     clear();
 }
 
@@ -128,7 +153,14 @@ void RenderState::startMixing() {
     lastMixRadius = 0.0f;
 }
 
-void RenderState::renderMixer(float lag) {
+void RenderState::startGlowing() {
+    lastGlowAlpha = 1.0f;
+    glowAlpha = 1.0f;
+    lastGlowScale = 1.0f;
+    glowScale = 1.0f;
+}
+
+void RenderState::renderEffects(float lag) {
     bindAndClearDefaultFramebuffer();
     mixer.use();
     setViewMatrix(mixer);
@@ -136,9 +168,35 @@ void RenderState::renderMixer(float lag) {
     texToPos.transform(Vector(0.0f, Tilemap::getHeight()));
     texToPos.scale(Vector(Tilemap::getWidth(), -Tilemap::getHeight()));
     mixer.setMatrix("texToPos", texToPos);
-    bindTextureTo(0);
     mixer.setVector("center", mixCenter);
     mixer.setFloat("radius", lastMixRadius + (mixRadius - lastMixRadius) * lag);
     mixer.setInt("samp", 0);
+    bindTextureTo(0);
     rectangle.drawTriangles(6);
+
+    enableBlending();
+    glow.use();
+    Matrix modifier;
+    Vector modifierCenter = viewMatrix * Player::getCenter();
+    modifier.transform(modifierCenter);
+    float scale = lastGlowScale + (glowScale - lastGlowScale) * lag;
+    modifier.scale(Vector(scale, scale));
+    modifier.transform(-modifierCenter);
+
+    glow.setMatrix("modifier", modifier);
+    glow.setFloat("alpha", lastGlowAlpha + (glowAlpha - lastGlowAlpha) * lag);
+    glow.setInt("samp", 0);
+    bindTextureTo(0);
+    rectangle.drawTriangles(6);
+    disableBlending();
+}
+
+void RenderState::enableBlending() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquation(GL_FUNC_ADD);
+}
+
+void RenderState::disableBlending() {
+    glDisable(GL_BLEND);
 }

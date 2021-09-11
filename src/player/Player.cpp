@@ -145,8 +145,8 @@ void Player::setPosition(const Vector& pos) {
     lastPosition = pos;
 }
 
-Vector Player::getCenter() {
-    return position + data.size * 0.5f;
+Vector Player::getCenter(float lag) {
+    return lastPosition + (position - lastPosition) * lag + data.size * 0.5f;
 }
 
 static void tickWallJumpCollision(Face face, bool& wall) {

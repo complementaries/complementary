@@ -446,7 +446,7 @@ void Player::render(float lag) {
     // TEMP: indicator if we're gliding
     // TODO: remove
     if (abilities[worldType] == Ability::GLIDER && Input::getButton(ButtonType::ABILITY).pressed) {
-        color = ColorUtils::rgba(0, 255, 255);
+        color = ColorUtils::CYAN;
     }
     buf.add(0.0f).add(0.0f).add(color);
     buf.add(1.0f).add(0.0f).add(color);

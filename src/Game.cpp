@@ -83,9 +83,11 @@ void Game::tick() {
             return;
         }
     }
+    RenderState::tick();
 
     if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
         Player::toggleWorld();
+        RenderState::addRandomizedShake(2.0f);
         Objects::instantiateClone(testParticleSystem, Player::getPosition());
     }
 
@@ -120,7 +122,7 @@ void Game::render(float lag) {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    RenderState::updateViewMatrix();
+    RenderState::updateViewMatrix(lag);
     if (tilemapEditor) {
         tilemapEditor->render();
         return;

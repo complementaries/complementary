@@ -22,6 +22,7 @@ namespace GL {
 
         void use();
         void setFloat(const char* name, float f);
+        void setInt(const char* name, int i);
         void setVector(const char* name, Vector v);
         void setMatrix(const char* name, const Matrix& matrix);
 

@@ -145,6 +145,10 @@ void Player::setPosition(const Vector& pos) {
     lastPosition = pos;
 }
 
+Vector Player::getCenter() {
+    return position + data.size * 0.5f;
+}
+
 static void tickWallJumpCollision(Face face, bool& wall) {
     Vector min = position + FaceUtils::getDirection(face) * step;
     Vector max = min + data.size;

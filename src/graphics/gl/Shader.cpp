@@ -79,6 +79,10 @@ void GL::Shader::setFloat(const char* name, float f) {
     glUniform1f(glGetUniformLocation(program, name), f);
 }
 
+void GL::Shader::setInt(const char* name, int i) {
+    glUniform1i(glGetUniformLocation(program, name), i);
+}
+
 void GL::Shader::setVector(const char* name, Vector vec) {
     glUniform2f(glGetUniformLocation(program, name), vec.x, vec.y);
 }

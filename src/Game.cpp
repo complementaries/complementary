@@ -43,7 +43,8 @@ static std::shared_ptr<ParticleSystem> testParticleSystem;
 
 bool Game::init() {
     Tiles::init();
-    if (Tilemap::init(48, 27) || Player::init() || Objects::init() || TilemapEditor::init()) {
+    if (Tilemap::init(48, 27) || Player::init() || Objects::init() || TilemapEditor::init() ||
+        RenderState::init()) {
         return true;
     }
 
@@ -88,6 +89,7 @@ void Game::tick() {
     if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
         Player::toggleWorld();
         RenderState::addRandomizedShake(2.0f);
+        RenderState::startMixing();
         Objects::instantiateClone(testParticleSystem, Player::getPosition());
     }
 
@@ -116,17 +118,13 @@ void Game::tick() {
 void Game::render(float lag) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-    if (Player::invertColors()) {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    } else {
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    }
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    RenderState::bindAndClearDefaultFramebuffer();
     RenderState::updateViewMatrix(lag);
     if (tilemapEditor) {
         tilemapEditor->render();
         return;
     }
+    RenderState::prepareMixer();
     Player::render(lag);
     Tilemap::render();
 
@@ -135,6 +133,7 @@ void Game::render(float lag) {
     glBlendEquation(GL_FUNC_ADD);
     Objects::render(lag);
     glDisable(GL_BLEND);
+    RenderState::renderMixer(lag);
 }
 
 void Game::renderImGui() {

@@ -14,7 +14,7 @@ void main() {
     vec3 c = texture(samp, varTex).xyz;
     vec3 ic = vec3(1.0, 1.0, 1.0) - c;
 
-    vec2 pos = (texToPos * vec4(varTex, 0.0, 1.0)).xy; 
+    vec2 pos = (texToPos * vec4(varTex, 0.0, 1.0)).xy;
 
     color = vec4(mix(ic, c, float(length(pos - center) < radius)), 1.0);
 }

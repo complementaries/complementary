@@ -1,17 +1,39 @@
 #include "ParticleSystem.h"
 
-#include <cassert>
 #include <cmath>
 #include <imgui.h>
 #include <vector>
 
+#include "graphics/Buffer.h"
 #include "graphics/RenderState.h"
+#include "graphics/gl/Shader.h"
+#include "graphics/gl/VertexBuffer.h"
 #include "imgui/ImGuiUtils.h"
 #include "player/Player.h"
 
-ParticleSystem::ParticleSystem() {
-    assert(!shader.compile({"assets/shaders/particle.vs", "assets/shaders/particle.fs"}));
+static GL::Shader shader;
+static GL::VertexBuffer buffer;
+static Buffer rawData;
+static int vertices = 0;
+
+bool ParticleRenderer::init() {
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
+    return shader.compile({"assets/shaders/particle.vs", "assets/shaders/particle.fs"});
+}
+
+void ParticleRenderer::prepare() {
+    rawData.clear();
+    vertices = 0;
+}
+
+void ParticleRenderer::render() {
+    shader.use();
+    RenderState::setViewMatrix(shader);
+    buffer.setData(rawData.getData(), rawData.getSize());
+    buffer.drawTriangles(vertices);
+}
+
+ParticleSystem::ParticleSystem() {
 }
 
 ParticleSystem::ParticleSystem(Vector position) : ParticleSystem() {
@@ -72,53 +94,46 @@ T interpolate(const T& from, const T& to, float factor) {
     return from * (1.0f - factor) + to * factor;
 }
 
-int ParticleSystem::renderTriangles(Buffer& buffer, float lag) {
-    int vertices = 0;
+void ParticleSystem::renderTriangles(float lag) {
     for (Particle& p : triangles) {
         Vector particlePosition = interpolate(p.lastPosition, p.position, lag);
-        float factor = static_cast<float>(p.lifetime) / data.maxLifetime;
+        float factor = (p.lifetime + lag) / data.maxLifetime;
         float size = interpolate(data.startSize, data.endSize, factor);
         float h = 0.866025f * size; // sqrtf(0.75)
         float a = 0.333333f * h;    // sin(30°) / (1 + sin(30°))
         Color c = ColorUtils::mix(data.startColor, data.endColor, factor);
 
-        buffer.add(particlePosition + Vector(0.0f, a - h)).add(c);
-        buffer.add(particlePosition + Vector(-0.5 * size, a)).add(c);
-        buffer.add(particlePosition + Vector(0.5 * size, a)).add(c);
+        rawData.add(particlePosition + Vector(0.0f, a - h)).add(c);
+        rawData.add(particlePosition + Vector(-0.5 * size, a)).add(c);
+        rawData.add(particlePosition + Vector(0.5 * size, a)).add(c);
         vertices += 3;
     }
-    return vertices;
 }
 
-int ParticleSystem::renderSquares(Buffer& buffer, float lag) {
-    int vertices = 0;
+void ParticleSystem::renderSquares(float lag) {
     for (Particle& p : squares) {
         Vector particlePosition = interpolate(p.lastPosition, p.position, lag);
-        float factor = static_cast<float>(p.lifetime) / data.maxLifetime;
+        float factor = (p.lifetime + lag) / data.maxLifetime;
         float halfSize = 0.5f * interpolate(data.startSize, data.endSize, factor);
         Color c = ColorUtils::mix(data.startColor, data.endColor, factor);
-        auto [r, g, b, a] = ColorUtils::unpack(c);
-        printf("factor=%f, r=%d, g=%d, b=%d, a=%d\n", factor, r, g, b, a);
 
         Vector leftBottom = particlePosition + Vector(-halfSize, halfSize);
         Vector rightTop = particlePosition + Vector(halfSize, -halfSize);
 
-        buffer.add(particlePosition - Vector(halfSize, halfSize)).add(c);
-        buffer.add(leftBottom).add(c);
-        buffer.add(rightTop).add(c);
-        buffer.add(particlePosition + Vector(halfSize, halfSize)).add(c);
-        buffer.add(leftBottom).add(c);
-        buffer.add(rightTop).add(c);
+        rawData.add(particlePosition - Vector(halfSize, halfSize)).add(c);
+        rawData.add(leftBottom).add(c);
+        rawData.add(rightTop).add(c);
+        rawData.add(particlePosition + Vector(halfSize, halfSize)).add(c);
+        rawData.add(leftBottom).add(c);
+        rawData.add(rightTop).add(c);
         vertices += 6;
     }
-    return vertices;
 }
 
-int ParticleSystem::renderCircles(Buffer& buffer, float lag) {
-    int vertices = 0;
+void ParticleSystem::renderCircles(float lag) {
     for (Particle& p : circles) {
         Vector particlePosition = interpolate(p.lastPosition, p.position, lag);
-        float factor = static_cast<float>(p.lifetime) / data.maxLifetime;
+        float factor = (p.lifetime + lag) / data.maxLifetime;
         float radius = 0.5f * interpolate(data.startSize, data.endSize, factor);
         Color c = ColorUtils::mix(data.startColor, data.endColor, factor);
 
@@ -127,26 +142,19 @@ int ParticleSystem::renderCircles(Buffer& buffer, float lag) {
         float step = full / radius * 0.05f;
         for (float f = step; f <= full + step; f += step) {
             Vector rotated = particlePosition + Vector(sinf(f), cosf(f)) * radius;
-            buffer.add(particlePosition).add(c);
-            buffer.add(rotated).add(c);
-            buffer.add(last).add(c);
+            rawData.add(particlePosition).add(c);
+            rawData.add(rotated).add(c);
+            rawData.add(last).add(c);
             last = rotated;
             vertices += 3;
         }
     }
-    return vertices;
 }
 
 void ParticleSystem::render(float lag) {
-    shader.use();
-    RenderState::setViewMatrix(shader);
-
-    Buffer data;
-    int vertices = renderTriangles(data, lag);
-    vertices += renderSquares(data, lag);
-    vertices += renderCircles(data, lag);
-    buffer.setData(data.getData(), data.getSize());
-    buffer.drawTriangles(vertices);
+    renderTriangles(lag);
+    renderSquares(lag);
+    renderCircles(lag);
 }
 
 void ParticleSystem::spawnTriangle(const Vector& position, const Vector& velocity) {

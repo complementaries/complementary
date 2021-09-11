@@ -44,7 +44,7 @@ static std::shared_ptr<ParticleSystem> testParticleSystem;
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Player::init() || Objects::init() || TilemapEditor::init() ||
-        RenderState::init()) {
+        RenderState::init() || ParticleRenderer::init()) {
         return true;
     }
 
@@ -130,7 +130,9 @@ void Game::render(float lag) {
     Tilemap::render();
 
     RenderState::enableBlending();
+    ParticleRenderer::prepare();
     Objects::render(lag);
+    ParticleRenderer::render();
     RenderState::disableBlending();
     RenderState::renderEffects(lag);
 }

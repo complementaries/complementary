@@ -3,10 +3,7 @@
 
 #include <vector>
 
-#include "graphics/Buffer.h"
 #include "graphics/Color.h"
-#include "graphics/gl/Shader.h"
-#include "graphics/gl/VertexBuffer.h"
 #include "math/Random.h"
 #include "math/Vector.h"
 #include "objects/Object.h"
@@ -56,19 +53,23 @@ class ParticleSystem : public Object<ParticleSystemData> {
     std::shared_ptr<ObjectBase> clone() override;
 
   private:
-    GL::Shader shader;
-    GL::VertexBuffer buffer;
     std::vector<Particle> triangles;
     std::vector<Particle> squares;
     std::vector<Particle> circles;
 
-    int renderTriangles(Buffer& data, float lag);
-    int renderSquares(Buffer& data, float lag);
-    int renderCircles(Buffer& data, float lag);
+    void renderTriangles(float lag);
+    void renderSquares(float lag);
+    void renderCircles(float lag);
     void tickParticles(std::vector<Particle>& particles);
 
     int currentLifetime = 0;
     Random random;
 };
+
+namespace ParticleRenderer {
+    bool init();
+    void prepare();
+    void render();
+}
 
 #endif

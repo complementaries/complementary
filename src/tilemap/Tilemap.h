@@ -18,7 +18,6 @@ namespace Tilemap {
     Vector getSpawnPoint();
 
     void render();
-    void renderBuffer(Buffer& buffer);
 
     void forceReload();
 

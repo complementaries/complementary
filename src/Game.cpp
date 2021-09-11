@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "Input.h"
 #include "graphics/Buffer.h"
+#include "graphics/RenderState.h"
 #include "graphics/Window.h"
 #include "graphics/gl/Glew.h"
 #include "graphics/gl/Shader.h"
@@ -24,8 +25,6 @@
 #include "tilemap/Tilemap.h"
 #include "tilemap/TilemapEditor.h"
 #include "tilemap/Tiles.h"
-
-Matrix Game::viewMatrix;
 
 static constexpr int MAX_LEVEL_NAME_LENGTH = 100;
 
@@ -121,9 +120,7 @@ void Game::render(float lag) {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    viewMatrix.unit()
-        .transform(Vector(-1.0f, 1.0f))
-        .scale(Vector(2.0f / Tilemap::getWidth(), -2.0f / Tilemap::getHeight()));
+    RenderState::updateViewMatrix();
     if (tilemapEditor) {
         tilemapEditor->render();
         return;

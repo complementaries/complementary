@@ -3,6 +3,7 @@ project('complementary', 'cpp', default_options : ['cpp_std=c++17'])
 src = [
   'src/graphics/gl/Shader.cpp',
   'src/graphics/gl/VertexBuffer.cpp',
+  'src/graphics/RenderState.cpp',
   'src/graphics/Buffer.cpp',
   'src/graphics/Color.cpp',
   'src/graphics/Window.cpp',

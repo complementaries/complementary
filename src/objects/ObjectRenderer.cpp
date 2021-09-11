@@ -1,7 +1,7 @@
 #include "ObjectRenderer.h"
 
-#include "Game.h"
 #include "graphics/Buffer.h"
+#include "graphics/RenderState.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 
@@ -19,7 +19,7 @@ bool ObjectRenderer::init() {
 void ObjectRenderer::prepare() {
     shader.use();
     setZ(0.0f);
-    shader.setMatrix("view", Game::viewMatrix);
+    RenderState::setViewMatrix(shader);
 }
 
 void ObjectRenderer::drawRectangle(const Vector& position, const Vector& size, Color c) {

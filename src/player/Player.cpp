@@ -5,9 +5,9 @@
 #include <imgui.h>
 #include <imgui/ImGuiUtils.h>
 
-#include "Game.h"
 #include "Input.h"
 #include "graphics/Buffer.h"
+#include "graphics/RenderState.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "math/Vector.h"
@@ -422,7 +422,7 @@ void Player::tick() {
 
 void Player::render(float lag) {
     shader.use();
-    shader.setMatrix("view", Game::viewMatrix);
+    RenderState::setViewMatrix(shader);
 
     Matrix model;
     model.transform(lastPosition + (position - lastPosition) * lag);

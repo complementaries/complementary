@@ -5,7 +5,7 @@
 #include <imgui.h>
 #include <vector>
 
-#include "Game.h"
+#include "graphics/RenderState.h"
 #include "imgui/ImGuiUtils.h"
 #include "player/Player.h"
 
@@ -139,7 +139,7 @@ int ParticleSystem::renderCircles(Buffer& buffer, float lag) {
 
 void ParticleSystem::render(float lag) {
     shader.use();
-    shader.setMatrix("view", Game::viewMatrix);
+    RenderState::setViewMatrix(shader);
 
     Buffer data;
     int vertices = renderTriangles(data, lag);

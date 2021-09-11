@@ -35,9 +35,9 @@ static int tilemapBackgroundColor;
 #undef STB_TILEMAP_EDITOR_IMPLEMENTATION
 #pragma GCC diagnostic pop
 
-#include "Game.h"
 #include "Tilemap.h"
 #include "Tiles.h"
+#include "graphics/RenderState.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "objects/ObjectRenderer.h"
@@ -298,7 +298,7 @@ void TilemapEditor::render() {
     stbte_draw(stbTileMap);
 
     shader.use();
-    shader.setMatrix("view", Game::viewMatrix);
+    RenderState::setViewMatrix(shader);
     int vertices = renderBuffer.getSize() / (sizeof(float) * 2 + 4);
     buffer.setData(renderBuffer.getData(), renderBuffer.getSize());
     buffer.drawTriangles(vertices);

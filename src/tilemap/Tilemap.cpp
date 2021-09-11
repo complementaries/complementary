@@ -5,9 +5,9 @@
 #include <fstream>
 #include <vector>
 
-#include "Game.h"
 #include "Tiles.h"
 #include "graphics/Buffer.h"
+#include "graphics/RenderState.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "player/Player.h"
@@ -76,16 +76,8 @@ static void prepareRendering() {
 
 void Tilemap::render() {
     shader.use();
-    shader.setMatrix("view", Game::viewMatrix);
+    RenderState::setViewMatrix(shader);
     prepareRendering();
-    buffer.drawTriangles(vertices);
-}
-
-void Tilemap::renderBuffer(Buffer& data) {
-    shader.use();
-    shader.setMatrix("view", Game::viewMatrix);
-    vertices = data.getSize() / (sizeof(float) * 2 + 4);
-    buffer.setData(data.getData(), data.getSize());
     buffer.drawTriangles(vertices);
 }
 

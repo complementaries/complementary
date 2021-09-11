@@ -21,6 +21,7 @@ class ColorObject : public Object<ColorObjectData> {
     bool collidesWith(const Vector& position, const Vector& size) const override;
     void render(float lag) override;
     std::shared_ptr<ObjectBase> clone() override;
+    Vector getSize() const override;
 
 #ifndef NDEBUG
     void initTileEditorData(std::vector<TileEditorProp>& props) override;

@@ -63,3 +63,7 @@ void WindObject::applyTileEditorData(float* props) {
     data.force.y = props[3];
 }
 #endif
+
+Vector WindObject::getSize() const {
+    return data.size;
+}

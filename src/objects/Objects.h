@@ -48,6 +48,7 @@ namespace Objects {
         return std::dynamic_pointer_cast<T>(obj);
     }
     void saveObject(const char* path, ObjectBase& object);
+    void print();
 }
 
 #endif

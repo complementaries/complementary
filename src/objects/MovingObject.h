@@ -25,6 +25,7 @@ class MovingObject : public Object<MovingObjectData> {
     void render(float lag) override;
     void renderEditor(float lag) override;
     std::shared_ptr<ObjectBase> clone() override;
+    Vector getSize() const override;
 
 #ifndef NDEBUG
     void initTileEditorData(std::vector<TileEditorProp>& props) override;

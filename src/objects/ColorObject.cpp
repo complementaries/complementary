@@ -59,3 +59,7 @@ void ColorObject::applyTileEditorData(float* props) {
     data.abilities[1] = static_cast<Ability>(props[3]);
 }
 #endif
+
+Vector ColorObject::getSize() const {
+    return data.size;
+}

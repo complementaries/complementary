@@ -111,7 +111,8 @@ void Objects::tick() {
         o->tick();
     }
 
-    for (size_t i = objects.size() - 1; i > 0; i--) {
+    for (size_t i = objects.size(); i > 0;) {
+        i--;
         auto object = objects[i];
         if (object->shouldDestroy) {
             objects.erase(objects.begin() + i);
@@ -253,4 +254,12 @@ void Objects::saveObject(const char* path, ObjectBase& object) {
     stream.write((char*)&object.prototypeId, sizeof(int));
     stream.write((char*)&object.position, sizeof(Vector));
     stream.write(object.getDataPointer(), object.getDataSize());
+}
+
+void Objects::print() {
+    for (auto o : objects) {
+        Vector v = o->getSize();
+        std::cout << o->position.x << " " << o->position.y << " " << v.x << " " << v.y << " "
+                  << o->shouldDestroy << "\n";
+    }
 }

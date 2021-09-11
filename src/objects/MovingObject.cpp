@@ -97,3 +97,7 @@ void MovingObject::applyTileEditorData(float* props) {
     data.speed = props[6];
 }
 #endif
+
+Vector MovingObject::getSize() const {
+    return data.size;
+}

@@ -25,6 +25,7 @@ class ObjectBase {
     virtual char* getDataPointer() = 0;
     virtual size_t getDataSize() const = 0;
     virtual std::shared_ptr<ObjectBase> clone() = 0;
+    virtual Vector getSize() const;
 
 #ifndef NDEBUG
     virtual const char* getTypeName();

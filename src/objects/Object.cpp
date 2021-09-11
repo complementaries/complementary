@@ -3,7 +3,7 @@
 #include "imgui/ImGuiUtils.h"
 #include <imgui.h>
 
-ObjectBase::ObjectBase() : hasWall(true) {
+ObjectBase::ObjectBase() : hasWall(true), shouldDestroy(false) {
 }
 
 void ObjectBase::postInit() {
@@ -90,4 +90,8 @@ void ObjectBase::renderImGui() {
 
 void ObjectBase::destroy() {
     shouldDestroy = true;
+}
+
+Vector ObjectBase::getSize() const {
+    return Vector();
 }

@@ -14,6 +14,7 @@
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
+static GL::VertexBuffer background;
 static int vertices = 0;
 static bool dirty = true;
 static int width = 0;
@@ -29,6 +30,7 @@ bool Tilemap::init(int w, int h) {
     height = h;
     tiles.resize(width * height, 0);
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
+    background.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
     return false;
 }
 
@@ -64,6 +66,17 @@ static void prepareRendering() {
         return;
     }
     Buffer data;
+
+    Color c = Tiles::AIR.getColor();
+    data.add(0.0f).add(0.0f).add(c);
+    data.add(static_cast<float>(width)).add(0.0f).add(c);
+    data.add(0.0f).add(static_cast<float>(height)).add(c);
+    data.add(static_cast<float>(width)).add(static_cast<float>(height)).add(c);
+    data.add(static_cast<float>(width)).add(0.0f).add(c);
+    data.add(0.0f).add(static_cast<float>(height)).add(c);
+    background.setData(data.getData(), data.getSize());
+    data.clear();
+
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
             Tilemap::getTile(x, y).render(data, x, y);
@@ -72,6 +85,13 @@ static void prepareRendering() {
     vertices = data.getSize() / (sizeof(float) * 2 + 4);
     buffer.setData(data.getData(), data.getSize());
     dirty = false;
+}
+
+void Tilemap::renderBackground() {
+    shader.use();
+    RenderState::setViewMatrix(shader);
+    prepareRendering();
+    background.drawTriangles(6);
 }
 
 void Tilemap::render() {

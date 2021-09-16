@@ -304,15 +304,13 @@ void TilemapEditor::render() {
     buffer.drawTriangles(vertices);
 
     ObjectRenderer::prepare();
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBlendEquation(GL_FUNC_ADD);
+    RenderState::enableBlending();
     for (unsigned int i = 0; i < objectQueue.size(); i++) {
         ObjectRenderer::setZ(objectQueue[i].zLayer);
         objectQueue[i].object->renderEditor(0.f);
     }
     objectQueue.clear();
-    glDisable(GL_BLEND);
+    RenderState::disableBlending();
 }
 
 void TilemapEditor::onMouseEvent(void* eventPtr) {

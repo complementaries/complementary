@@ -121,12 +121,14 @@ void Game::render(float lag) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     RenderState::bindAndClearDefaultFramebuffer();
-    RenderState::updateViewMatrix(lag);
     if (tilemapEditor) {
+        RenderState::updateEditorViewMatrix(lag);
         tilemapEditor->render();
         return;
     }
+    RenderState::updateViewMatrix(lag);
     RenderState::prepareEffectFramebuffer();
+    Tilemap::renderBackground();
     Player::render(lag);
     Tilemap::render();
 

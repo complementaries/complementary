@@ -17,6 +17,7 @@ namespace Tilemap {
     void setTile(int x, int y, const Tile& tile);
     Vector getSpawnPoint();
 
+    void renderBackground();
     void render();
 
     void forceReload();

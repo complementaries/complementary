@@ -431,6 +431,7 @@ void Player::render(float lag) {
     Matrix model;
     model.transform(lastPosition + (position - lastPosition) * lag);
     model.scale(data.size);
+    model.scale(Vector(1.005f, 1.005f));
     constexpr float maxWobble = 1.5f;
     float wobble = 1.0f + renderForce;
     if (wobble > maxWobble) {

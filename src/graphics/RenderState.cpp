@@ -81,6 +81,17 @@ static Vector getShake(float ticks) {
 }
 
 void RenderState::updateViewMatrix(float lag) {
+    int x = Window::getWidth() / Tilemap::getWidth();
+    int y = Window::getHeight() / Tilemap::getHeight();
+    float factor = std::min(x, y);
+    Vector realSize(Tilemap::getWidth() * factor, Tilemap::getHeight() * factor);
+    viewMatrix.unit()
+        .transform(realSize / Vector(-Window::getWidth(), Window::getHeight()))
+        .scale(Vector(factor / Window::getWidth(), -factor / Window::getHeight()) * 2.0f);
+    viewMatrix.transform(getShake(shakeTicks + lag));
+}
+
+void RenderState::updateEditorViewMatrix(float lag) {
     viewMatrix.unit()
         .transform(Vector(-1.0f, 1.0f))
         .scale(Vector(2.0f / Tilemap::getWidth(), -2.0f / Tilemap::getHeight()));
@@ -124,7 +135,7 @@ void RenderState::resize(int width, int height) {
 }
 
 static void clear() {
-    if (Player::invertColors()) {
+    if (!Player::invertColors()) {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     } else {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

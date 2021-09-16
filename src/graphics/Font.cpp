@@ -90,3 +90,14 @@ void Font::draw(const Vector& pos, float size, Color color, const char* s) {
     buffer.setData(data.getData(), data.getSize());
     buffer.drawTriangles(6 * index);
 }
+
+float Font::getWidth(float size, const char* s) {
+    float width = 0.0f;
+    int index = 0;
+    while (s[index] != '\0') {
+        width += fontWidth[s[index] & 0x7F];
+        index++;
+    }
+    width *= size;
+    return width;
+}

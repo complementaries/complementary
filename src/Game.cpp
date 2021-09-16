@@ -140,7 +140,11 @@ void Game::render(float lag) {
     RenderState::enableBlending();
     Font::prepare();
     Font::draw(Vector(0.0f, 0.0f), 4.0f, ColorUtils::RED, "This is a test.");
-    Font::draw(Vector(0.0f, 4.0f), 2.0f, ColorUtils::MAGENTA, "This is a test.");
+    const char* center = "I'm in the center.";
+    constexpr float size = 4.0f;
+    float width = Font::getWidth(size, center);
+    Font::draw(Vector(Tilemap::getWidth() - width, Tilemap::getHeight() - size) * 0.5f, size,
+               0x5FFF00FF, center);
     RenderState::disableBlending();
 }
 

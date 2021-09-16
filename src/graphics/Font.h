@@ -8,6 +8,7 @@ namespace Font {
     bool init();
     void prepare();
     void draw(const Vector& pos, float size, Color color, const char* s);
+    float getWidth(float size, const char* s);
 }
 
 #endif

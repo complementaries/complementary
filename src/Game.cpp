@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "Input.h"
 #include "graphics/Buffer.h"
+#include "graphics/Font.h"
 #include "graphics/RenderState.h"
 #include "graphics/Window.h"
 #include "graphics/gl/Glew.h"
@@ -44,7 +45,7 @@ static std::shared_ptr<ParticleSystem> testParticleSystem;
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Player::init() || Objects::init() || TilemapEditor::init() ||
-        RenderState::init() || ParticleRenderer::init()) {
+        RenderState::init() || ParticleRenderer::init() || Font::init()) {
         return true;
     }
 
@@ -135,6 +136,12 @@ void Game::render(float lag) {
     ParticleRenderer::render();
     RenderState::disableBlending();
     RenderState::renderEffects(lag);
+
+    RenderState::enableBlending();
+    Font::prepare();
+    Font::draw(Vector(0.0f, 0.0f), 4.0f, ColorUtils::RED, "This is a test.");
+    Font::draw(Vector(0.0f, 4.0f), 2.0f, ColorUtils::MAGENTA, "This is a test.");
+    RenderState::disableBlending();
 }
 
 void Game::renderImGui() {

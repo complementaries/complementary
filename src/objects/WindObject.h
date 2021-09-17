@@ -21,6 +21,11 @@ class WindObject : public Object<WindObjectData> {
     void render(float lag) override;
     std::shared_ptr<ObjectBase> clone() override;
     Vector getSize() const override;
+    void tick() override;
+    float calculatePlayerDistance();
+    float calculatePlayerDistanceAxis(int axis);
+    void handleSound(int soundId);
+    static const int soundThreshold = 6.0f;
 
 #ifndef NDEBUG
     void initTileEditorData(std::vector<TileEditorProp>& props) override;

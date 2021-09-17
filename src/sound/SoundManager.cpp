@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#define MIX_EFFECTSMAXSPEED
-
 const static int musicVolume = MIX_MAX_VOLUME / 2;
 const static int lightSoundID = 0;
 const static int darkSoundID = 1;
@@ -11,7 +9,7 @@ const static int soundEffectsGroup = 1;
 const static int maxChannels = 16;
 static int curMusicChannel = lightSoundID;
 
-SoundManager::SoundObject SoundArray[Sound::MAXIMUM];
+SoundManager::SoundObject soundArray[Sound::MAX];
 
 bool SoundManager::init() {
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
@@ -26,8 +24,8 @@ bool SoundManager::init() {
 }
 
 bool SoundManager::playMusic() {
-    if (play(LIGHT_BG, curMusicChannel, musicVolume, -1)) return true;
-    if (play(DARK_BG, 1 - curMusicChannel, 0, -1)) return true;
+    if (play(Sound::LIGHT_BG, curMusicChannel, musicVolume, -1)) return true;
+    if (play(Sound::DARK_BG, 1 - curMusicChannel, 0, -1)) return true;
     return false;
 }
 
@@ -44,13 +42,13 @@ int SoundManager::findFreeChannel() {
 }
 
 bool SoundManager::playSoundEffect(int soundId) {
-    SoundArray[soundId].channel = findFreeChannel();
-    return play(soundId, SoundArray[soundId].channel);
+    soundArray[soundId].channel = findFreeChannel();
+    return play(soundId, soundArray[soundId].channel);
 }
 
 bool SoundManager::playContinuousSound(int soundId) {
-    SoundArray[soundId].channel = findFreeChannel();
-    return play(soundId, SoundArray[soundId].channel, -1, -1);
+    soundArray[soundId].channel = findFreeChannel();
+    return play(soundId, soundArray[soundId].channel, -1, -1);
 }
 
 void SoundManager::switchMusic() {
@@ -60,22 +58,25 @@ void SoundManager::switchMusic() {
 }
 
 bool SoundManager::loadSounds() {
-    SoundArray[Sound::LIGHT_BG].sound = Mix_LoadWAV("assets/sounds/light.ogg");
-    SoundArray[Sound::LIGHT_BG].defaultVolume = musicVolume;
+    soundArray[Sound::LIGHT_BG].sound = Mix_LoadWAV("assets/sounds/light.ogg");
+    soundArray[Sound::LIGHT_BG].defaultVolume = musicVolume;
 
-    SoundArray[Sound::DARK_BG].sound = Mix_LoadWAV("assets/sounds/dark.ogg");
-    SoundArray[Sound::DARK_BG].defaultVolume = musicVolume;
+    soundArray[Sound::DARK_BG].sound = Mix_LoadWAV("assets/sounds/dark.ogg");
+    soundArray[Sound::DARK_BG].defaultVolume = musicVolume;
 
-    SoundArray[Sound::WORLD_SWITCH].sound = Mix_LoadWAV("assets/sounds/switch.ogg");
-    SoundArray[Sound::WORLD_SWITCH].defaultVolume = MIX_MAX_VOLUME;
+    soundArray[Sound::WORLD_SWITCH].sound = Mix_LoadWAV("assets/sounds/switch.ogg");
+    soundArray[Sound::WORLD_SWITCH].defaultVolume = MIX_MAX_VOLUME;
 
-    SoundArray[Sound::JUMP].sound = Mix_LoadWAV("assets/sounds/jump2.ogg");
-    SoundArray[Sound::JUMP].defaultVolume = MIX_MAX_VOLUME;
+    soundArray[Sound::JUMP].sound = Mix_LoadWAV("assets/sounds/jump2.ogg");
+    soundArray[Sound::JUMP].defaultVolume = MIX_MAX_VOLUME / 2;
 
-    SoundArray[Sound::TEST].sound = Mix_LoadWAV("assets/sounds/air.ogg");
-    SoundArray[Sound::TEST].defaultVolume = MIX_MAX_VOLUME / 2;
+    soundArray[Sound::DASH].sound = Mix_LoadWAV("assets/sounds/dash.ogg");
+    soundArray[Sound::DASH].defaultVolume = MIX_MAX_VOLUME / 2;
 
-    for (SoundObject object : SoundArray) {
+    soundArray[Sound::WIND].sound = Mix_LoadWAV("assets/sounds/wind.ogg");
+    soundArray[Sound::WIND].defaultVolume = MIX_MAX_VOLUME / 2;
+
+    for (SoundObject object : soundArray) {
         if (object.sound == NULL) return true;
     }
     return false;
@@ -83,19 +84,20 @@ bool SoundManager::loadSounds() {
 
 // do not directly use this to play a sound, rather use playSoundEffect
 bool SoundManager::play(int soundId, int channel, int volume, int loops) {
-    SoundArray[soundId].channel = Mix_PlayChannel(channel, SoundArray[soundId].sound, loops);
-    if (SoundArray[soundId].channel == -1) return true;
-    Mix_Volume(SoundArray[soundId].channel,
-               volume > -1 ? volume : SoundArray[soundId].defaultVolume);
+    soundArray[soundId].channel = Mix_PlayChannel(channel, soundArray[soundId].sound, loops);
+    soundArray[soundId].playing = true;
+    if (soundArray[soundId].channel == -1) return true;
+    Mix_Volume(soundArray[soundId].channel,
+               volume > -1 ? volume : soundArray[soundId].defaultVolume);
     return false;
 }
 
 void SoundManager::setVolume(int soundId, int volume) {
-    Mix_Volume(SoundArray[soundId].channel, volume);
+    Mix_Volume(soundArray[soundId].channel, volume);
 }
 
 void SoundManager::stopSound(int soundId) {
-    Mix_HaltChannel(SoundArray[soundId].channel);
+    Mix_HaltChannel(soundArray[soundId].channel);
 }
 
 void SoundManager::setDistanceToPlayer(int soundId, float distance, float xDistance,
@@ -119,17 +121,17 @@ void SoundManager::setDistanceToPlayer(int soundId, float distance, float xDista
     // -255 shouls be 0 and 0 should be 127
     xDist = (xDist + 255) / 2;
 
-    if (!Mix_SetDistance(SoundArray[soundId].channel, abs(dist))) {
+    if (!Mix_SetDistance(soundArray[soundId].channel, abs(dist))) {
         printf("Mix_SetDistance: %s\n", Mix_GetError());
     }
 
-    if (!Mix_SetPanning(SoundArray[soundId].channel, xDist, 255 - xDist)) {
+    if (!Mix_SetPanning(soundArray[soundId].channel, xDist, 255 - xDist)) {
         printf("Mix_SetPanning: %s\n", Mix_GetError());
     }
 }
 
 bool SoundManager::soundPlaying(int soundId) {
-    return Mix_Playing(SoundArray[soundId].channel);
+    return soundArray[soundId].playing;
 }
 
 void SoundManager::channelDone(int channel) {
@@ -137,11 +139,24 @@ void SoundManager::channelDone(int channel) {
     if (!Mix_UnregisterAllEffects(channel)) {
         printf("Mix_UnregisterAllEffects: %s\n", Mix_GetError());
     }
+    int ID = getIdFromChannel(channel);
+    soundArray[ID].playing = false;
+    soundArray[ID].channel = -1;
+}
+
+int SoundManager::getIdFromChannel(int channel) {
+    for (int i = 0; i < Sound::MAX; i++) {
+        if (soundArray[i].channel == channel) {
+            return i;
+        }
+    }
+    // should not happen
+    return -1;
 }
 
 void SoundManager::quit() {
     // clean up our resources
-    for (SoundObject object : SoundArray) {
+    for (SoundObject object : soundArray) {
         Mix_FreeChunk(object.sound);
     }
 

@@ -284,8 +284,8 @@ void Window::run() {
         return;
     }
     // TODO: find a better place to start music
-    // SoundManager::playMusic();
-    SoundManager::playContinuousSound(Sound::TEST);
+    SoundManager::playMusic();
+
     running = true;
     Nanos lag = 0;
     Nanos lastTime = getNanos();

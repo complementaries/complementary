@@ -3,4 +3,5 @@ A list of the used sounds and their sources can be found below.
 
 jump - https://freesound.org/people/ryusa/sounds/531145/
 switch - https://freesound.org/people/altemark/sounds/35913/
-air - https://freesound.org/people/fedsmoker/sounds/208525/
+wind - https://freesound.org/people/fedsmoker/sounds/208525/
+dash - https://freesound.org/people/Kastenfrosch/sounds/521999/

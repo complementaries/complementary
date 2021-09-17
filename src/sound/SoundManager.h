@@ -3,7 +3,9 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 
-enum Sound { LIGHT_BG, DARK_BG, WORLD_SWITCH, JUMP, TEST, /* GLIDE, DASH,*/ MAXIMUM };
+namespace Sound {
+    enum Sound { LIGHT_BG, DARK_BG, WORLD_SWITCH, JUMP, WIND, /* GLIDE,*/ DASH, MAX };
+}
 
 namespace SoundManager {
 
@@ -11,6 +13,7 @@ namespace SoundManager {
         Mix_Chunk* sound;
         int channel;
         int defaultVolume;
+        bool playing;
     };
 
     bool init();
@@ -26,6 +29,8 @@ namespace SoundManager {
     bool play(int soundId, int channel, int volume = -1, int loops = 0);
 
     int findFreeChannel();
+
+    int getIdFromChannel(int channel);
 
     void setVolume(int soundId, int volume);
 

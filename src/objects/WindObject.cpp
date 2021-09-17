@@ -2,6 +2,7 @@
 
 #include "ObjectRenderer.h"
 #include "player/Player.h"
+#include "sound/SoundManager.h"
 #include <memory>
 
 WindObject::WindObject() {
@@ -21,6 +22,46 @@ void WindObject::onCollision() {
     if (Player::isGliding()) {
         Player::addForce(data.force);
     }
+}
+
+void WindObject::tick() {
+    handleSound(Sound::WIND);
+}
+
+void WindObject::handleSound(int soundId) {
+    float distance = calculatePlayerDistance();
+    float xDistance = calculatePlayerDistanceAxis(0);
+    if (abs(distance) < soundThreshold) {
+        if (!SoundManager::soundPlaying(soundId)) {
+            SoundManager::playContinuousSound(soundId);
+        }
+        SoundManager::setDistanceToPlayer(soundId, distance, xDistance, soundThreshold);
+    } else {
+        if (SoundManager::soundPlaying(soundId)) {
+            SoundManager::stopSound(soundId);
+        }
+    }
+}
+
+float WindObject::calculatePlayerDistance() {
+    Vector playerPos = Player::getPosition();
+    float xDist = calculatePlayerDistanceAxis(0);
+    float yDist = calculatePlayerDistanceAxis(1);
+
+    // float distance =
+    //    pow(pow(playerPos.x - position.x, 2.0f) + pow(playerPos.y - position.y, 2.0f), 0.5f);
+    float distance = abs(xDist) > abs(yDist) ? xDist : yDist;
+    return distance;
+}
+float WindObject::calculatePlayerDistanceAxis(int axis) {
+    Vector playerPos = Player::getPosition();
+    float distance = 0;
+    if (playerPos[axis] < position[axis]) {
+        distance = playerPos[axis] - position[axis];
+    } else if (playerPos[axis] > position[axis] + data.size[axis]) {
+        distance = playerPos[axis] - (position[axis] + data.size[axis]);
+    }
+    return distance;
 }
 
 bool WindObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {

@@ -281,12 +281,6 @@ void Player::tick() {
 
     leftWallJumpCooldown -= leftWallJumpCooldown > 0;
     rightWallJumpCooldown -= rightWallJumpCooldown > 0;
-    // Code for testing panning and sound distance
-    // TODO: Create Sound Object
-    Vector pos{13.0f, 20.0f};
-    float distance = pow(pow(position.x - pos.x, 2.0) + pow(position.y - pos.y, 2.0), 0.5);
-    float xDist = position.x - pos.x;
-    SoundManager::setDistanceToPlayer(Sound::TEST, distance, xDist, 10);
 
     int sign = Input::getHorizontal() < 0
                    ? -1 + static_cast<float>(leftWallJumpCooldown) / data.wallJumpMoveCooldown
@@ -380,6 +374,7 @@ void Player::tick() {
         dashCoolDown = data.maxDashCooldown + dashTicks;
         dashVelocity = Vector(data.dashStrength * dashDirection, 0.0f);
         addRenderForce(-0.5f, dashDirection < 0.0f ? Face::LEFT : Face::RIGHT);
+        SoundManager::playSoundEffect(Sound::DASH);
     }
     if (leftWall || rightWall) {
         dashUseable = true;

@@ -8,6 +8,7 @@ const static int darkSoundID = 1;
 const static int soundEffectsGroup = 1;
 const static int maxChannels = 16;
 static int curMusicChannel = lightSoundID;
+static bool muted = false;
 
 SoundManager::SoundObject soundArray[Sound::MAX];
 
@@ -54,7 +55,9 @@ bool SoundManager::playContinuousSound(int soundId) {
 void SoundManager::switchMusic() {
     setVolume(curMusicChannel, 0);
     curMusicChannel = 1 - curMusicChannel;
-    setVolume(curMusicChannel, musicVolume);
+    if (!muted) {
+        setVolume(curMusicChannel, musicVolume);
+    }
 }
 
 bool SoundManager::loadSounds() {
@@ -76,7 +79,7 @@ bool SoundManager::loadSounds() {
     soundArray[Sound::WIND].sound = Mix_LoadWAV("assets/sounds/wind.ogg");
     soundArray[Sound::WIND].defaultVolume = MIX_MAX_VOLUME / 2;
 
-    for (SoundObject object : soundArray) {
+    for (const SoundObject object : soundArray) {
         if (object.sound == NULL) return true;
     }
     return false;
@@ -87,8 +90,8 @@ bool SoundManager::play(int soundId, int channel, int volume, int loops) {
     soundArray[soundId].channel = Mix_PlayChannel(channel, soundArray[soundId].sound, loops);
     soundArray[soundId].playing = true;
     if (soundArray[soundId].channel == -1) return true;
-    Mix_Volume(soundArray[soundId].channel,
-               volume > -1 ? volume : soundArray[soundId].defaultVolume);
+    int newVolume = volume > -1 ? volume : soundArray[soundId].defaultVolume;
+    Mix_Volume(soundArray[soundId].channel, muted ? 0 : newVolume);
     return false;
 }
 
@@ -162,4 +165,22 @@ void SoundManager::quit() {
 
     // quit SDL_mixer
     Mix_CloseAudio();
+}
+
+void SoundManager::mute() {
+    if (muted) {
+        setVolume(curMusicChannel, musicVolume);
+        setVolume(1 - curMusicChannel, 0);
+
+        for (int i = darkSoundID + 1; i < Sound::MAX; i++) {
+            if (soundArray[i].playing) {
+                setVolume(i, soundArray[i].defaultVolume);
+            }
+        }
+    } else {
+        for (int i = 0; i < 16; i++) {
+            Mix_Volume(i, 0);
+        }
+    }
+    muted = !muted;
 }

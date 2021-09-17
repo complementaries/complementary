@@ -11,9 +11,9 @@ namespace SoundManager {
 
     struct SoundObject {
         Mix_Chunk* sound;
-        int channel;
-        int defaultVolume;
-        bool playing;
+        int channel = -1;
+        int defaultVolume = MIX_MAX_VOLUME;
+        bool playing = false;
     };
 
     bool init();
@@ -45,4 +45,6 @@ namespace SoundManager {
     bool soundPlaying(int soundId);
 
     void quit();
+
+    void mute();
 }

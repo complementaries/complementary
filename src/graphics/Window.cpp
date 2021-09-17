@@ -124,6 +124,7 @@ static void pollEvents() {
                         case SDLK_a: Input::Internal::setButtonPressed(ButtonType::LEFT); break;
                         case SDLK_RIGHT:
                         case SDLK_d: Input::Internal::setButtonPressed(ButtonType::RIGHT); break;
+                        case SDLK_0: SoundManager::mute(); break;
                     }
                 }
                 break;
@@ -285,6 +286,7 @@ void Window::run() {
     }
     // TODO: find a better place to start music
     SoundManager::playMusic();
+    // SoundManager::mute();
 
     running = true;
     Nanos lag = 0;

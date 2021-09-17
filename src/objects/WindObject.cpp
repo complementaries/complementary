@@ -44,7 +44,6 @@ void WindObject::handleSound(int soundId) {
 }
 
 float WindObject::calculatePlayerDistance() {
-    Vector playerPos = Player::getPosition();
     float xDist = calculatePlayerDistanceAxis(0);
     float yDist = calculatePlayerDistanceAxis(1);
 
@@ -53,6 +52,7 @@ float WindObject::calculatePlayerDistance() {
     float distance = abs(xDist) > abs(yDist) ? xDist : yDist;
     return distance;
 }
+
 float WindObject::calculatePlayerDistanceAxis(int axis) {
     Vector playerPos = Player::getPosition();
     float distance = 0;

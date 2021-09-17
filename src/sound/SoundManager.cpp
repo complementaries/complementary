@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#define MIX_EFFECTSMAXSPEED
+
 const static int musicVolume = MIX_MAX_VOLUME / 2;
 const static int lightSoundID = 0;
 const static int darkSoundID = 1;
@@ -19,7 +21,7 @@ bool SoundManager::init() {
 
     Mix_AllocateChannels(maxChannels);
     Mix_GroupChannels(darkSoundID + 1, maxChannels - 1, soundEffectsGroup);
-
+    Mix_ChannelFinished(channelDone);
     return false;
 }
 
@@ -92,6 +94,10 @@ void SoundManager::setVolume(int soundId, int volume) {
     Mix_Volume(SoundArray[soundId].channel, volume);
 }
 
+void SoundManager::stopSound(int soundId) {
+    Mix_HaltChannel(SoundArray[soundId].channel);
+}
+
 void SoundManager::setDistanceToPlayer(int soundId, float distance, float xDistance,
                                        int threshold) {
     // distance from 0 to 255
@@ -119,6 +125,17 @@ void SoundManager::setDistanceToPlayer(int soundId, float distance, float xDista
 
     if (!Mix_SetPanning(SoundArray[soundId].channel, xDist, 255 - xDist)) {
         printf("Mix_SetPanning: %s\n", Mix_GetError());
+    }
+}
+
+bool SoundManager::soundPlaying(int soundId) {
+    return Mix_Playing(SoundArray[soundId].channel);
+}
+
+void SoundManager::channelDone(int channel) {
+    // remove all effects from channel
+    if (!Mix_UnregisterAllEffects(channel)) {
+        printf("Mix_UnregisterAllEffects: %s\n", Mix_GetError());
     }
 }
 

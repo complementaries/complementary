@@ -33,5 +33,11 @@ namespace SoundManager {
 
     bool loadSounds();
 
+    void stopSound(int soundId);
+
+    void channelDone(int channel);
+
+    bool soundPlaying(int soundId);
+
     void quit();
 }

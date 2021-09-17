@@ -13,6 +13,7 @@
 #include "math/Vector.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
+#include "sound/SoundManager.h"
 #include "tilemap/Tilemap.h"
 
 static constexpr float step = 0.005f;
@@ -280,6 +281,12 @@ void Player::tick() {
 
     leftWallJumpCooldown -= leftWallJumpCooldown > 0;
     rightWallJumpCooldown -= rightWallJumpCooldown > 0;
+    // Code for testing panning and sound distance
+    // TODO: Create Sound Object
+    Vector pos{13.0f, 20.0f};
+    float distance = pow(pow(position.x - pos.x, 2.0) + pow(position.y - pos.y, 2.0), 0.5);
+    float xDist = position.x - pos.x;
+    SoundManager::setDistanceToPlayer(Sound::TEST, distance, xDist, 10);
 
     int sign = Input::getHorizontal() < 0
                    ? -1 + static_cast<float>(leftWallJumpCooldown) / data.wallJumpMoveCooldown
@@ -316,6 +323,7 @@ void Player::tick() {
             jumpCount++;
             data.velocity.y = 0;
             fakeGrounded = 0;
+            SoundManager::playSoundEffect(Sound::JUMP);
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
             if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
                 wallJumpDirection = Vector(1.0f, -1.0f);
@@ -324,6 +332,7 @@ void Player::tick() {
                 leftWallJumpCooldown = data.wallJumpMoveCooldown;
                 jumpBufferTicks = 0;
                 addRenderForce(-0.5f, Face::LEFT);
+                SoundManager::playSoundEffect(Sound::JUMP);
             } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed) {
                 wallJumpDirection = Vector(-1.0f, -1.0f);
                 addForce(wallJumpDirection * data.wallJumpInit);
@@ -331,6 +340,7 @@ void Player::tick() {
                 rightWallJumpCooldown = data.wallJumpMoveCooldown;
                 jumpBufferTicks = 0;
                 addRenderForce(-0.5f, Face::RIGHT);
+                SoundManager::playSoundEffect(Sound::JUMP);
             }
         }
     }

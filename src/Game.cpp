@@ -23,6 +23,7 @@
 #include "objects/WindObject.h"
 #include "particles/ParticleSystem.h"
 #include "player/Player.h"
+#include "sound/SoundManager.h"
 #include "tilemap/Tilemap.h"
 #include "tilemap/TilemapEditor.h"
 #include "tilemap/Tiles.h"
@@ -93,6 +94,9 @@ void Game::tick() {
         RenderState::startMixing();
         RenderState::startGlowing();
         Objects::instantiateClone(testParticleSystem, Player::getPosition());
+
+        SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
+        SoundManager::switchMusic();
     }
 
     if (tilemapEditor) {

@@ -19,6 +19,7 @@ src = [
   'src/objects/ObjectRenderer.cpp',
   'src/objects/Objects.cpp',
   'src/objects/TileEditorProp.cpp',
+  'src/sound/SoundManager.cpp',
   'src/objects/WindObject.cpp',
   'src/particles/ParticleSystem.cpp',
   'src/player/Ability.cpp',

@@ -21,6 +21,7 @@
 #include "objects/WindObject.h"
 #include "particles/Particles.h"
 #include "player/Player.h"
+#include "sound/SoundManager.h"
 #include "tilemap/Tilemap.h"
 #include "tilemap/TilemapEditor.h"
 #include "tilemap/Tiles.h"
@@ -70,6 +71,8 @@ void Game::nextLevel() {
 void Game::tick() {
     if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
         Player::toggleWorld();
+        SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
+        SoundManager::switchMusic();
     }
 
     if (tilemapEditor) {

@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include <SDL.h>
-#include <SDL_mixer.h>
 #include <algorithm>
 #include <cmath>
 #include <imgui_impl_opengl3.h>
@@ -13,6 +12,7 @@
 #include "Game.h"
 #include "Input.h"
 #include "graphics/gl/Glew.h"
+#include "sound/SoundManager.h"
 
 typedef long long int Nanos;
 static constexpr Nanos NANOS_PER_TICK = 1'000'000'000L * Window::SECONDS_PER_TICK;
@@ -22,20 +22,13 @@ static bool running = false;
 static int width = 850;
 static int height = 480;
 
-static Mix_Chunk* light;
-static Mix_Chunk* dark;
-static Mix_Chunk* jump;
-static Mix_Chunk* world_switch;
-static int curTrack = 0;
-
 bool Window::init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
         fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
         return true;
     }
 
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
-        fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
+    if (SoundManager::init() || SoundManager::loadSounds()) {
         return true;
     }
 
@@ -98,25 +91,6 @@ bool Window::init() {
 
     SDL_GameControllerEventState(SDL_ENABLE);
 
-    light = Mix_LoadWAV("assets/sounds/light.ogg");
-    if (light == NULL) return -1;
-
-    dark = Mix_LoadWAV("assets/sounds/dark.ogg");
-    if (dark == NULL) return -1;
-
-    jump = Mix_LoadWAV("assets/sounds/jump2.ogg");
-    if (jump == NULL) return -1;
-
-    world_switch = Mix_LoadWAV("assets/sounds/switch.ogg");
-    if (jump == NULL) return -1;
-
-    // if (Mix_PlayChannel(curTrack, light, -1) == -1) return -1;
-    // Mix_Volume(curTrack, MIX_MAX_VOLUME / 2);
-
-    curTrack = 1 - curTrack;
-
-    // if (Mix_PlayChannel(curTrack, dark, -1) == -1) return -1;
-    // Mix_Volume(curTrack, 0);
     return false;
 }
 
@@ -136,18 +110,10 @@ static void pollEvents() {
                     switch (e.key.keysym.sym) {
                         case SDLK_SPACE: {
                             Input::Internal::setButtonPressed(ButtonType::JUMP);
-                            int channel = Mix_PlayChannel(-1, jump, 0);
-                            if (channel != -1) {
-                                Mix_Volume(channel, MIX_MAX_VOLUME / 2);
-                            }
                             break;
                         }
                         case SDLK_RETURN: {
                             Input::Internal::setButtonPressed(ButtonType::SWITCH);
-                            Mix_PlayChannel(-1, world_switch, 0);
-                            Mix_Volume(curTrack, MIX_MAX_VOLUME / 2);
-                            curTrack = 1 - curTrack;
-                            Mix_Volume(curTrack, 0);
                             break;
                         }
                         case SDLK_LSHIFT:
@@ -317,6 +283,9 @@ void Window::run() {
     if (Game::init()) {
         return;
     }
+    // TODO: find a better place to start music
+    // SoundManager::playMusic();
+    SoundManager::playContinuousSound(Sound::TEST);
     running = true;
     Nanos lag = 0;
     Nanos lastTime = getNanos();
@@ -358,13 +327,7 @@ void Window::exit() {
     SDL_DestroyWindow(window);
     SDL_Quit();
 
-    // clean up our resources
-    Mix_FreeChunk(light);
-    Mix_FreeChunk(dark);
-    Mix_FreeChunk(jump);
-
-    // quit SDL_mixer
-    Mix_CloseAudio();
+    SoundManager::quit();
 }
 
 int Window::getWidth() {

@@ -79,7 +79,7 @@ bool SoundManager::loadSounds() {
     soundArray[Sound::WIND].sound = Mix_LoadWAV("assets/sounds/wind.ogg");
     soundArray[Sound::WIND].defaultVolume = MIX_MAX_VOLUME / 2;
 
-    for (const SoundObject object : soundArray) {
+    for (SoundObject object : soundArray) {
         if (object.sound == NULL) return true;
     }
     return false;

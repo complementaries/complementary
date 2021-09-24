@@ -31,14 +31,6 @@ jobs:
           meson build
           ninja -C build
 
-      - name: Runtime check
-        shell: bash
-        run: |
-          # Check if shaders compile and if the game is generally runnable
-          # If there's no crash in the first five seconds, we assume that everything is fine
-
-          timeout --preserve-status 5 ./build/complementary
-
       - name: Prepare upload
         shell: bash
         run: |

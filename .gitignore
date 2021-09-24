@@ -9,4 +9,9 @@
 .pch
 .vs/
 
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+.vsls.json
+
 imgui.ini

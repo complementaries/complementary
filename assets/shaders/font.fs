@@ -10,7 +10,7 @@ out vec4 color;
 const float smoothing = 1.0 / 32.0;
 
 void main() {
-    float distance = 1.0 - texture2D(samp, varTex).r;
-    float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, distance);
+    float dist = 1.0 - texture(samp, varTex).r;
+    float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, dist);
     color = vec4(varColor.xyz, varColor.w * alpha);
 }

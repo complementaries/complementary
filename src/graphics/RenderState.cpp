@@ -76,7 +76,12 @@ bool RenderState::init() {
 }
 
 static Vector getShake(float ticks) {
-    float factor = (sinf(ticks * 0.125f) * expf(-ticks * 0.025f) + 1.0f) * 0.5f;
+    float falloff = expf(-ticks * 0.09f);
+    if (falloff < 0.05f) {
+        // Don't keep on wobbling for an extended time
+        return Vector(0.f, 0.f);
+    }
+    float factor = (sinf(ticks * 0.3f) * falloff + 1.0f) * 0.5f;
     return shake * (2.0f * factor - 1.0f);
 }
 
@@ -116,7 +121,7 @@ void RenderState::addRandomizedShake(float strength) {
 void RenderState::tick() {
     shakeTicks++;
     lastMixRadius = mixRadius;
-    mixRadius += 1.0f;
+    mixRadius += 1.5f + mixRadius * 0.02f;
     if (mixRadius > 1000.0f) {
         mixRadius = 1000.0f;
     }

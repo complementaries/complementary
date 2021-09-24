@@ -42,11 +42,19 @@ namespace Objects {
     void save(const char* path);
 
     std::shared_ptr<ObjectBase> loadObject(const char* path);
+
     template <typename T>
     std::shared_ptr<T> loadObject(const char* path) {
         auto obj = loadObject(path);
         return std::dynamic_pointer_cast<T>(obj);
     }
+    template <typename T>
+    std::shared_ptr<T> instantiateObject(const char* path) {
+        auto object = loadObject<T>(path);
+        add(object);
+        return object;
+    }
+
     void saveObject(const char* path, ObjectBase& object);
     void print();
 }

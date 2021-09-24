@@ -52,7 +52,13 @@ size_t Objects::getPrototypeCount() {
 }
 
 void Objects::clear() {
-    objects.clear();
+    for (size_t i = objects.size(); i > 0;) {
+        i--;
+        auto object = objects[i];
+        if (object->destroyOnLevelLoad) {
+            objects.erase(objects.begin() + i);
+        }
+    }
 }
 
 void Objects::add(std::shared_ptr<ObjectBase> o) {
@@ -264,7 +270,7 @@ void Objects::saveObject(const char* path, ObjectBase& object) {
 void Objects::print() {
     for (auto o : objects) {
         Vector v = o->getSize();
-        std::cout << o->position.x << " " << o->position.y << " " << v.x << " " << v.y << " "
-                  << o->shouldDestroy << "\n";
+        std::cout << o->getTypeName() << " " << o->position.x << " " << o->position.y << " " << v.x
+                  << " " << v.y << " " << o->shouldDestroy << "\n";
     }
 }

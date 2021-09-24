@@ -3,7 +3,7 @@
 #include "imgui/ImGuiUtils.h"
 #include <imgui.h>
 
-ObjectBase::ObjectBase() : hasWall(true), shouldDestroy(false) {
+ObjectBase::ObjectBase() : hasWall(true), shouldDestroy(false), destroyOnLevelLoad(true) {
 }
 
 void ObjectBase::postInit() {

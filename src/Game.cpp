@@ -50,9 +50,12 @@ bool Game::init() {
         return true;
     }
 
-    testParticleSystem = Objects::loadObject<ParticleSystem>("assets/particlesystems/test.cmob");
+    testParticleSystem =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/test.cmob");
+    testParticleSystem->destroyOnLevelLoad = false;
 
     nextLevel();
+
     return false;
 }
 
@@ -90,10 +93,12 @@ void Game::tick() {
 
     if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
         Player::toggleWorld();
-        RenderState::addRandomizedShake(2.0f);
+        RenderState::addRandomizedShake(1.0f);
         RenderState::startMixing();
         RenderState::startGlowing();
-        Objects::instantiateClone(testParticleSystem, Player::getPosition());
+
+        testParticleSystem->position = Player::getPosition();
+        testParticleSystem->play();
 
         SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
         SoundManager::switchMusic();
@@ -264,7 +269,13 @@ void Game::renderImGui() {
     for (size_t i = 0; i < Objects::getObjects().size(); i++) {
         auto object = Objects::getObjects()[i];
 
-        const char* destructionInfo = object->shouldDestroy ? "[QUEUED FOR DESTRUCTION] " : "";
+        const char* destructionInfo = "";
+        if (!object->destroyOnLevelLoad) {
+            destructionInfo = "[PERSISTENT] ";
+        }
+        if (object->shouldDestroy) {
+            destructionInfo = "[QUEUED FOR DESTRUCTION] ";
+        }
 
         char header[256];
         snprintf(header, 256, "%s#%zu: %s (prototype #%d)", destructionInfo, i,

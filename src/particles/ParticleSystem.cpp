@@ -38,10 +38,22 @@ ParticleSystem::ParticleSystem() {
 
 ParticleSystem::ParticleSystem(Vector position) : ParticleSystem() {
     this->position = position;
+    if (data.playOnSpawn) {
+        play();
+    }
 }
 
 ParticleSystem::ParticleSystem(const ParticleSystemData& data) : ParticleSystem() {
     this->data = data;
+}
+
+void ParticleSystem::play() {
+    this->playing = true;
+    currentLifetime = 0.f;
+}
+
+void ParticleSystem::stop() {
+    this->playing = false;
 }
 
 void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
@@ -63,7 +75,7 @@ void ParticleSystem::tick() {
         position = Player::getPosition();
     }
 
-    if ((data.duration <= 0.f || currentLifetime < data.duration) &&
+    if (playing && (data.duration <= 0.f || currentLifetime < data.duration) &&
         (data.emissionInterval <= 0 || currentLifetime % data.emissionInterval == 0)) {
         for (int i = 0; i < data.emissionRate; i++) {
             float startVelocityX =
@@ -84,7 +96,8 @@ void ParticleSystem::tick() {
     tickParticles(circles);
 
     currentLifetime++;
-    if (data.duration > 0.f && currentLifetime >= data.duration + data.maxLifetime) {
+    if (data.destroyOnEnd && data.duration > 0.f &&
+        currentLifetime >= data.duration + data.maxLifetime) {
         destroy();
     }
 }
@@ -193,7 +206,17 @@ void ParticleSystem::renderImGui() {
     ImGuiUtils::ColorPicker("End color", &data.endColor);
     ImGui::DragFloat2("Size over lifetime", &data.startSize);
     ImGui::Checkbox("Follow player", &data.followPlayer);
+    ImGui::Checkbox("Play on spawn", &data.playOnSpawn);
+    ImGui::Checkbox("Destroy on end", &data.destroyOnEnd);
 
     ImGui::Text("Current duration: %d, particle count: %zu", currentLifetime,
                 triangles.size() + squares.size() + circles.size());
+
+    if (ImGui::Button("Play")) {
+        play();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Stop")) {
+        stop();
+    }
 }

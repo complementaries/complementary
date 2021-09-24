@@ -29,6 +29,8 @@ struct ParticleSystemData final {
     float startSize = 2;
     float endSize = 1;
     bool followPlayer = false;
+    bool playOnSpawn = true;
+    bool destroyOnEnd = false;
 };
 
 struct Particle final {
@@ -43,13 +45,12 @@ class ParticleSystem : public Object<ParticleSystemData> {
     ParticleSystem();
     ParticleSystem(Vector position);
     ParticleSystem(const ParticleSystemData& data);
+    void play();
+    void stop();
     void tick() override;
     void render(float lag) override;
     void renderImGui() override;
 
-    void spawnTriangle(const Vector& position, const Vector& velocity);
-    void spawnSquare(const Vector& position, const Vector& velocity);
-    void spawnCircle(const Vector& position, const Vector& velocity);
     std::shared_ptr<ObjectBase> clone() override;
 
   private:
@@ -62,7 +63,12 @@ class ParticleSystem : public Object<ParticleSystemData> {
     void renderCircles(float lag);
     void tickParticles(std::vector<Particle>& particles);
 
+    void spawnTriangle(const Vector& position, const Vector& velocity);
+    void spawnSquare(const Vector& position, const Vector& velocity);
+    void spawnCircle(const Vector& position, const Vector& velocity);
+
     int currentLifetime = 0;
+    bool playing = false;
     Random random;
 };
 

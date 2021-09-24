@@ -49,6 +49,7 @@ class ObjectBase {
     int prototypeId = -1;
     Vector position;
     bool shouldDestroy;
+    bool destroyOnLevelLoad;
 };
 
 template <typename T>

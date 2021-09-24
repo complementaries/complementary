@@ -32,7 +32,7 @@ class MovingObject : public Object<MovingObjectData> {
     void applyTileEditorData(float* props) override;
 #endif
 
-  private:
+  protected:
     Vector lastPosition;
     Vector velocity;
 };

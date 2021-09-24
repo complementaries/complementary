@@ -7,7 +7,11 @@
 typedef uint32_t Color;
 
 namespace ColorUtils {
-    Color rgba(int red, int green, int blue, int alpha = 0xFF);
+    constexpr Color rgba(int red, int green, int blue, int alpha = 0xFF) {
+        return (red & 0xFF) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16) |
+               ((alpha & 0xFF) << 24);
+    }
+
     Color floatRgba(float red, float green, float blue, float alpha = 1.f);
     std::tuple<int, int, int, int> unpack(Color color);
     std::tuple<float, float, float, float> unpackFloat(Color color);

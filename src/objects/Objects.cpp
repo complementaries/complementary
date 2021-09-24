@@ -10,6 +10,7 @@
 
 #include "objects/ColorObject.h"
 #include "objects/MovingObject.h"
+#include "objects/MovingSwitchObject.h"
 #include "objects/ObjectRenderer.h"
 #include "objects/WindObject.h"
 #include "particles/ParticleSystem.h"
@@ -27,7 +28,10 @@ bool Objects::init() {
     addPrototype(std::make_shared<MovingObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
                                                 Vector(1.0f, 24.0f), 0.025f));
     addPrototype(std::make_shared<ParticleSystem>(Vector(24, 15)));
-
+    addPrototype(std::make_shared<MovingSwitchObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
+                                                      Vector(1.0f, 24.0f), 0.025f, true));
+    addPrototype(std::make_shared<MovingSwitchObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
+                                                      Vector(1.0f, 24.0f), 0.025f, false));
     return ObjectRenderer::init();
 }
 

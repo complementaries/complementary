@@ -15,6 +15,7 @@ src = [
   'src/math/Random.cpp',
   'src/objects/ColorObject.cpp',
   'src/objects/MovingObject.cpp',
+  'src/objects/MovingSwitchObject.cpp',
   'src/objects/Object.cpp',
   'src/objects/ObjectRenderer.cpp',
   'src/objects/Objects.cpp',

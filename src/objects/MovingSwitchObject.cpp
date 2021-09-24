@@ -34,7 +34,7 @@ void MovingSwitchObject::render(float lag) {
 }
 
 void MovingSwitchObject::renderEditor(float lag) {
-    constexpr Color color[2] = {ColorUtils::rgba(20, 20, 20), ColorUtils::rgba(235, 235, 235)};
+    constexpr Color color[2] = {ColorUtils::rgba(40, 40, 40), ColorUtils::rgba(215, 215, 215)};
     Vector oversize(0.05f, 0.05f);
     Vector i = position;
     ObjectRenderer::drawRectangle(i - oversize, data.size + oversize * 2.0f, color[seen]);

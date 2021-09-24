@@ -2,6 +2,7 @@
 #define OBJECT_H
 
 #include <cstddef>
+#include <fstream>
 #include <memory>
 #include <vector>
 
@@ -22,8 +23,8 @@ class ObjectBase {
     virtual void render(float lag);
     virtual void renderEditor(float lag);
     virtual void destroy();
-    virtual char* getDataPointer() = 0;
-    virtual size_t getDataSize() const = 0;
+    virtual void read(std::ifstream& in) = 0;
+    virtual void write(std::ofstream& out) = 0;
     virtual std::shared_ptr<ObjectBase> clone() = 0;
     virtual Vector getSize() const;
 
@@ -53,12 +54,11 @@ class ObjectBase {
 template <typename T>
 class Object : public ObjectBase {
   public:
-    char* getDataPointer() {
-        return reinterpret_cast<char*>(&data);
+    void read(std::ifstream& in) override {
+        in.read(reinterpret_cast<char*>(&data), sizeof(T));
     }
-
-    size_t getDataSize() const {
-        return sizeof(T);
+    void write(std::ofstream& out) override {
+        out.write(reinterpret_cast<char*>(&data), sizeof(T));
     }
 
     T data;

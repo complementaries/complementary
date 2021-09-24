@@ -160,7 +160,7 @@ void Objects::load(const char* path) {
         stream.read((char*)&dataPosition, 4);
         int lastPos = stream.tellg();
         stream.seekg(dataPosition, std::ios_base::beg);
-        stream.read((char*)object->getDataPointer(), object->getDataSize());
+        object->read(stream);
         stream.seekg(lastPos, std::ios_base::beg);
 
 #ifndef NDEBUG
@@ -187,7 +187,7 @@ void Objects::save(const char* path) {
     for (size_t i = 0; i < objects.size(); i++) {
         int filePos = stream.tellp();
         pointers.push_back(filePos);
-        stream.write(objects[i]->getDataPointer(), objects[i]->getDataSize());
+        objects[i]->write(stream);
 
         filePos = stream.tellp();
         // Align to 8 bytes
@@ -240,7 +240,7 @@ std::shared_ptr<ObjectBase> Objects::loadObject(const char* path) {
     object->prototypeId = prototypeId;
 
     stream.read((char*)&object->position, sizeof(Vector));
-    stream.read((char*)object->getDataPointer(), object->getDataSize());
+    object->read(stream);
 
     return object;
 }
@@ -254,7 +254,7 @@ void Objects::saveObject(const char* path, ObjectBase& object) {
     assert(object.prototypeId > -1);
     stream.write((char*)&object.prototypeId, sizeof(int));
     stream.write((char*)&object.position, sizeof(Vector));
-    stream.write(object.getDataPointer(), object.getDataSize());
+    object.write(stream);
 }
 
 void Objects::print() {

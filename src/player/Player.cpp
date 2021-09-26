@@ -23,6 +23,7 @@ static GL::VertexBuffer buffer;
 static Vector lastPosition;
 static Vector position;
 static Vector baseVelocity;
+static float lastRenderForce;
 static float renderForce;
 static Vector renderOffset;
 
@@ -75,6 +76,9 @@ static float dashDirection = 1.0f;
 static bool dashUseable = false;
 
 static int jumpCount = 0;
+
+static int idleTicks = 0;
+static bool idle = false;
 
 bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
@@ -276,7 +280,25 @@ void Player::toggleWorld() {
     Tilemap::forceReload();
 }
 
+static void tickIdleAndRunAnimation() {
+    if (!Player::isColliding(Face::DOWN)) {
+        idle = false;
+        idleTicks = 0;
+        return;
+    }
+    if (std::abs(renderForce) < 0.05f) {
+        idle = true;
+    }
+    if (!idle) {
+        return;
+    }
+    idle = true;
+    idleTicks++;
+    addRenderForce(sinf(idleTicks * 0.08f) * 0.01f, Face::DOWN);
+}
+
 void Player::tick() {
+    lastRenderForce = renderForce;
     lastPosition = position;
 
     leftWallJumpCooldown -= leftWallJumpCooldown > 0;
@@ -427,6 +449,8 @@ void Player::tick() {
         addRenderForce(0.25f, Face::LEFT);
     }
     renderForce *= 0.95f;
+
+    tickIdleAndRunAnimation();
 }
 
 void Player::render(float lag) {
@@ -438,7 +462,7 @@ void Player::render(float lag) {
     model.scale(data.size);
     model.scale(Vector(1.005f, 1.005f));
     constexpr float maxWobble = 1.5f;
-    float wobble = 1.0f + renderForce;
+    float wobble = 1.0f + (lastRenderForce + (renderForce - lastRenderForce) * lag);
     if (wobble > maxWobble) {
         wobble = maxWobble;
     }

@@ -30,3 +30,7 @@ Color ColorUtils::mix(Color a, Color b, float factor) {
                 ((a >> 16) & 0xFF) * iFactor + ((b >> 16) & 0xFF) * factor,
                 ((a >> 24) & 0xFF) * iFactor + ((b >> 24) & 0xFF) * factor);
 }
+
+Color ColorUtils::setAlpha(Color c, int alpha) {
+    return (c & 0xFFFFFF) | ((alpha & 0xFF) << 24);
+}

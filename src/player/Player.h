@@ -24,6 +24,8 @@ namespace Player {
 
     void setAbilities(Ability dark, Ability light);
     bool hasAbility(Ability a);
+    Ability getAbility();
+    Ability getPassiveAbility();
     bool isGliding();
 
     void tick();

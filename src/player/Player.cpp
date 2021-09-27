@@ -275,6 +275,14 @@ bool Player::hasAbility(Ability a) {
     return abilities[worldType] == a;
 }
 
+Ability Player::getAbility() {
+    return abilities[worldType];
+}
+
+Ability Player::getPassiveAbility() {
+    return abilities[!worldType];
+}
+
 bool Player::isGliding() {
     return hasAbility(Ability::GLIDER) && Input::getButton(ButtonType::ABILITY).pressed;
 }

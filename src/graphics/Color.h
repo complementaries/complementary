@@ -17,6 +17,7 @@ namespace ColorUtils {
     std::tuple<float, float, float, float> unpackFloat(Color color);
     Color invert(Color c);
     Color mix(Color a, Color b, float factor);
+    Color setAlpha(Color c, int alpha);
 
     constexpr static Color WHITE = 0xFFFFFFFF;
     constexpr static Color LIGHT_GRAY = 0xFFC0C0C0;

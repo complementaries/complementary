@@ -9,6 +9,7 @@
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/Texture.h"
 #include "graphics/gl/VertexBuffer.h"
+#include "player/Player.h"
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
@@ -44,10 +45,20 @@ static void renderBox(const Vector& min, const Vector& max, const Vector& tMin, 
     buffer.drawTriangles(6);
 }
 
+static void renderIcon(const Vector& min, const Vector& max, Ability a) {
+    if (a == Ability::NONE) {
+        return;
+    }
+    int id = a - 1;
+    Vector tMin((id % 2) * 0.5f, (id / 2) * 0.5f);
+    renderBox(min, max, tMin, tMin + Vector(0.5f, 0.5f),
+              ColorUtils::setAlpha(AbilityUtils::getColor(a), 100));
+}
+
 void TextureRenderer::render(float lag) {
     (void)lag;
     shader.use();
     abilities.bindTo();
-    renderBox(Vector(0.5f, 0.0f), Vector(1.0f, -1.0f), Vector(0.0f, 0.0f), Vector(1.0f, 1.0f),
-              ColorUtils::rgba(255, 0, 0, 127));
+    renderIcon(Vector(0.5f, -0.5f), Vector(1.0f, -1.0f), Player::getAbility());
+    renderIcon(Vector(0.75f, -0.25f), Vector(1.0f, -0.5f), Player::getPassiveAbility());
 }

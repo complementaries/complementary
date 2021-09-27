@@ -16,7 +16,7 @@
 #include "sound/SoundManager.h"
 #include "tilemap/Tilemap.h"
 
-static constexpr float step = 0.005f;
+static constexpr float step = 0.0025f;
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
@@ -26,6 +26,7 @@ static Vector baseVelocity;
 static float lastRenderForce;
 static float renderForce;
 static Vector renderOffset;
+static Vector lastVelocity;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -80,6 +81,9 @@ static int jumpCount = 0;
 static int idleTicks = 0;
 static bool idle = false;
 
+static float lastTopShear = 0.0f;
+static float topShear = 0.0f;
+
 bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
         return true;
@@ -128,9 +132,13 @@ void Player::addForce(Face face, float force) {
     addForce(FaceUtils::getDirection(face) * force);
 }
 
+static void setRenderForceFace(Face face) {
+    renderOffset = (FaceUtils::getDirection(face) + Vector(1.0f, 1.0f)) * 0.5f;
+}
+
 static void addRenderForce(float force, Face face) {
     renderForce += force;
-    renderOffset = (FaceUtils::getDirection(face) + Vector(1.0f, 1.0f)) * 0.5f;
+    setRenderForceFace(face);
 }
 
 void Player::addBaseVelocity(const Vector& v) {
@@ -297,7 +305,20 @@ static void tickIdleAndRunAnimation() {
     addRenderForce(sinf(idleTicks * 0.08f) * 0.01f, Face::DOWN);
 }
 
+static void addTopShear(float shear) {
+    topShear += shear;
+}
+
+static void tickShear() {
+    lastTopShear = topShear;
+    if (Player::isColliding(Face::DOWN)) {
+        addTopShear(data.velocity.x * 0.2f);
+    }
+    topShear *= 0.9;
+}
+
 void Player::tick() {
+    lastVelocity = data.velocity;
     lastRenderForce = renderForce;
     lastPosition = position;
 
@@ -349,6 +370,7 @@ void Player::tick() {
                 jumpBufferTicks = 0;
                 addRenderForce(-0.5f, Face::LEFT);
                 SoundManager::playSoundEffect(Sound::JUMP);
+                addTopShear(-0.5f);
             } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed) {
                 wallJumpDirection = Vector(-1.0f, -1.0f);
                 addForce(wallJumpDirection * data.wallJumpInit);
@@ -357,6 +379,7 @@ void Player::tick() {
                 jumpBufferTicks = 0;
                 addRenderForce(-0.5f, Face::RIGHT);
                 SoundManager::playSoundEffect(Sound::JUMP);
+                addTopShear(0.5f);
             }
         }
     }
@@ -384,10 +407,14 @@ void Player::tick() {
     data.velocity += data.acceleration;
     data.acceleration = Vector();
     Vector actualDrag = data.drag;
-    if (((leftWall && Input::getButton(ButtonType::LEFT).pressed) ||
-         (rightWall && Input::getButton(ButtonType::RIGHT).pressed)) &&
-        hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
-        actualDrag[1] *= data.wallJumpDrag;
+    if (hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
+        if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
+            actualDrag[1] *= data.wallJumpDrag;
+            setRenderForceFace(Face::LEFT);
+        } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed) {
+            actualDrag[1] *= data.wallJumpDrag;
+            setRenderForceFace(Face::RIGHT);
+        }
     }
     if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
         dashTicks == 0 && dashCoolDown == 0 && dashUseable) {
@@ -436,21 +463,22 @@ void Player::tick() {
         wallJumpTicks = 0;
     }
 
+    tickIdleAndRunAnimation();
+    tickShear();
+
     if (!wasColliding(Face::DOWN) && isColliding(Face::DOWN)) {
         addRenderForce(-2.0f * fallStrenght, Face::DOWN);
     }
     if (!wasColliding(Face::UP) && isColliding(Face::UP)) {
         addRenderForce(2.0f * fallStrenght, Face::UP);
     }
-    if (!wasColliding(Face::RIGHT) && isColliding(Face::RIGHT)) {
+    if (!wasColliding(Face::RIGHT) && isColliding(Face::RIGHT) && lastVelocity.x > 0.0f) {
         addRenderForce(0.25f, Face::RIGHT);
     }
-    if (!wasColliding(Face::LEFT) && isColliding(Face::LEFT)) {
+    if (!wasColliding(Face::LEFT) && isColliding(Face::LEFT) && lastVelocity.x < 0.0f) {
         addRenderForce(0.25f, Face::LEFT);
     }
     renderForce *= 0.95f;
-
-    tickIdleAndRunAnimation();
 }
 
 void Player::render(float lag) {
@@ -482,12 +510,13 @@ void Player::render(float lag) {
     if (abilities[worldType] == Ability::GLIDER && Input::getButton(ButtonType::ABILITY).pressed) {
         color = ColorUtils::CYAN;
     }
+    float shear = lastTopShear + (topShear - lastTopShear) * lag;
     buf.add(0.0f).add(0.0f).add(color);
     buf.add(1.0f).add(0.0f).add(color);
-    buf.add(0.0f).add(1.0f).add(color);
-    buf.add(1.0f).add(1.0f).add(color);
+    buf.add(shear + 0.0f).add(1.0f).add(color);
+    buf.add(shear + 1.0f).add(1.0f).add(color);
     buf.add(1.0f).add(0.0f).add(color);
-    buf.add(0.0f).add(1.0f).add(color);
+    buf.add(shear + 0.0f).add(1.0f).add(color);
 
     buffer.setData(buf.getData(), buf.getSize());
     buffer.drawTriangles(6);

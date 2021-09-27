@@ -1,8 +1,8 @@
 #include "Font.h"
 
-#include <SDL.h>
 #include <SDL_image.h>
 #include <array>
+#include <cstdio>
 
 #include "graphics/Buffer.h"
 #include "graphics/RenderState.h"

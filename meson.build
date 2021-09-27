@@ -6,6 +6,7 @@ src = [
   'src/graphics/gl/Texture.cpp',
   'src/graphics/RenderState.cpp',
   'src/graphics/Buffer.cpp',
+  'src/graphics/TextureRenderer.cpp',
   'src/graphics/Color.cpp',
   'src/graphics/Window.cpp',
   'src/graphics/Font.cpp',

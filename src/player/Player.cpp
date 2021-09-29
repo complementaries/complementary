@@ -310,7 +310,9 @@ static void tickIdleAndRunAnimation() {
     }
     idle = true;
     idleTicks++;
-    addRenderForce(sinf(idleTicks * 0.08f) * 0.01f, Face::DOWN);
+    if (std::abs(data.velocity.x) < 0.01f) {
+        addRenderForce(sinf(idleTicks * 0.08f) * 0.01f, Face::DOWN);
+    }
 }
 
 static void addTopShear(float shear) {

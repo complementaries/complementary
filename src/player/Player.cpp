@@ -354,6 +354,7 @@ void Player::tick() {
 
     if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
         jumpBufferTicks = data.maxJumpBufferTicks;
+        addTopShear(-data.velocity.x * 12.f);
     }
     jumpBufferTicks -= jumpBufferTicks > 0;
 

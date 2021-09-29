@@ -356,7 +356,6 @@ void Player::tick() {
 
     if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
         jumpBufferTicks = data.maxJumpBufferTicks;
-        addTopShear(-data.velocity.x * 12.f);
     }
     jumpBufferTicks -= jumpBufferTicks > 0;
 
@@ -372,6 +371,7 @@ void Player::tick() {
             data.velocity.y = 0;
             fakeGrounded = 0;
             SoundManager::playSoundEffect(Sound::JUMP);
+            addTopShear(-data.velocity.x * 12.f);
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
             if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
                 wallJumpDirection = Vector(1.0f, -1.0f);

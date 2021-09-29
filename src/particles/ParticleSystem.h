@@ -14,6 +14,11 @@ enum class ParticleType {
     CIRCLE,
 };
 
+enum class SpawnPositionType {
+    CENTER,
+    BOX_EDGE,
+};
+
 struct ParticleSystemData final {
     int duration = 0;
     ParticleType type = ParticleType::SQUARE;
@@ -31,6 +36,10 @@ struct ParticleSystemData final {
     bool followPlayer = false;
     bool playOnSpawn = true;
     bool destroyOnEnd = false;
+    bool enableCollision = false;
+    bool clampPositionInBounds = false;
+    SpawnPositionType spawnPositionType = SpawnPositionType::CENTER; // Does nothing yet
+    Vector boxSize = Vector(0.5f, 0.5f);
 };
 
 struct Particle final {
@@ -66,6 +75,8 @@ class ParticleSystem : public Object<ParticleSystemData> {
     void spawnTriangle(const Vector& position, const Vector& velocity);
     void spawnSquare(const Vector& position, const Vector& velocity);
     void spawnCircle(const Vector& position, const Vector& velocity);
+
+    bool isInBox(const Particle& particle) const;
 
     int currentLifetime = 0;
     bool playing = false;

@@ -61,7 +61,11 @@ void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
         Particle& p = particles[i];
         p.lastPosition = p.position;
         p.velocity[1] += data.gravity;
-        p.position += p.velocity;
+        auto nextPosition = p.position + p.velocity;
+        if (!data.clampPositionInBounds || isInBox(p)) {
+            p.position = nextPosition;
+        }
+
         p.lifetime++;
         if (p.lifetime >= data.maxLifetime) {
             particles[i] = particles.back();
@@ -182,16 +186,20 @@ void ParticleSystem::spawnCircle(const Vector& position, const Vector& velocity)
     circles.push_back({position, position, velocity, 0});
 }
 
+bool ParticleSystem::isInBox(const Particle& particle) const {
+    return particle.position.x > position.x - data.boxSize.x &&
+           particle.position.x < position.x + data.boxSize.x &&
+           particle.position.y > position.y - data.boxSize.y &&
+           particle.position.y < position.y + data.boxSize.y;
+}
+
 std::shared_ptr<ObjectBase> ParticleSystem::clone() {
     return std::make_shared<ParticleSystem>(data);
 }
 
 void ParticleSystem::renderImGui() {
     ImGui::DragInt("Duration", &data.duration);
-    const char* types[3];
-    types[0] = "Triangle";
-    types[1] = "Square";
-    types[2] = "Circle";
+    const char* types[] = {"Triangle", "Square", "Circle"};
     ImGui::ListBox("Particle type", (int*)&data.type, types, 3);
     ImGui::DragInt("Emission Interval", &data.emissionInterval);
     ImGui::DragInt("Emission Rate", &data.emissionRate);
@@ -208,6 +216,12 @@ void ParticleSystem::renderImGui() {
     ImGui::Checkbox("Follow player", &data.followPlayer);
     ImGui::Checkbox("Play on spawn", &data.playOnSpawn);
     ImGui::Checkbox("Destroy on end", &data.destroyOnEnd);
+    ImGui::Checkbox("Enable collision", &data.enableCollision);
+    ImGui::Checkbox("Clamp pos. in bounds", &data.clampPositionInBounds);
+
+    const char* spawnPosTypes[] = {"Center", "Box Edge"};
+    ImGui::ListBox("Spawn pos type", (int*)&data.spawnPositionType, spawnPosTypes, 2);
+    ImGui::DragFloat2("Box Size", data.boxSize.data());
 
     ImGui::Text("Current duration: %d, particle count: %zu", currentLifetime,
                 triangles.size() + squares.size() + circles.size());

@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "Clock.h"
 #include "Game.h"
 #include "Input.h"
 #include "graphics/Buffer.h"
@@ -47,6 +48,9 @@ static std::shared_ptr<ParticleSystem> testParticleSystem;
 static int fade = 0;
 static int fadeAdd = 0;
 
+static Clock tps;
+static Clock fps;
+
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Objects::init() || TilemapEditor::init() || RenderState::init() ||
@@ -86,6 +90,7 @@ void Game::nextLevel() {
 }
 
 void Game::tick() {
+    tps.update();
     if (paused) {
         if (singleStep) {
             singleStep = false;
@@ -132,6 +137,7 @@ void Game::tick() {
 }
 
 void Game::render(float lag) {
+    fps.update();
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     RenderState::bindAndClearDefaultFramebuffer();
@@ -155,12 +161,10 @@ void Game::render(float lag) {
 
     RenderState::enableBlending();
     Font::prepare();
-    Font::draw(Vector(0.0f, 0.0f), 4.0f, ColorUtils::RED, "This is a test.");
-    const char* center = "I'm in the center.";
-    constexpr float size = 4.0f;
-    float width = Font::getWidth(size, center);
-    Font::draw(Vector(Tilemap::getWidth() - width, Tilemap::getHeight() - size) * 0.5f, size,
-               0x5FFF00FF, center);
+    char buffer[256];
+    snprintf(buffer, 256, "FPS: %2.0f TPS: %3.0f", fps.getUpdatesPerSecond(),
+             tps.getUpdatesPerSecond());
+    Font::draw(Vector(0.0f, 0.0f), 2.0f, ColorUtils::RED, buffer);
     TextureRenderer::render(lag);
 
     ObjectRenderer::prepare(Matrix());

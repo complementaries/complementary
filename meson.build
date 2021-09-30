@@ -38,6 +38,7 @@ src = [
   'src/tilemap/TilemapEditor.cpp',
   'src/tilemap/Tiles.cpp',
   'src/Game.cpp',
+  'src/Clock.cpp',
   'src/Input.cpp',
   'src/Arguments.cpp',
   'src/Main.cpp'

@@ -5,6 +5,8 @@
 #include "math/Vector.h"
 #include "player/Ability.h"
 
+#include <memory>
+
 struct MovingObjectData {
     Vector size;
     Vector goalA;

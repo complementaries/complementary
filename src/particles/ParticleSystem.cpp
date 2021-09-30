@@ -9,12 +9,15 @@
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "imgui/ImGuiUtils.h"
+#include "objects/Objects.h"
 #include "player/Player.h"
+#include "tilemap/Tilemap.h"
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
 static Buffer rawData;
 static int vertices = 0;
+constexpr float step = 0.01f;
 
 bool ParticleRenderer::init() {
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
@@ -56,14 +59,83 @@ void ParticleSystem::stop() {
     this->playing = false;
 }
 
+template <typename T>
+T interpolate(const T& from, const T& to, float factor) {
+    return from * (1.0f - factor) + to * factor;
+}
+
+static bool isColliding(const ParticleSystemData& s, Particle& p, const Vector& position,
+                        const Vector& size) {
+    float factor = static_cast<float>(p.lifetime) / s.maxLifetime;
+    float halfSize = 0.5f * interpolate(s.startSize, s.endSize, factor);
+    float minX = p.position.x - halfSize;
+    float minY = p.position.y - halfSize;
+    float maxX = p.position.x + halfSize;
+    float maxY = p.position.y + halfSize;
+    return minX < position[0] + size[0] && maxX > position[0] && minY < position[1] + size[1] &&
+           maxY > position[1];
+}
+
+static bool isColliding(const ParticleSystemData& s, Particle& p) {
+    float factor = static_cast<float>(p.lifetime) / s.maxLifetime;
+    float halfSize = 0.5f * interpolate(s.startSize, s.endSize, factor);
+    int minX = floorf(p.position.x - halfSize);
+    int minY = floorf(p.position.y - halfSize);
+    int maxX = floorf(p.position.x + halfSize);
+    int maxY = floorf(p.position.y + halfSize);
+    if (minX < 0 || minY < 0 || maxX >= Tilemap::getWidth() || maxY >= Tilemap::getHeight()) {
+        return true;
+    }
+    for (int x = minX; x <= maxX; x++) {
+        for (int y = minY; y <= maxY; y++) {
+            if (Tilemap::getTile(x, y).isSolid()) {
+                return true;
+            }
+        }
+    }
+    Vector half(halfSize, halfSize);
+    return Objects::collidesWithAny(p.position - half, half * 2.0f);
+}
+
+static void move(const ParticleSystemData& s, Particle& p) {
+    Vector energy = p.velocity;
+    while (energy[0] != 0.0f || energy[1] != 0.0f) {
+        for (int i = 0; i < 2; i++) {
+            if (energy[i] == 0.0f) {
+                continue;
+            }
+            float old = p.position[i];
+            if (energy[i] > step) {
+                p.position[i] += step;
+                energy[i] -= step;
+            } else if (energy[i] < -step) {
+                p.position[i] -= step;
+                energy[i] += step;
+            } else {
+                p.position[i] += energy[i];
+                energy[i] = 0.0f;
+            }
+            if (isColliding(s, p)) {
+                energy[i] = 0.0f;
+                p.position[i] = old;
+                p.velocity[i] = 0.0f;
+            }
+        }
+    }
+}
+
 void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
     for (unsigned int i = 0; i < particles.size(); i++) {
         Particle& p = particles[i];
         p.lastPosition = p.position;
         p.velocity[1] += data.gravity;
-        auto nextPosition = p.position + p.velocity;
+        Vector nextPosition = p.position + p.velocity;
         if (!data.clampPositionInBounds || isInBox(p)) {
-            p.position = nextPosition;
+            if (data.enableCollision) {
+                move(data, p);
+            } else {
+                p.position = nextPosition;
+            }
         }
 
         p.lifetime++;
@@ -104,11 +176,6 @@ void ParticleSystem::tick() {
         currentLifetime >= data.duration + data.maxLifetime) {
         destroy();
     }
-}
-
-template <typename T>
-T interpolate(const T& from, const T& to, float factor) {
-    return from * (1.0f - factor) + to * factor;
 }
 
 void ParticleSystem::renderTriangles(float lag) {
@@ -232,5 +299,15 @@ void ParticleSystem::renderImGui() {
     ImGui::SameLine();
     if (ImGui::Button("Stop")) {
         stop();
+    }
+}
+
+void ParticleSystem::forceMoveParticles(const Vector& position, const Vector& size,
+                                        const Vector& velocity) {
+    for (Particle& p : squares) {
+        if (isColliding(data, p, position, size)) {
+            p.position += velocity;
+            p.lastPosition += velocity;
+        }
     }
 }

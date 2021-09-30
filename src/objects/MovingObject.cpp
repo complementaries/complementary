@@ -1,9 +1,8 @@
 #include "MovingObject.h"
 
 #include "ObjectRenderer.h"
+#include "objects/Objects.h"
 #include "player/Player.h"
-#include <iostream>
-#include <memory>
 
 MovingObject::MovingObject() {
 }
@@ -34,15 +33,17 @@ void MovingObject::tick() {
         position += velocity;
     }
 
+    Vector step = velocity;
+    if (step.y != 0.0f) {
+        step.x = 0.0f;
+    }
+    step.normalize();
+    step *= 0.01f;
     while (Player::isColliding(*this)) {
-        Vector step = velocity;
-        if (step.y != 0.0f) {
-            step.x = 0.0f;
-        }
-        step.normalize();
-        step *= 0.01f;
         Player::moveForced(step);
     }
+    Vector grow(0.0f, 0.1f);
+    Objects::forceMoveParticles(position - grow, data.size + grow, velocity);
 }
 
 bool MovingObject::isSolid() const {

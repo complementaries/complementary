@@ -41,6 +41,8 @@ namespace Objects {
     void load(const char* path);
     void save(const char* path);
 
+    void forceMoveParticles(const Vector& position, const Vector& size, const Vector& velocity);
+
     std::shared_ptr<ObjectBase> loadObject(const char* path);
 
     template <typename T>

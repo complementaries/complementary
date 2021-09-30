@@ -95,3 +95,10 @@ void ObjectBase::destroy() {
 Vector ObjectBase::getSize() const {
     return Vector();
 }
+
+void ObjectBase::forceMoveParticles(const Vector& position, const Vector& size,
+                                    const Vector& velocity) {
+    (void)position;
+    (void)size;
+    (void)velocity;
+}

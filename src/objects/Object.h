@@ -27,6 +27,8 @@ class ObjectBase {
     virtual void write(std::ofstream& out) = 0;
     virtual std::shared_ptr<ObjectBase> clone() = 0;
     virtual Vector getSize() const;
+    virtual void forceMoveParticles(const Vector& position, const Vector& size,
+                                    const Vector& velocity);
 
 #ifndef NDEBUG
     virtual const char* getTypeName();

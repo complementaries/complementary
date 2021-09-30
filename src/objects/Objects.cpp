@@ -274,3 +274,10 @@ void Objects::print() {
                   << " " << v.y << " " << o->shouldDestroy << "\n";
     }
 }
+
+void Objects::forceMoveParticles(const Vector& position, const Vector& size,
+                                 const Vector& velocity) {
+    for (auto& o : objects) {
+        o->forceMoveParticles(position, size, velocity);
+    }
+}

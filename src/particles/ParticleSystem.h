@@ -59,6 +59,8 @@ class ParticleSystem : public Object<ParticleSystemData> {
     void tick() override;
     void render(float lag) override;
     void renderImGui() override;
+    void forceMoveParticles(const Vector& position, const Vector& size,
+                            const Vector& velocity) override;
 
     std::shared_ptr<ObjectBase> clone() override;
 

@@ -7,6 +7,7 @@
 namespace ObjectRenderer {
     bool init();
     void prepare();
+    void drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color c);
     void drawRectangle(const Vector& position, const Vector& size, Color c);
     void setZ(float z);
 }

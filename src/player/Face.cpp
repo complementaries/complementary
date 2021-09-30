@@ -15,3 +15,13 @@ Vector FaceUtils::getDirection(Face face) {
 const Faces& FaceUtils::getFaces() {
     return faces;
 }
+
+Face FaceUtils::invert(Face f) {
+    switch (f) {
+        case LEFT: return RIGHT;
+        case RIGHT: return LEFT;
+        case UP: return DOWN;
+        case DOWN: return UP;
+        default: return UP;
+    }
+}

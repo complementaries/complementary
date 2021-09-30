@@ -12,6 +12,7 @@ typedef std::array<Face, FACES> Faces;
 namespace FaceUtils {
     Vector getDirection(Face face);
     const Faces& getFaces();
+    Face invert(Face f);
 }
 
 #endif

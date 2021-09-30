@@ -57,6 +57,7 @@ bool Game::init() {
     testParticleSystem->destroyOnLevelLoad = false;
 
     nextLevel();
+    Objects::instantiateObject(5);
 
     return false;
 }

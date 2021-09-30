@@ -22,6 +22,15 @@ void ObjectRenderer::prepare() {
     RenderState::setViewMatrix(shader);
 }
 
+void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color c) {
+    Buffer data;
+    data.add(x).add(c);
+    data.add(y).add(c);
+    data.add(z).add(c);
+    buffer.setData(data.getData(), data.getSize());
+    buffer.drawTriangles(3);
+}
+
 void ObjectRenderer::drawRectangle(const Vector& position, const Vector& size, Color c) {
     Buffer data;
     float minX = position[0];

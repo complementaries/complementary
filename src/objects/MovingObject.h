@@ -12,6 +12,7 @@ struct MovingObjectData {
     Vector goalA;
     Vector goalB;
     float speed;
+    bool spiky[4];
 };
 
 class MovingObject : public Object<MovingObjectData> {
@@ -26,6 +27,7 @@ class MovingObject : public Object<MovingObjectData> {
     bool collidesWith(const Vector& position, const Vector& size) const override;
     void render(float lag) override;
     void renderEditor(float lag) override;
+    void render(float lag, Color color);
     std::shared_ptr<ObjectBase> clone() override;
     Vector getSize() const override;
 

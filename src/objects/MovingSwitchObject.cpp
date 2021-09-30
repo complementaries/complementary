@@ -28,16 +28,12 @@ void MovingSwitchObject::render(float lag) {
         return;
     }
     constexpr Color color[2] = {ColorUtils::BLACK, ColorUtils::WHITE};
-    Vector oversize(0.05f, 0.05f);
-    Vector i = lastPosition + (position - lastPosition) * lag;
-    ObjectRenderer::drawRectangle(i - oversize, data.size + oversize * 2.0f, color[seen]);
+    MovingObject::render(lag, color[seen]);
 }
 
 void MovingSwitchObject::renderEditor(float lag) {
     constexpr Color color[2] = {ColorUtils::rgba(40, 40, 40), ColorUtils::rgba(215, 215, 215)};
-    Vector oversize(0.05f, 0.05f);
-    Vector i = position;
-    ObjectRenderer::drawRectangle(i - oversize, data.size + oversize * 2.0f, color[seen]);
+    MovingObject::render(lag, color[seen]);
 }
 
 std::shared_ptr<ObjectBase> MovingSwitchObject::clone() {
@@ -48,6 +44,7 @@ std::shared_ptr<ObjectBase> MovingSwitchObject::clone() {
 void MovingSwitchObject::read(std::ifstream& in) {
     MovingObject::read(in);
     in.read(reinterpret_cast<char*>(&seen), sizeof(seen));
+    seen &= 1;
 }
 
 void MovingSwitchObject::write(std::ofstream& out) {

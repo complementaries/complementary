@@ -60,6 +60,8 @@ static std::array<bool, FACES> lastCollision;
 static int fakeGrounded = 0;
 static bool leftWall = false;
 static bool rightWall = false;
+static int leftWallBuffer = 0;
+static int rightWallBuffer = 0;
 
 static bool worldType = false;
 static int wallJumpCooldown = 0;
@@ -69,6 +71,8 @@ static Vector wallJumpDirection;
 static int leftWallJumpCooldown = 0;
 static int rightWallJumpCooldown = 0;
 static int jumpBufferTicks = 0;
+static int leftWallJumpBuffer = 0;
+static int rightWallJumpBuffer = 0;
 
 static int dashTicks = 0;
 static int dashCoolDown = 0;
@@ -215,7 +219,13 @@ static void tickCollision() {
     }
 
     tickWallJumpCollision(Face::LEFT, leftWall);
+    if (leftWall) {
+        leftWallBuffer = 5;
+    }
     tickWallJumpCollision(Face::RIGHT, rightWall);
+    if (rightWall) {
+        rightWallBuffer = 5;
+    }
 
     Vector min = position;
     Vector max = min + data.size;
@@ -359,6 +369,11 @@ void Player::tick() {
     }
     jumpBufferTicks -= jumpBufferTicks > 0;
 
+    if (leftWallBuffer > 0 && Input::getButton(ButtonType::LEFT).pressed) {
+        leftWallJumpBuffer = 15;
+    } else if (rightWallBuffer > 0 && Input::getButton(ButtonType::RIGHT).pressed) {
+        rightWallJumpBuffer = 15;
+    }
     if (jumpBufferTicks > 0) {
         if (fakeGrounded > 0 ||
             (hasAbility(Ability::DOUBLE_JUMP) && jumpCount < data.maxJumpCount)) {
@@ -373,7 +388,7 @@ void Player::tick() {
             SoundManager::playSoundEffect(Sound::JUMP);
             addTopShear(-data.velocity.x * 12.f);
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
-            if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
+            if (leftWallJumpBuffer > 0) {
                 wallJumpDirection = Vector(1.0f, -1.0f);
                 addForce(wallJumpDirection * data.wallJumpInit);
                 wallJumpTicks = data.maxWallJumpTicks;
@@ -382,7 +397,9 @@ void Player::tick() {
                 addRenderForce(-0.5f, Face::LEFT);
                 SoundManager::playSoundEffect(Sound::JUMP);
                 addTopShear(-0.5f);
-            } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed) {
+                leftWallJumpBuffer = 0;
+                rightWallJumpBuffer = 0;
+            } else if (rightWallJumpBuffer > 0) {
                 wallJumpDirection = Vector(-1.0f, -1.0f);
                 addForce(wallJumpDirection * data.wallJumpInit);
                 wallJumpTicks = data.maxWallJumpTicks;
@@ -391,9 +408,15 @@ void Player::tick() {
                 addRenderForce(-0.5f, Face::RIGHT);
                 SoundManager::playSoundEffect(Sound::JUMP);
                 addTopShear(0.5f);
+                leftWallJumpBuffer = 0;
+                rightWallJumpBuffer = 0;
             }
         }
     }
+    leftWallBuffer -= leftWallBuffer > 0;
+    rightWallBuffer -= rightWallBuffer > 0;
+    leftWallJumpBuffer -= leftWallJumpBuffer > 0;
+    rightWallJumpBuffer -= rightWallJumpBuffer > 0;
     if (!Input::getButton(ButtonType::JUMP).pressed && jumpTicks > 0) {
         jumpTicks = 0;
     }

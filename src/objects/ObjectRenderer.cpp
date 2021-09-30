@@ -22,6 +22,12 @@ void ObjectRenderer::prepare() {
     RenderState::setViewMatrix(shader);
 }
 
+void ObjectRenderer::prepare(const Matrix& view) {
+    shader.use();
+    setZ(0.0f);
+    shader.setMatrix("view", view);
+}
+
 void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color c) {
     Buffer data;
     data.add(x).add(c);

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -16,7 +17,6 @@
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "imgui/ImGuiUtils.h"
-#include "math/Matrix.h"
 #include "objects/ColorObject.h"
 #include "objects/MovingObject.h"
 #include "objects/ObjectRenderer.h"
@@ -44,6 +44,9 @@ static bool singleStep;
 
 static std::shared_ptr<ParticleSystem> testParticleSystem;
 
+static int fade = 0;
+static int fadeAdd = 0;
+
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Player::init() || Objects::init() || TilemapEditor::init() ||
@@ -57,7 +60,6 @@ bool Game::init() {
     testParticleSystem->destroyOnLevelLoad = false;
 
     nextLevel();
-    Objects::instantiateObject(5);
 
     return false;
 }
@@ -92,6 +94,7 @@ void Game::tick() {
             return;
         }
     }
+    fade = std::clamp(fade + fadeAdd, 0, 255);
     RenderState::tick();
 
     if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
@@ -160,6 +163,10 @@ void Game::render(float lag) {
     Font::draw(Vector(Tilemap::getWidth() - width, Tilemap::getHeight() - size) * 0.5f, size,
                0x5FFF00FF, center);
     TextureRenderer::render(lag);
+
+    ObjectRenderer::prepare(Matrix());
+    ObjectRenderer::drawRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
+                                  ColorUtils::setAlpha(ColorUtils::BLACK, fade));
     RenderState::disableBlending();
 }
 
@@ -169,6 +176,14 @@ void Game::renderImGui() {
     }
 
     ImGui::Begin("DevGUI");
+
+    if (ImGui::Button("Fade Out")) {
+        fadeOut();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Fade In")) {
+        fadeIn();
+    }
 
     if (ImGui::Button("Next level")) {
         nextLevel();
@@ -320,4 +335,16 @@ void Game::onMouseEvent(void* eventPointer) {
     if (tilemapEditor) {
         tilemapEditor->onMouseEvent(eventPointer);
     }
+}
+
+void Game::fadeIn() {
+    fadeAdd = -1;
+}
+
+void Game::fadeOut() {
+    fadeAdd = 1;
+}
+
+bool Game::isFading() {
+    return fade != 0 && fade != 255;
 }

@@ -10,6 +10,10 @@ namespace Game {
 
     void onWindowResize(int width, int height);
     void onMouseEvent(void* eventPointer);
+
+    void fadeIn();
+    void fadeOut();
+    bool isFading();
 }
 
 #endif

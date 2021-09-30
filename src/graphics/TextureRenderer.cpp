@@ -10,6 +10,7 @@
 #include "graphics/gl/Texture.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "player/Player.h"
+#include "tilemap/Tilemap.h"
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
@@ -58,7 +59,11 @@ static void renderIcon(const Vector& min, const Vector& max, Ability a) {
 void TextureRenderer::render(float lag) {
     (void)lag;
     shader.use();
+    RenderState::setViewMatrix(shader);
     abilities.bindTo();
-    renderIcon(Vector(0.5f, -0.5f), Vector(1.0f, -1.0f), Player::getAbility());
-    renderIcon(Vector(0.75f, -0.25f), Vector(1.0f, -0.5f), Player::getPassiveAbility());
+    Vector wSize(Tilemap::getWidth(), Tilemap::getHeight());
+    Vector size(8.0f, 8.0f);
+    renderIcon(wSize - size, wSize, Player::getAbility());
+    renderIcon(wSize - Vector(size.x * 0.5f, size.y * 1.5f), wSize - Vector(0.0, size.y),
+               Player::getPassiveAbility());
 }

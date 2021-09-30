@@ -340,12 +340,12 @@ void Game::onMouseEvent(void* eventPointer) {
     }
 }
 
-void Game::fadeIn() {
-    fadeAdd = -1;
+void Game::fadeIn(int speed) {
+    fadeAdd = -speed;
 }
 
-void Game::fadeOut() {
-    fadeAdd = 1;
+void Game::fadeOut(int speed) {
+    fadeAdd = speed;
 }
 
 bool Game::isFading() {

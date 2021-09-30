@@ -11,8 +11,8 @@ namespace Game {
     void onWindowResize(int width, int height);
     void onMouseEvent(void* eventPointer);
 
-    void fadeIn();
-    void fadeOut();
+    void fadeIn(int speed = 1);
+    void fadeOut(int speed = 1);
     bool isFading();
 }
 

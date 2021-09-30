@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include <imgui/ImGuiUtils.h>
 
+#include "Game.h"
 #include "Input.h"
 #include "graphics/Buffer.h"
 #include "graphics/RenderState.h"
@@ -280,6 +281,7 @@ static void onKill() {
     lastPosition = position;
     Tilemap::reset();
     Player::setAbilities(Ability::NONE, Ability::NONE);
+    Game::fadeIn(3);
 }
 
 void Player::kill() {
@@ -289,6 +291,8 @@ void Player::kill() {
     deathParticles->data.endColor =
         ColorUtils::setAlpha(AbilityUtils::getColor(abilities[worldType]), 0);
     dead = deathParticles->data.duration + deathParticles->data.maxLifetime;
+    RenderState::addRandomizedShake(1.0f);
+    Game::fadeOut(3);
 }
 
 void Player::setAbilities(Ability dark, Ability light) {

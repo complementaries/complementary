@@ -272,8 +272,8 @@ void ParticleSystem::renderImGui() {
     ImGui::DragInt("Emission Rate", &data.emissionRate);
     ImGui::Spacing();
 
-    ImGui::DragFloat2("Min start velocity", data.minStartVelocity.data());
-    ImGui::DragFloat2("Max start velocity", data.maxStartVelocity.data());
+    ImGui::DragFloat2("Min start velocity", data.minStartVelocity.data(), 0.05f);
+    ImGui::DragFloat2("Max start velocity", data.maxStartVelocity.data(), 0.05f);
     ImGui::DragFloat("Gravity", &data.gravity);
     ImGui::DragInt("Particle lifetime", &data.maxLifetime);
 

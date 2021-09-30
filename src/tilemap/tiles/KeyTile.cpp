@@ -1,5 +1,6 @@
 #include "KeyTile.h"
 
+#include "Sound/SoundManager.h"
 #include "player/Player.h"
 #include "tilemap/Tilemap.h"
 #include "tilemap/Tiles.h"
@@ -9,6 +10,7 @@ KeyTile::KeyTile() : Tile(ColorUtils::GRAY, false, "key") {
 
 void KeyTile::onCollision(int x, int y) const {
     Tilemap::setTile(x, y, Tiles::COLLECTED_KEY);
+    SoundManager::playSoundEffect(Sound::COLLECT);
 }
 
 void KeyTile::render(Buffer& buffer, float x, float y) const {

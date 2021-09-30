@@ -2,6 +2,9 @@ Disclaimer: Sound Effects are taken from free websites and not our original work
 A list of the used sounds and their sources can be found below.
 
 jump - https://freesound.org/people/ryusa/sounds/531145/
-switch - https://freesound.org/people/altemark/sounds/35913/
+switch - https://freesound.org/people/pelicanicious/sounds/580062/
 wind - https://freesound.org/people/fedsmoker/sounds/208525/
-dash - https://freesound.org/people/Kastenfrosch/sounds/521999/
+dash_old - https://freesound.org/people/Kastenfrosch/sounds/521999/
+collect - https://freesound.org/people/LittleRobotSoundFactory/sounds/270304/
+dash - https://freesound.org/people/erkanozan/sounds/51755/
+death - https://freesound.org/people/tkky/sounds/524281/

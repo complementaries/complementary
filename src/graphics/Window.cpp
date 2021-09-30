@@ -125,7 +125,7 @@ static void pollEvents() {
                         case SDLK_a: Input::Internal::setButtonPressed(ButtonType::LEFT); break;
                         case SDLK_RIGHT:
                         case SDLK_d: Input::Internal::setButtonPressed(ButtonType::RIGHT); break;
-                        case SDLK_0: SoundManager::mute(); break;
+                        case SDLK_m: SoundManager::mute(); break;
                     }
                 }
                 break;

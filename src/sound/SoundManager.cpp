@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-const static int musicVolume = MIX_MAX_VOLUME / 2;
+const static int musicVolume = MIX_MAX_VOLUME;
 const static int lightSoundID = 0;
 const static int darkSoundID = 1;
 const static int soundEffectsGroup = 1;
@@ -68,7 +68,7 @@ bool SoundManager::loadSounds() {
     soundArray[Sound::DARK_BG].defaultVolume = musicVolume;
 
     soundArray[Sound::WORLD_SWITCH].sound = Mix_LoadWAV("assets/sounds/switch.ogg");
-    soundArray[Sound::WORLD_SWITCH].defaultVolume = MIX_MAX_VOLUME;
+    soundArray[Sound::WORLD_SWITCH].defaultVolume = MIX_MAX_VOLUME / 4;
 
     soundArray[Sound::JUMP].sound = Mix_LoadWAV("assets/sounds/jump2.ogg");
     soundArray[Sound::JUMP].defaultVolume = MIX_MAX_VOLUME / 2;
@@ -79,7 +79,13 @@ bool SoundManager::loadSounds() {
     soundArray[Sound::WIND].sound = Mix_LoadWAV("assets/sounds/wind.ogg");
     soundArray[Sound::WIND].defaultVolume = MIX_MAX_VOLUME / 2;
 
-    for (SoundObject object : soundArray) {
+    soundArray[Sound::COLLECT].sound = Mix_LoadWAV("assets/sounds/collect.ogg");
+    soundArray[Sound::COLLECT].defaultVolume = MIX_MAX_VOLUME / 2;
+
+    soundArray[Sound::DEATH].sound = Mix_LoadWAV("assets/sounds/death.ogg");
+    soundArray[Sound::DEATH].defaultVolume = MIX_MAX_VOLUME / 2;
+
+    for (auto& object : soundArray) {
         if (object.sound == NULL) return true;
     }
     return false;
@@ -121,7 +127,7 @@ void SoundManager::setDistanceToPlayer(int soundId, float distance, float xDista
     } else {
         xDist = xDistance * 255 / threshold;
     }
-    // -255 shouls be 0 and 0 should be 127
+    // -255 should be 0 and 0 should be 127
     xDist = (xDist + 255) / 2;
 
     if (!Mix_SetDistance(soundArray[soundId].channel, abs(dist))) {

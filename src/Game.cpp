@@ -43,8 +43,6 @@ static TilemapEditor* tilemapEditor;
 static bool paused;
 static bool singleStep;
 
-static std::shared_ptr<ParticleSystem> testParticleSystem;
-
 static int fade = 0;
 static int fadeAdd = 0;
 
@@ -57,10 +55,6 @@ bool Game::init() {
         ParticleRenderer::init() || Font::init() || TextureRenderer::init() || Player::init()) {
         return true;
     }
-
-    testParticleSystem =
-        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/test.cmob");
-    testParticleSystem->destroyOnLevelLoad = false;
 
     nextLevel();
 
@@ -106,9 +100,6 @@ void Game::tick() {
         RenderState::addRandomizedShake(1.0f);
         RenderState::startMixing();
         RenderState::startGlowing();
-
-        testParticleSystem->position = Player::getPosition();
-        testParticleSystem->play();
 
         SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
         SoundManager::switchMusic();
@@ -160,11 +151,13 @@ void Game::render(float lag) {
     RenderState::renderEffects(lag);
 
     RenderState::enableBlending();
+
     Font::prepare();
     char buffer[256];
     snprintf(buffer, 256, "FPS: %2.0f TPS: %3.0f", fps.getUpdatesPerSecond(),
              tps.getUpdatesPerSecond());
     Font::draw(Vector(0.0f, 0.0f), 2.0f, ColorUtils::RED, buffer);
+
     TextureRenderer::render(lag);
 
     ObjectRenderer::prepare(Matrix());

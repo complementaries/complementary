@@ -46,14 +46,14 @@ static void renderBox(const Vector& min, const Vector& max, const Vector& tMin, 
     buffer.drawTriangles(6);
 }
 
-static void renderIcon(const Vector& min, const Vector& max, Ability a) {
+static void renderIcon(const Vector& min, const Vector& max, Ability a, int alpha) {
     if (a == Ability::NONE) {
         return;
     }
     int id = a - 1;
     Vector tMin((id % 2) * 0.5f, (id / 2) * 0.5f);
     renderBox(min, max, tMin, tMin + Vector(0.5f, 0.5f),
-              ColorUtils::setAlpha(AbilityUtils::getColor(a), 100));
+              ColorUtils::setAlpha(AbilityUtils::getColor(a), alpha));
 }
 
 void TextureRenderer::render(float lag) {
@@ -62,8 +62,8 @@ void TextureRenderer::render(float lag) {
     RenderState::setViewMatrix(shader);
     abilities.bindTo();
     Vector wSize(Tilemap::getWidth(), Tilemap::getHeight());
-    Vector size(8.0f, 8.0f);
-    renderIcon(wSize - size, wSize, Player::getAbility());
+    Vector size(4.0f, 4.0f);
+    renderIcon(wSize - size, wSize, Player::getAbility(), 255);
     renderIcon(wSize - Vector(size.x * 0.5f, size.y * 1.5f), wSize - Vector(0.0, size.y),
-               Player::getPassiveAbility());
+               Player::getPassiveAbility(), 100);
 }

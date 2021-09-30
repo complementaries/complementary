@@ -30,6 +30,7 @@ static float renderForce;
 static Vector renderOffset;
 static Vector lastVelocity;
 static std::shared_ptr<ParticleSystem> deathParticles;
+static std::shared_ptr<ParticleSystem> walkParticles;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -98,6 +99,10 @@ bool Player::init() {
         return true;
     }
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
+
+    walkParticles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/walk.cmob");
+    walkParticles->destroyOnLevelLoad = false;
+
     load();
     deathParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/death.cmob");
@@ -285,6 +290,7 @@ static void onKill() {
 }
 
 void Player::kill() {
+    SoundManager::playSoundEffect(Sound::DEATH);
     deathParticles->position = getCenter();
     deathParticles->play();
     deathParticles->data.startColor = AbilityUtils::getColor(abilities[worldType]);
@@ -508,9 +514,40 @@ void Player::tick() {
 
     move();
     tickCollision();
+
     if (isColliding(Face::DOWN)) {
         fakeGrounded = data.coyoteTicks;
         dashUseable = true;
+        if (std::abs(data.velocity.x) > 0.02f) {
+            Color color = AbilityUtils::getColor(abilities[worldType]);
+            walkParticles->data.startColor = color;
+            walkParticles->data.endColor = color;
+
+            Vector minVelocity = walkParticles->data.minStartVelocity;
+            Vector maxVelocity = walkParticles->data.maxStartVelocity;
+            if (data.velocity.x > 0) {
+                walkParticles->position = Vector(
+                    position.x, position.y + data.size.y - (walkParticles->data.startSize / 2.0f));
+                walkParticles->data.minStartVelocity =
+                    Vector(std::abs(minVelocity.x) * -1, minVelocity.y);
+                walkParticles->data.maxStartVelocity =
+                    Vector(std::abs(maxVelocity.x), maxVelocity.y);
+            } else {
+                walkParticles->position =
+                    Vector(position.x + data.size.x,
+                           position.y + data.size.y - (walkParticles->data.startSize / 2.0f));
+                walkParticles->data.minStartVelocity =
+                    Vector(std::abs(minVelocity.x), minVelocity.y);
+                walkParticles->data.maxStartVelocity =
+                    Vector(std::abs(maxVelocity.x) * -1, maxVelocity.y);
+            }
+
+            walkParticles->play();
+        } else {
+            walkParticles->stop();
+        }
+    } else {
+        walkParticles->stop();
     }
     fakeGrounded -= fakeGrounded > 0;
 

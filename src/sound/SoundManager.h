@@ -4,7 +4,17 @@
 #include <SDL_mixer.h>
 
 namespace Sound {
-    enum Sound { LIGHT_BG, DARK_BG, WORLD_SWITCH, JUMP, WIND, /* GLIDE,*/ DASH, MAX };
+    enum Sound {
+        LIGHT_BG,
+        DARK_BG,
+        WORLD_SWITCH,
+        JUMP,
+        WIND,
+        COLLECT,
+        DEATH,
+        /* GLIDE,*/ DASH,
+        MAX
+    };
 }
 
 namespace SoundManager {

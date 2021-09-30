@@ -1,11 +1,16 @@
+#include <cstring>
 #include <filesystem>
 #include <iostream>
 
+#include "Arguments.h"
 #include "graphics/Window.h"
 
 int main(int argc, char** args) {
-    (void)argc;
-    (void)args;
+    for (int i = 0; i < argc; i++) {
+        if (strcmp(args[i], "--muted") == 0) {
+            Arguments::muted = true;
+        }
+    }
 
 #ifndef NDEBUG
     if (!std::filesystem::exists("assets")) {

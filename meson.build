@@ -39,6 +39,7 @@ src = [
   'src/tilemap/Tiles.cpp',
   'src/Game.cpp',
   'src/Input.cpp',
+  'src/Arguments.cpp',
   'src/Main.cpp'
 ]
 

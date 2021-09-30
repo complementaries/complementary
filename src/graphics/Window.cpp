@@ -9,6 +9,7 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
 
+#include "Arguments.h"
 #include "Game.h"
 #include "Input.h"
 #include "graphics/gl/Glew.h"
@@ -286,7 +287,9 @@ void Window::run() {
     }
     // TODO: find a better place to start music
     SoundManager::playMusic();
-    // SoundManager::mute();
+    if (Arguments::muted) {
+        SoundManager::mute();
+    }
 
     running = true;
     Nanos lag = 0;

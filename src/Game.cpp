@@ -49,9 +49,8 @@ static int fadeAdd = 0;
 
 bool Game::init() {
     Tiles::init();
-    if (Tilemap::init(48, 27) || Player::init() || Objects::init() || TilemapEditor::init() ||
-        RenderState::init() || ParticleRenderer::init() || Font::init() ||
-        TextureRenderer::init()) {
+    if (Tilemap::init(48, 27) || Objects::init() || TilemapEditor::init() || RenderState::init() ||
+        ParticleRenderer::init() || Font::init() || TextureRenderer::init() || Player::init()) {
         return true;
     }
 

@@ -12,6 +12,7 @@
 #include "graphics/gl/VertexBuffer.h"
 #include "math/Vector.h"
 #include "objects/Objects.h"
+#include "particles/ParticleSystem.h"
 #include "player/Player.h"
 #include "sound/SoundManager.h"
 #include "tilemap/Tilemap.h"
@@ -27,6 +28,7 @@ static float lastRenderForce;
 static float renderForce;
 static Vector renderOffset;
 static Vector lastVelocity;
+static std::shared_ptr<ParticleSystem> deathParticles;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -88,13 +90,17 @@ static bool idle = false;
 static float lastTopShear = 0.0f;
 static float topShear = 0.0f;
 
+static int dead = 0;
+
 bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
         return true;
     }
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
-
     load();
+    deathParticles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/death.cmob");
+    deathParticles->destroyOnLevelLoad = false;
     return false;
 }
 
@@ -269,11 +275,20 @@ static void move() {
     }
 }
 
-void Player::kill() {
+static void onKill() {
     position = Tilemap::getSpawnPoint();
     lastPosition = position;
     Tilemap::reset();
-    setAbilities(Ability::NONE, Ability::NONE);
+    Player::setAbilities(Ability::NONE, Ability::NONE);
+}
+
+void Player::kill() {
+    deathParticles->position = getCenter();
+    deathParticles->play();
+    deathParticles->data.startColor = AbilityUtils::getColor(abilities[worldType]);
+    deathParticles->data.endColor =
+        ColorUtils::setAlpha(AbilityUtils::getColor(abilities[worldType]), 0);
+    dead = deathParticles->data.duration + deathParticles->data.maxLifetime;
 }
 
 void Player::setAbilities(Ability dark, Ability light) {
@@ -338,6 +353,13 @@ static void tickShear() {
 }
 
 void Player::tick() {
+    if (dead > 0) {
+        dead--;
+        if (dead == 0) {
+            onKill();
+        }
+        return;
+    }
     lastVelocity = data.velocity;
     lastRenderForce = renderForce;
     lastPosition = position;
@@ -516,6 +538,9 @@ void Player::tick() {
 }
 
 void Player::render(float lag) {
+    if (dead > 0) {
+        return;
+    }
     shader.use();
     RenderState::setViewMatrix(shader);
 

@@ -1,7 +1,7 @@
 #include "KeyTile.h"
 
-#include "sound/SoundManager.h"
 #include "player/Player.h"
+#include "sound/SoundManager.h"
 #include "tilemap/Tilemap.h"
 #include "tilemap/Tiles.h"
 

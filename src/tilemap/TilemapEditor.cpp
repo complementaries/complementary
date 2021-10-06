@@ -307,7 +307,7 @@ void TilemapEditor::render() {
     RenderState::enableBlending();
     for (unsigned int i = 0; i < objectQueue.size(); i++) {
         ObjectRenderer::setZ(objectQueue[i].zLayer);
-        objectQueue[i].object->renderEditor(0.f);
+        objectQueue[i].object->renderEditor(1.0f);
     }
     objectQueue.clear();
     RenderState::disableBlending();

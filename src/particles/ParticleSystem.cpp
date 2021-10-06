@@ -12,6 +12,7 @@
 #include "objects/Objects.h"
 #include "player/Player.h"
 #include "tilemap/Tilemap.h"
+#include "tilemap/Tiles.h"
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
@@ -88,7 +89,13 @@ static bool isColliding(const ParticleSystemData& s, Particle& p) {
     }
     for (int x = minX; x <= maxX; x++) {
         for (int y = minY; y <= maxY; y++) {
-            if (Tilemap::getTile(x, y).isSolid()) {
+            const Tile& tile = Tilemap::getTile(x, y);
+            if (tile == Tiles::SPIKES) {
+                // Make the hitbox of spikes a bit smaller because it looks weird if
+                // the particles hover above the spike triangles
+                return p.position.y > y + 0.25f;
+            }
+            if (tile.isSolid()) {
                 return true;
             }
         }

@@ -141,12 +141,17 @@ void Game::render(float lag) {
     RenderState::prepareEffectFramebuffer();
     Tilemap::renderBackground();
     Player::render(lag);
-    Tilemap::render();
 
     RenderState::enableBlending();
     ParticleRenderer::prepare();
-    Objects::render(lag);
+    Objects::render(lag); // Particles don't render if we don't do this for some reason
     ParticleRenderer::render();
+    RenderState::disableBlending();
+
+    Tilemap::render();
+
+    RenderState::enableBlending();
+    Objects::render(lag);
     RenderState::disableBlending();
     RenderState::renderEffects(lag);
 

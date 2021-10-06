@@ -22,8 +22,10 @@ enum class SpawnPositionType {
 struct ParticleSystemData final {
     int duration = 0;
     ParticleType type = ParticleType::SQUARE;
-    int emissionInterval = 15;
-    int emissionRate = 1;
+    int minEmissionInterval = 10;
+    int maxEmissionInterval = 15;
+    int minEmissionRate = 1;
+    int maxEmissionRate = 1;
 
     Vector minStartVelocity = Vector(-0.1f, -0.1f);
     Vector maxStartVelocity = Vector(0.1f, 0.1f);

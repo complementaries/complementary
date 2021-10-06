@@ -158,18 +158,21 @@ void ParticleSystem::tick() {
         position = Player::getPosition();
     }
 
-    if (playing && (data.duration <= 0.f || currentLifetime < data.duration) &&
-        (data.emissionInterval <= 0 || currentLifetime % data.emissionInterval == 0)) {
-        for (int i = 0; i < data.emissionRate; i++) {
-            float startVelocityX =
-                random.nextFloat(data.minStartVelocity.x, data.maxStartVelocity.x);
-            float startVelocityY =
-                random.nextFloat(data.minStartVelocity.y, data.maxStartVelocity.y);
-            Vector startVelocity(startVelocityX, startVelocityY);
-            switch (data.type) {
-                case ParticleType::TRIANGLE: spawnTriangle(position, startVelocity); break;
-                case ParticleType::SQUARE: spawnSquare(position, startVelocity); break;
-                case ParticleType::CIRCLE: spawnCircle(position, startVelocity); break;
+    if (playing && (data.duration <= 0.f || currentLifetime < data.duration)) {
+        int emissionInterval = random.next(data.minEmissionInterval, data.maxEmissionInterval + 1);
+        if (emissionInterval <= 0 || currentLifetime % emissionInterval == 0) {
+            int emissionRate = random.next(data.minEmissionRate, data.maxEmissionRate + 1);
+            for (int i = 0; i < emissionRate; i++) {
+                float startVelocityX =
+                    random.nextFloat(data.minStartVelocity.x, data.maxStartVelocity.x);
+                float startVelocityY =
+                    random.nextFloat(data.minStartVelocity.y, data.maxStartVelocity.y);
+                Vector startVelocity(startVelocityX, startVelocityY);
+                switch (data.type) {
+                    case ParticleType::TRIANGLE: spawnTriangle(position, startVelocity); break;
+                    case ParticleType::SQUARE: spawnSquare(position, startVelocity); break;
+                    case ParticleType::CIRCLE: spawnCircle(position, startVelocity); break;
+                }
             }
         }
     }
@@ -275,8 +278,8 @@ void ParticleSystem::renderImGui() {
     ImGui::DragInt("Duration", &data.duration);
     const char* types[] = {"Triangle", "Square", "Circle"};
     ImGui::ListBox("Particle type", (int*)&data.type, types, 3);
-    ImGui::DragInt("Emission Interval", &data.emissionInterval);
-    ImGui::DragInt("Emission Rate", &data.emissionRate);
+    ImGui::DragInt2("Emission Interval", &data.minEmissionInterval);
+    ImGui::DragInt2("Emission Rate", &data.minEmissionRate);
     ImGui::Spacing();
 
     ImGui::DragFloat2("Min start velocity", data.minStartVelocity.data(), 0.05f);

@@ -18,13 +18,13 @@ bool ObjectRenderer::init() {
 
 void ObjectRenderer::prepare() {
     shader.use();
-    setZ(0.0f);
+    setZ(-0.4f);
     RenderState::setViewMatrix(shader);
 }
 
 void ObjectRenderer::prepare(const Matrix& view) {
     shader.use();
-    setZ(0.0f);
+    setZ(-1.0f);
     shader.setMatrix("view", view);
 }
 

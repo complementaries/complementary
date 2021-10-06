@@ -81,6 +81,7 @@ class ParticleSystem : public Object<ParticleSystemData> {
     void spawnCircle(const Vector& position, const Vector& velocity);
 
     bool isInBox(const Particle& particle) const;
+    float getZ() const;
 
     int currentLifetime = 0;
     bool playing = false;

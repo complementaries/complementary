@@ -34,6 +34,10 @@ bool Tilemap::init(int w, int h) {
     return false;
 }
 
+static void setZ(float z) {
+    shader.setFloat("zLayer", z);
+}
+
 int Tilemap::getWidth() {
     return width;
 }
@@ -91,6 +95,7 @@ void Tilemap::renderBackground() {
     shader.use();
     RenderState::setViewMatrix(shader);
     prepareRendering();
+    setZ(0.0f);
     background.drawTriangles(6);
 }
 
@@ -98,6 +103,7 @@ void Tilemap::render() {
     shader.use();
     RenderState::setViewMatrix(shader);
     prepareRendering();
+    setZ(-0.2f);
     buffer.drawTriangles(vertices);
 }
 

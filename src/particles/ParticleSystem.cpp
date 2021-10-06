@@ -21,7 +21,7 @@ static int vertices = 0;
 constexpr float step = 0.01f;
 
 bool ParticleRenderer::init() {
-    buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
+    buffer.init(GL::VertexBuffer::Attributes().addVector3().addRGBA());
     return shader.compile({"assets/shaders/particle.vs", "assets/shaders/particle.fs"});
 }
 
@@ -188,7 +188,12 @@ void ParticleSystem::tick() {
     }
 }
 
+float ParticleSystem::getZ() const {
+    return data.enableCollision ? -0.1f : -0.5f;
+}
+
 void ParticleSystem::renderTriangles(float lag) {
+    float z = getZ();
     for (Particle& p : triangles) {
         Vector particlePosition = interpolate(p.lastPosition, p.position, lag);
         float factor = (p.lifetime + lag) / data.maxLifetime;
@@ -197,14 +202,15 @@ void ParticleSystem::renderTriangles(float lag) {
         float a = 0.333333f * h;    // sin(30°) / (1 + sin(30°))
         Color c = ColorUtils::mix(data.startColor, data.endColor, factor);
 
-        rawData.add(particlePosition + Vector(0.0f, a - h)).add(c);
-        rawData.add(particlePosition + Vector(-0.5 * size, a)).add(c);
-        rawData.add(particlePosition + Vector(0.5 * size, a)).add(c);
+        rawData.add(particlePosition + Vector(0.0f, a - h)).add(z).add(c);
+        rawData.add(particlePosition + Vector(-0.5 * size, a)).add(z).add(c);
+        rawData.add(particlePosition + Vector(0.5 * size, a)).add(z).add(c);
         vertices += 3;
     }
 }
 
 void ParticleSystem::renderSquares(float lag) {
+    float z = getZ();
     for (Particle& p : squares) {
         Vector particlePosition = interpolate(p.lastPosition, p.position, lag);
         float factor = (p.lifetime + lag) / data.maxLifetime;
@@ -214,17 +220,18 @@ void ParticleSystem::renderSquares(float lag) {
         Vector leftBottom = particlePosition + Vector(-halfSize, halfSize);
         Vector rightTop = particlePosition + Vector(halfSize, -halfSize);
 
-        rawData.add(particlePosition - Vector(halfSize, halfSize)).add(c);
-        rawData.add(leftBottom).add(c);
-        rawData.add(rightTop).add(c);
-        rawData.add(particlePosition + Vector(halfSize, halfSize)).add(c);
-        rawData.add(leftBottom).add(c);
-        rawData.add(rightTop).add(c);
+        rawData.add(particlePosition - Vector(halfSize, halfSize)).add(z).add(c);
+        rawData.add(leftBottom).add(z).add(c);
+        rawData.add(rightTop).add(z).add(c);
+        rawData.add(particlePosition + Vector(halfSize, halfSize)).add(z).add(c);
+        rawData.add(leftBottom).add(z).add(c);
+        rawData.add(rightTop).add(z).add(c);
         vertices += 6;
     }
 }
 
 void ParticleSystem::renderCircles(float lag) {
+    float z = getZ();
     for (Particle& p : circles) {
         Vector particlePosition = interpolate(p.lastPosition, p.position, lag);
         float factor = (p.lifetime + lag) / data.maxLifetime;
@@ -236,9 +243,9 @@ void ParticleSystem::renderCircles(float lag) {
         float step = full / radius * 0.05f;
         for (float f = step; f <= full + step; f += step) {
             Vector rotated = particlePosition + Vector(sinf(f), cosf(f)) * radius;
-            rawData.add(particlePosition).add(c);
-            rawData.add(rotated).add(c);
-            rawData.add(last).add(c);
+            rawData.add(particlePosition).add(z).add(c);
+            rawData.add(rotated).add(z).add(c);
+            rawData.add(last).add(z).add(c);
             last = rotated;
             vertices += 3;
         }

@@ -31,6 +31,8 @@ static Vector renderOffset;
 static Vector lastVelocity;
 static std::shared_ptr<ParticleSystem> deathParticles;
 static std::shared_ptr<ParticleSystem> walkParticles;
+static std::shared_ptr<ParticleSystem> wallJumpParticles;
+static std::shared_ptr<ParticleSystem> wallStickParticles;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -92,6 +94,8 @@ static bool idle = false;
 static float lastTopShear = 0.0f;
 static float topShear = 0.0f;
 
+static int stickingToWall = 0;
+
 static int dead = 0;
 
 bool Player::init() {
@@ -100,13 +104,23 @@ bool Player::init() {
     }
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
 
-    walkParticles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/walk.cmob");
-    walkParticles->destroyOnLevelLoad = false;
-
     load();
+
     deathParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/death.cmob");
     deathParticles->destroyOnLevelLoad = false;
+
+    walkParticles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/walk.cmob");
+    walkParticles->destroyOnLevelLoad = false;
+
+    wallJumpParticles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/walljump.cmob");
+    wallJumpParticles->destroyOnLevelLoad = false;
+
+    wallStickParticles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/wallstick.cmob");
+    wallStickParticles->destroyOnLevelLoad = false;
+
     return false;
 }
 
@@ -420,6 +434,13 @@ void Player::tick() {
             SoundManager::playSoundEffect(Sound::JUMP);
             addTopShear(-data.velocity.x * 12.f);
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
+            Vector minVelocity = wallJumpParticles->data.minStartVelocity;
+            Vector maxVelocity = wallJumpParticles->data.maxStartVelocity;
+            // Color color = AbilityUtils::getColor(abilities[worldType]);
+            Color color = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
+            wallJumpParticles->data.startColor = color;
+            wallJumpParticles->data.endColor = color;
+
             if (leftWallJumpBuffer > 0) {
                 wallJumpDirection = Vector(1.0f, -1.0f);
                 addForce(wallJumpDirection * data.wallJumpInit);
@@ -431,6 +452,13 @@ void Player::tick() {
                 addTopShear(-0.5f);
                 leftWallJumpBuffer = 0;
                 rightWallJumpBuffer = 0;
+
+                wallJumpParticles->position =
+                    getCenter() +
+                    Vector(-data.size.x / 2 + data.size.x / 8, data.size.y / 2 + data.size.y / 8);
+                Vector(std::abs(minVelocity.x), minVelocity.y);
+                wallJumpParticles->play();
+
             } else if (rightWallJumpBuffer > 0) {
                 wallJumpDirection = Vector(-1.0f, -1.0f);
                 addForce(wallJumpDirection * data.wallJumpInit);
@@ -442,6 +470,13 @@ void Player::tick() {
                 addTopShear(0.5f);
                 leftWallJumpBuffer = 0;
                 rightWallJumpBuffer = 0;
+
+                wallJumpParticles->position =
+                    getCenter() +
+                    Vector(data.size.x / 2 - data.size.x / 8, data.size.y / 2 + data.size.y / 8);
+                wallJumpParticles->data.minStartVelocity =
+                    Vector(std::abs(minVelocity.x) * -1, minVelocity.y);
+                wallJumpParticles->play();
             }
         }
     }
@@ -474,13 +509,44 @@ void Player::tick() {
     data.acceleration = Vector();
     Vector actualDrag = data.drag;
     if (hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
+        // Color color = AbilityUtils::getColor(abilities[worldType]);
+        Color color = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
+        wallStickParticles->data.startColor = color;
+        wallStickParticles->data.endColor = color;
+
+        Vector minVelocity = wallStickParticles->data.minStartVelocity;
+        Vector maxVelocity = wallStickParticles->data.maxStartVelocity;
         if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::LEFT);
+
+            wallStickParticles->position = getCenter() + Vector(-data.size.x / 2 + data.size.x / 8,
+                                                                data.size.y / 2 + data.size.y / 8);
+            wallStickParticles->data.minStartVelocity =
+                Vector(std::abs(minVelocity.x), minVelocity.y);
+            if (stickingToWall == 0) {
+                wallStickParticles->play();
+                stickingToWall = 1;
+            }
         } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::RIGHT);
+
+            wallStickParticles->position = getCenter() + Vector(data.size.x / 2 - data.size.x / 8,
+                                                                data.size.y / 2 + data.size.y / 8);
+            wallStickParticles->data.minStartVelocity =
+                Vector(std::abs(minVelocity.x) * -1, minVelocity.y);
+            if (stickingToWall == 0) {
+                wallStickParticles->play();
+                stickingToWall = 1;
+            }
+        } else {
+            wallStickParticles->stop();
+            stickingToWall = 0;
         }
+    } else {
+        wallStickParticles->stop();
+        stickingToWall = 0;
     }
     if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
         dashTicks == 0 && dashCoolDown == 0 && dashUseable) {
@@ -520,6 +586,7 @@ void Player::tick() {
         dashUseable = true;
         if (std::abs(data.velocity.x) > 0.02f) {
             Color color = AbilityUtils::getColor(abilities[worldType]);
+
             walkParticles->data.startColor = color;
             walkParticles->data.endColor = color;
 

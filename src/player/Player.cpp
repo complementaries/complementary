@@ -515,7 +515,6 @@ void Player::tick() {
         wallStickParticles->data.endColor = color;
 
         Vector minVelocity = wallStickParticles->data.minStartVelocity;
-        Vector maxVelocity = wallStickParticles->data.maxStartVelocity;
         if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::LEFT);

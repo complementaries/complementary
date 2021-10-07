@@ -9,6 +9,8 @@
 #include <vector>
 
 #include "objects/ColorObject.h"
+#include "objects/DoorObject.h"
+#include "objects/KeyObject.h"
 #include "objects/MovingObject.h"
 #include "objects/MovingSwitchObject.h"
 #include "objects/ObjectRenderer.h"
@@ -32,6 +34,12 @@ bool Objects::init() {
                                                       Vector(1.0f, 24.0f), 0.025f, true));
     addPrototype(std::make_shared<MovingSwitchObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
                                                       Vector(1.0f, 24.0f), 0.025f, false));
+    addPrototype(std::make_shared<KeyObject>(Vector(), 0));
+    addPrototype(std::make_shared<KeyObject>(Vector(), 1));
+    addPrototype(std::make_shared<KeyObject>(Vector(), 2));
+    addPrototype(std::make_shared<DoorObject>(Vector(), Vector(1.0f, 1.0f), 0));
+    addPrototype(std::make_shared<DoorObject>(Vector(), Vector(1.0f, 1.0f), 1));
+    addPrototype(std::make_shared<DoorObject>(Vector(), Vector(1.0f, 1.0f), 2));
     return ObjectRenderer::init();
 }
 
@@ -135,6 +143,9 @@ void Objects::render(float lag) {
     ObjectRenderer::prepare();
     for (auto& o : objects) {
         o->render(lag);
+    }
+    for (auto& o : objects) {
+        o->lateRender(lag);
     }
 }
 
@@ -280,4 +291,27 @@ void Objects::forceMoveParticles(const Vector& position, const Vector& size,
     for (auto& o : objects) {
         o->forceMoveParticles(position, size, velocity);
     }
+}
+
+void Objects::reset() {
+    for (auto& o : objects) {
+        o->reset();
+    }
+}
+
+std::shared_ptr<ObjectBase> Objects::findDoor(int type) {
+    for (auto& o : objects) {
+        if (o->isDoorOfType(type)) {
+            return o;
+        }
+    }
+    return nullptr;
+}
+
+int Objects::countKeys(int type) {
+    int counter = 0;
+    for (auto& o : objects) {
+        counter += o->isKeyOfType(type);
+    }
+    return counter;
 }

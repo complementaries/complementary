@@ -21,6 +21,7 @@ class ObjectBase {
     virtual bool collidesWith(const Vector& position, const Vector& size) const;
     virtual void tick();
     virtual void render(float lag);
+    virtual void lateRender(float lag);
     virtual void renderEditor(float lag);
     virtual void destroy();
     virtual void read(std::ifstream& in) = 0;
@@ -29,6 +30,10 @@ class ObjectBase {
     virtual Vector getSize() const;
     virtual void forceMoveParticles(const Vector& position, const Vector& size,
                                     const Vector& velocity);
+    virtual void reset();
+    virtual bool isKeyOfType(int type) const;
+    virtual bool isDoorOfType(int type) const;
+    virtual void addKey();
 
 #ifndef NDEBUG
     virtual const char* getTypeName();

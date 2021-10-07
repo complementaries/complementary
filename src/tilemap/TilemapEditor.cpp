@@ -338,7 +338,6 @@ void TilemapEditor::flush() {
 
     Tilemap::setWidth(width);
     Tilemap::setHeight(height);
-    Tilemap::reset();
 
     Objects::clear();
 

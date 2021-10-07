@@ -33,6 +33,10 @@ void ObjectBase::render(float lag) {
     (void)lag;
 }
 
+void ObjectBase::lateRender(float lag) {
+    (void)lag;
+}
+
 void ObjectBase::renderEditor(float lag) {
     render(lag);
 }
@@ -101,4 +105,20 @@ void ObjectBase::forceMoveParticles(const Vector& position, const Vector& size,
     (void)position;
     (void)size;
     (void)velocity;
+}
+
+void ObjectBase::reset() {
+}
+
+bool ObjectBase::isKeyOfType(int type) const {
+    (void)type;
+    return false;
+}
+
+bool ObjectBase::isDoorOfType(int type) const {
+    (void)type;
+    return false;
+}
+
+void ObjectBase::addKey() {
 }

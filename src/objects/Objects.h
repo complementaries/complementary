@@ -59,6 +59,9 @@ namespace Objects {
 
     void saveObject(const char* path, ObjectBase& object);
     void print();
+    void reset();
+    std::shared_ptr<ObjectBase> findDoor(int type);
+    int countKeys(int type);
 }
 
 #endif

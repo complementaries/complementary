@@ -29,10 +29,15 @@ void ObjectRenderer::prepare(const Matrix& view) {
 }
 
 void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color c) {
+    drawTriangle(x, y, z, c, c, c);
+}
+
+void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color xc,
+                                  Color yc, Color zc) {
     Buffer data;
-    data.add(x).add(c);
-    data.add(y).add(c);
-    data.add(z).add(c);
+    data.add(x).add(xc);
+    data.add(y).add(yc);
+    data.add(z).add(zc);
     buffer.setData(data.getData(), data.getSize());
     buffer.drawTriangles(3);
 }

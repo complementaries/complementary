@@ -284,7 +284,7 @@ static void move() {
 static void onKill() {
     position = Tilemap::getSpawnPoint();
     lastPosition = position;
-    Tilemap::reset();
+    Objects::reset();
     Player::setAbilities(Ability::NONE, Ability::NONE);
     Game::fadeIn(3);
 }

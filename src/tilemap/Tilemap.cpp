@@ -20,7 +20,6 @@ static bool dirty = true;
 static int width = 0;
 static int height = 0;
 static std::vector<char> tiles;
-static int keys = 0;
 
 bool Tilemap::init(int w, int h) {
     if (shader.compile({"assets/shaders/tilemap.vs", "assets/shaders/tilemap.fs"})) {
@@ -59,9 +58,7 @@ const Tile& Tilemap::getTile(int x, int y) {
 }
 
 void Tilemap::setTile(int x, int y, const Tile& tile) {
-    int index = width * y + x;
-    keys += (tile == Tiles::KEY) - (tiles[index] == Tiles::KEY.getId());
-    tiles[index] = tile.getId();
+    tiles[width * y + x] = tile.getId();
     dirty = true;
 }
 
@@ -131,11 +128,6 @@ void Tilemap::load(const char* path) {
 
     forceReload();
 
-    keys = 0;
-    for (char c : tiles) {
-        keys += c == Tiles::KEY.getId();
-    }
-
     Player::setPosition(getSpawnPoint());
 }
 
@@ -160,18 +152,4 @@ void Tilemap::save(const char* path) {
     stream.write(tiles.data(), width * height);
 
     stream.close();
-}
-
-void Tilemap::reset() {
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            if (getTile(x, y) == Tiles::COLLECTED_KEY) {
-                setTile(x, y, Tiles::KEY);
-            }
-        }
-    }
-}
-
-int Tilemap::getKeys() {
-    return keys;
 }

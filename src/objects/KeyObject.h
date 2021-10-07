@@ -32,7 +32,7 @@ class KeyObject : public Object<KeyObjectData> {
 #endif
 
   private:
-    void render(float lag, Color color);
+    void renderColor(float lag, Color color);
 
     Vector goal;
     Vector lastRenderPosition;

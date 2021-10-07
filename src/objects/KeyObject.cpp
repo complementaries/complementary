@@ -76,7 +76,7 @@ void KeyObject::tick() {
     }
 }
 
-void KeyObject::render(float lag, Color color) {
+void KeyObject::renderColor(float lag, Color color) {
     color = ColorUtils::setAlpha(color, alpha);
     Vector pos = lastRenderPosition + (renderPosition - lastRenderPosition) * lag +
                  Vector(0.0f, sinf((counter + lag) * (6.283185307f / 150.0f)) * 0.125f);
@@ -105,14 +105,14 @@ void KeyObject::render(float lag, Color color) {
 }
 
 void KeyObject::lateRender(float lag) {
-    render(lag, ColorUtils::GRAY);
+    renderColor(lag, ColorUtils::GRAY);
 }
 
 void KeyObject::renderEditor(float lag) {
     lastRenderPosition = position;
     renderPosition = position;
     constexpr Color colors[] = {ColorUtils::RED, ColorUtils::GREEN, ColorUtils::BLUE};
-    render(lag, colors[(data.type & 0x3) % 3]);
+    renderColor(lag, colors[(data.type & 0x3) % 3]);
 }
 
 std::shared_ptr<ObjectBase> KeyObject::clone() {

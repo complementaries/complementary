@@ -9,6 +9,8 @@ int main(int argc, char** args) {
     for (int i = 0; i < argc; i++) {
         if (strcmp(args[i], "--muted") == 0) {
             Arguments::muted = true;
+        } else if (strcmp(args[i], "--no-vsync") == 0) {
+            Arguments::vsync = false;
         }
     }
 

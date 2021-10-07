@@ -3,6 +3,7 @@
 
 namespace Arguments {
     extern bool muted;
+    extern bool vsync;
 }
 
 #endif

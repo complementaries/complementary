@@ -36,7 +36,6 @@ bool Window::init() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetSwapInterval(1);
 
     window = SDL_CreateWindow("Complementary", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                               width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
@@ -59,8 +58,8 @@ bool Window::init() {
         return true;
     }
 
-    if (SDL_GL_SetSwapInterval(1) < 0) {
-        fprintf(stderr, "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
+    if (SDL_GL_SetSwapInterval(Arguments::vsync) < 0) {
+        fprintf(stderr, "unable to set swap interval to %d\n", Arguments::vsync);
     }
 
     // Imgui setup

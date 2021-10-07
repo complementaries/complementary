@@ -435,7 +435,6 @@ void Player::tick() {
             addTopShear(-data.velocity.x * 12.f);
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
             Vector minVelocity = wallJumpParticles->data.minStartVelocity;
-            Vector maxVelocity = wallJumpParticles->data.maxStartVelocity;
             // Color color = AbilityUtils::getColor(abilities[worldType]);
             Color color = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
             wallJumpParticles->data.startColor = color;
@@ -456,7 +455,8 @@ void Player::tick() {
                 wallJumpParticles->position =
                     getCenter() +
                     Vector(-data.size.x / 2 + data.size.x / 8, data.size.y / 2 + data.size.y / 8);
-                Vector(std::abs(minVelocity.x), minVelocity.y);
+                wallJumpParticles->data.minStartVelocity =
+                    Vector(std::abs(minVelocity.x), minVelocity.y);
                 wallJumpParticles->play();
 
             } else if (rightWallJumpBuffer > 0) {

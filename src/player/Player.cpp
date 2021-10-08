@@ -13,7 +13,6 @@
 #include "graphics/gl/VertexBuffer.h"
 #include "math/Vector.h"
 #include "objects/Objects.h"
-#include "particles/ParticleSystem.h"
 #include "player/Player.h"
 #include "sound/SoundManager.h"
 #include "tilemap/Tilemap.h"
@@ -307,9 +306,7 @@ void Player::kill() {
     SoundManager::playSoundEffect(Sound::DEATH);
     deathParticles->position = getCenter();
     deathParticles->play();
-    deathParticles->data.startColor = AbilityUtils::getColor(abilities[worldType]);
-    deathParticles->data.endColor =
-        ColorUtils::setAlpha(AbilityUtils::getColor(abilities[worldType]), 0);
+    PlayerParticles::setParticleColor(deathParticles, true);
     dead = deathParticles->data.duration + deathParticles->data.maxLifetime;
     RenderState::addRandomizedShake(1.0f);
     Game::fadeOut(3);
@@ -434,11 +431,7 @@ void Player::tick() {
             SoundManager::playSoundEffect(Sound::JUMP);
             addTopShear(-data.velocity.x * 12.f);
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
-            Vector minVelocity = wallJumpParticles->data.minStartVelocity;
-            // Color color = AbilityUtils::getColor(abilities[worldType]);
-            Color color = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
-            wallJumpParticles->data.startColor = color;
-            wallJumpParticles->data.endColor = color;
+            PlayerParticles::setParticleColor(wallJumpParticles, false);
 
             if (leftWallJumpBuffer > 0) {
                 wallJumpDirection = Vector(1.0f, -1.0f);
@@ -452,11 +445,9 @@ void Player::tick() {
                 leftWallJumpBuffer = 0;
                 rightWallJumpBuffer = 0;
 
-                wallJumpParticles->position =
-                    getCenter() +
-                    Vector(-data.size.x / 2 + data.size.x / 8, data.size.y / 2 + data.size.y / 8);
-                wallJumpParticles->data.minStartVelocity =
-                    Vector(std::abs(minVelocity.x), minVelocity.y);
+                PlayerParticles::setParticlePosition(wallJumpParticles, -1, 1, data.size.x / 8.0f,
+                                                     data.size.y / 8.0f);
+                PlayerParticles::setParticleVelocities(wallJumpParticles, 1, 1, 1, 1);
                 wallJumpParticles->play();
 
             } else if (rightWallJumpBuffer > 0) {
@@ -471,11 +462,9 @@ void Player::tick() {
                 leftWallJumpBuffer = 0;
                 rightWallJumpBuffer = 0;
 
-                wallJumpParticles->position =
-                    getCenter() +
-                    Vector(data.size.x / 2 - data.size.x / 8, data.size.y / 2 + data.size.y / 8);
-                wallJumpParticles->data.minStartVelocity =
-                    Vector(std::abs(minVelocity.x) * -1, minVelocity.y);
+                PlayerParticles::setParticlePosition(
+                    wallJumpParticles, 1, 1, -1.0f * data.size.x / 8.0f, data.size.y / 8.0f);
+                PlayerParticles::setParticleVelocities(wallJumpParticles, -1, -1, 1, 1);
                 wallJumpParticles->play();
             }
         }
@@ -509,20 +498,15 @@ void Player::tick() {
     data.acceleration = Vector();
     Vector actualDrag = data.drag;
     if (hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
-        // Color color = AbilityUtils::getColor(abilities[worldType]);
-        Color color = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
-        wallStickParticles->data.startColor = color;
-        wallStickParticles->data.endColor = color;
+        PlayerParticles::setParticleColor(wallStickParticles, false);
 
-        Vector minVelocity = wallStickParticles->data.minStartVelocity;
         if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::LEFT);
 
-            wallStickParticles->position = getCenter() + Vector(-data.size.x / 2 + data.size.x / 8,
-                                                                data.size.y / 2 + data.size.y / 8);
-            wallStickParticles->data.minStartVelocity =
-                Vector(std::abs(minVelocity.x), minVelocity.y);
+            PlayerParticles::setParticlePosition(wallStickParticles, -1, 1, data.size.x / 8.0f,
+                                                 data.size.y / 8.0f);
+            PlayerParticles::setParticleVelocities(wallStickParticles, 1, 1, 1, 1);
             if (stickingToWall == 0) {
                 wallStickParticles->play();
                 stickingToWall = 1;
@@ -531,10 +515,9 @@ void Player::tick() {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::RIGHT);
 
-            wallStickParticles->position = getCenter() + Vector(data.size.x / 2 - data.size.x / 8,
-                                                                data.size.y / 2 + data.size.y / 8);
-            wallStickParticles->data.minStartVelocity =
-                Vector(std::abs(minVelocity.x) * -1, minVelocity.y);
+            PlayerParticles::setParticlePosition(wallStickParticles, 1, 1,
+                                                 -1.0f * data.size.x / 8.0f, data.size.y / 8.0f);
+            PlayerParticles::setParticleVelocities(wallStickParticles, -1, -1, 1, 1);
             if (stickingToWall == 0) {
                 wallStickParticles->play();
                 stickingToWall = 1;
@@ -584,28 +567,16 @@ void Player::tick() {
         fakeGrounded = data.coyoteTicks;
         dashUseable = true;
         if (std::abs(data.velocity.x) > 0.02f) {
-            Color color = AbilityUtils::getColor(abilities[worldType]);
+            PlayerParticles::setParticleColor(walkParticles, true);
 
-            walkParticles->data.startColor = color;
-            walkParticles->data.endColor = color;
-
-            Vector minVelocity = walkParticles->data.minStartVelocity;
-            Vector maxVelocity = walkParticles->data.maxStartVelocity;
             if (data.velocity.x > 0) {
-                walkParticles->position = Vector(
-                    position.x, position.y + data.size.y - (walkParticles->data.startSize / 2.0f));
-                walkParticles->data.minStartVelocity =
-                    Vector(std::abs(minVelocity.x) * -1, minVelocity.y);
-                walkParticles->data.maxStartVelocity =
-                    Vector(std::abs(maxVelocity.x), maxVelocity.y);
+                PlayerParticles::setParticleVelocities(walkParticles, -1, 1, -1, -1);
+                PlayerParticles::setParticlePosition(walkParticles, -1, 1, 0,
+                                                     -1.0f * walkParticles->data.startSize / 2.0f);
             } else {
-                walkParticles->position =
-                    Vector(position.x + data.size.x,
-                           position.y + data.size.y - (walkParticles->data.startSize / 2.0f));
-                walkParticles->data.minStartVelocity =
-                    Vector(std::abs(minVelocity.x), minVelocity.y);
-                walkParticles->data.maxStartVelocity =
-                    Vector(std::abs(maxVelocity.x) * -1, maxVelocity.y);
+                PlayerParticles::setParticleVelocities(walkParticles, 1, -1, -1, -1);
+                PlayerParticles::setParticlePosition(walkParticles, 1, 1, 0,
+                                                     -1.0f * walkParticles->data.startSize / 2.0f);
             }
 
             walkParticles->play();
@@ -798,4 +769,37 @@ void Player::save() {
 
     stream.write("CMPL", 4);
     stream.write((char*)&data, sizeof(PlayerData));
+}
+
+// PARTICLE HELPERS
+
+void PlayerParticles::setParticleVelocities(std::shared_ptr<ParticleSystem> particles, int xMinSign,
+                                            int xMaxSign, int yMinMSign, int yMaxSign) {
+    Vector minVelocity = particles->data.minStartVelocity;
+    Vector maxVelocity = particles->data.maxStartVelocity;
+
+    particles->data.minStartVelocity =
+        Vector(std::abs(minVelocity.x) * xMinSign, std::abs(minVelocity.y) * yMinMSign);
+    particles->data.maxStartVelocity =
+        Vector(std::abs(maxVelocity.x) * xMaxSign, std::abs(maxVelocity.y) * yMaxSign);
+}
+
+void PlayerParticles::setParticlePosition(std::shared_ptr<ParticleSystem> particles, int xCoord,
+                                          int yCoord, float xOffset, float yOffset) {
+    particles->position = Player::getCenter() + Vector(data.size.x / 2.0f * xCoord + xOffset,
+                                                       data.size.y / 2.0f * yCoord + yOffset);
+}
+
+void PlayerParticles::setParticleColor(std::shared_ptr<ParticleSystem> particles,
+                                       bool playerColor) {
+    Color color;
+    if (playerColor) {
+        color = AbilityUtils::getColor(abilities[worldType]);
+    } else {
+        color = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
+    }
+
+    particles->data.startColor = color;
+    color = ColorUtils::setAlpha(color, 0);
+    particles->data.endColor = color;
 }

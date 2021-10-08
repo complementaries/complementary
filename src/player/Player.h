@@ -4,6 +4,7 @@
 #include "Ability.h"
 #include "math/Vector.h"
 #include "objects/Object.h"
+#include "particles/ParticleSystem.h"
 #include "player/Face.h"
 
 namespace Player {
@@ -34,6 +35,19 @@ namespace Player {
 
     void load();
     void save();
+}
+
+namespace PlayerParticles {
+    void setParticleVelocities(std::shared_ptr<ParticleSystem> particles, int xMinSign,
+                               int xMaxSign, int yMinMSign,
+                               int yMaxSign); // set sign variables to adjust particle directions
+    void setParticlePosition(std::shared_ptr<ParticleSystem> particles, int xCoord, int yCoord,
+                             float xOffset,
+                             float yOffset); // x and y coords relative to player center (top/left:
+                                             // -1, bottom/right: 1, center: 2)
+
+    void setParticleColor(std::shared_ptr<ParticleSystem> particles,
+                          bool playerColor); // either player color or inverted world color
 }
 
 #endif

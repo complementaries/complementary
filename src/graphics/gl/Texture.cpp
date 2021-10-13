@@ -1,10 +1,12 @@
 #include "Texture.h"
-
+#include <iostream>
 GL::Texture::Texture() : texture(0) {
 }
 
 GL::Texture::~Texture() {
-    glDeleteTextures(1, &texture);
+    if (texture != 0) {
+        glDeleteTextures(1, &texture);
+    }
 }
 
 void GL::Texture::init() {

@@ -22,7 +22,9 @@ struct Framebuffer {
     GLuint id = 0;
 
     ~Framebuffer() {
-        glDeleteFramebuffers(1, &id);
+        if (id != 0) {
+            glDeleteFramebuffers(1, &id);
+        }
     }
 };
 static Framebuffer framebuffer;

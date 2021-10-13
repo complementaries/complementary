@@ -1,4 +1,5 @@
 #include "VertexBuffer.h"
+#include <iostream>
 
 GL::VertexBuffer::Attributes& GL::VertexBuffer::Attributes::addFloat(int count) {
     data.push_back({GL_FLOAT, false, count, static_cast<int>(sizeof(float) * count)});
@@ -30,8 +31,12 @@ GL::VertexBuffer::VertexBuffer() : vertexArray(0), vertexBuffer(0) {
 }
 
 GL::VertexBuffer::~VertexBuffer() {
-    glDeleteBuffers(1, &vertexBuffer);
-    glDeleteVertexArrays(1, &vertexArray);
+    if (vertexBuffer != 0) {
+        glDeleteBuffers(1, &vertexBuffer);
+    }
+    if (vertexArray != 0) {
+        glDeleteVertexArrays(1, &vertexArray);
+    }
 }
 
 void GL::VertexBuffer::init(const Attributes& a) {

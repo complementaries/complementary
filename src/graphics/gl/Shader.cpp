@@ -5,9 +5,15 @@ GL::Shader::Shader() : vertex(0), fragment(0), program(0) {
 }
 
 GL::Shader::~Shader() {
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
-    glDeleteProgram(program);
+    if (vertex != 0) {
+        glDeleteShader(vertex);
+    }
+    if (fragment != 0) {
+        glDeleteShader(fragment);
+    }
+    if (program != 0) {
+        glDeleteProgram(program);
+    }
 }
 
 bool GL::Shader::readFile(std::vector<GLchar>& code, const char* path) const {

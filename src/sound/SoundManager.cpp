@@ -1,5 +1,7 @@
 #include "SoundManager.h"
 
+#include "Arguments.h"
+
 #include <iostream>
 
 const static int musicVolume = MIX_MAX_VOLUME;
@@ -12,7 +14,30 @@ static bool muted = false;
 
 SoundManager::SoundObject soundArray[Sound::MAX];
 
+static int getIdFromChannel(int channel) {
+    for (int i = 0; i < Sound::MAX; i++) {
+        if (soundArray[i].channel == channel) {
+            return i;
+        }
+    }
+    // should not happen
+    return -1;
+}
+
+static void channelDone(int channel) {
+    // remove all effects from channel
+    if (!Mix_UnregisterAllEffects(channel)) {
+        printf("Mix_UnregisterAllEffects: %s\n", Mix_GetError());
+    }
+    int ID = getIdFromChannel(channel);
+    soundArray[ID].playing = false;
+    soundArray[ID].channel = -1;
+}
+
 bool SoundManager::init() {
+    if (Arguments::muted) {
+        return false;
+    }
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
         fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
         return true;
@@ -24,13 +49,36 @@ bool SoundManager::init() {
     return false;
 }
 
+static bool play(int soundId, int channel, int volume, int loops) {
+    if (soundArray[soundId].sound == nullptr) {
+        return true;
+    }
+    soundArray[soundId].channel = Mix_PlayChannel(channel, soundArray[soundId].sound, loops);
+    soundArray[soundId].playing = true;
+    if (soundArray[soundId].channel == -1) return true;
+    int newVolume = volume > -1 ? volume : soundArray[soundId].defaultVolume;
+    Mix_Volume(soundArray[soundId].channel, muted ? 0 : newVolume);
+    return false;
+}
+
+static bool play(int soundId, int channel, int volume) {
+    return play(soundId, channel, volume, 0);
+}
+
+static bool play(int soundId, int channel) {
+    return play(soundId, channel, -1);
+}
+
 bool SoundManager::playMusic() {
+    if (Arguments::muted) {
+        return false;
+    }
     if (play(Sound::LIGHT_BG, curMusicChannel, musicVolume, -1)) return true;
     if (play(Sound::DARK_BG, 1 - curMusicChannel, 0, -1)) return true;
     return false;
 }
 
-int SoundManager::findFreeChannel() {
+static int findFreeChannel() {
     // find the first available channel in group 1
     int channel;
     channel = Mix_GroupAvailable(soundEffectsGroup);
@@ -43,16 +91,25 @@ int SoundManager::findFreeChannel() {
 }
 
 bool SoundManager::playSoundEffect(int soundId) {
+    if (Arguments::muted) {
+        return false;
+    }
     soundArray[soundId].channel = findFreeChannel();
     return play(soundId, soundArray[soundId].channel);
 }
 
 bool SoundManager::playContinuousSound(int soundId) {
+    if (Arguments::muted) {
+        return false;
+    }
     soundArray[soundId].channel = findFreeChannel();
     return play(soundId, soundArray[soundId].channel, -1, -1);
 }
 
 void SoundManager::switchMusic() {
+    if (Arguments::muted) {
+        return;
+    }
     setVolume(curMusicChannel, 0);
     curMusicChannel = 1 - curMusicChannel;
     if (!muted) {
@@ -60,57 +117,48 @@ void SoundManager::switchMusic() {
     }
 }
 
-bool SoundManager::loadSounds() {
-    soundArray[Sound::LIGHT_BG].sound = Mix_LoadWAV("assets/sounds/light.ogg");
-    soundArray[Sound::LIGHT_BG].defaultVolume = musicVolume;
-
-    soundArray[Sound::DARK_BG].sound = Mix_LoadWAV("assets/sounds/dark.ogg");
-    soundArray[Sound::DARK_BG].defaultVolume = musicVolume;
-
-    soundArray[Sound::WORLD_SWITCH].sound = Mix_LoadWAV("assets/sounds/switch.ogg");
-    soundArray[Sound::WORLD_SWITCH].defaultVolume = MIX_MAX_VOLUME / 4;
-
-    soundArray[Sound::JUMP].sound = Mix_LoadWAV("assets/sounds/jump2.ogg");
-    soundArray[Sound::JUMP].defaultVolume = MIX_MAX_VOLUME / 2;
-
-    soundArray[Sound::DASH].sound = Mix_LoadWAV("assets/sounds/dash.ogg");
-    soundArray[Sound::DASH].defaultVolume = MIX_MAX_VOLUME / 2;
-
-    soundArray[Sound::WIND].sound = Mix_LoadWAV("assets/sounds/wind.ogg");
-    soundArray[Sound::WIND].defaultVolume = MIX_MAX_VOLUME / 2;
-
-    soundArray[Sound::COLLECT].sound = Mix_LoadWAV("assets/sounds/collect.ogg");
-    soundArray[Sound::COLLECT].defaultVolume = MIX_MAX_VOLUME / 2;
-
-    soundArray[Sound::DEATH].sound = Mix_LoadWAV("assets/sounds/death.ogg");
-    soundArray[Sound::DEATH].defaultVolume = MIX_MAX_VOLUME / 2;
-
-    for (auto& object : soundArray) {
-        if (object.sound == NULL) return true;
+static void loadSound(Sound::Sound s, const char* path, int volume) {
+    soundArray[s].sound = Mix_LoadWAV(path);
+    soundArray[s].defaultVolume = volume;
+    if (soundArray[s].sound == nullptr) {
+        fprintf(stderr, "could not load sound '%s'\n", path);
     }
-    return false;
 }
 
-// do not directly use this to play a sound, rather use playSoundEffect
-bool SoundManager::play(int soundId, int channel, int volume, int loops) {
-    soundArray[soundId].channel = Mix_PlayChannel(channel, soundArray[soundId].sound, loops);
-    soundArray[soundId].playing = true;
-    if (soundArray[soundId].channel == -1) return true;
-    int newVolume = volume > -1 ? volume : soundArray[soundId].defaultVolume;
-    Mix_Volume(soundArray[soundId].channel, muted ? 0 : newVolume);
+bool SoundManager::loadSounds() {
+    if (Arguments::muted) {
+        return false;
+    }
+    loadSound(Sound::LIGHT_BG, "assets/sounds/light.ogg", musicVolume);
+    loadSound(Sound::DARK_BG, "assets/sounds/dark.ogg", musicVolume);
+    loadSound(Sound::WORLD_SWITCH, "assets/sounds/switch.ogg", MIX_MAX_VOLUME / 4);
+    loadSound(Sound::JUMP, "assets/sounds/jump.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::DASH, "assets/sounds/dash.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::WIND, "assets/sounds/wind.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::COLLECT, "assets/sounds/collect.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::DEATH, "assets/sounds/death.ogg", MIX_MAX_VOLUME / 2);
     return false;
 }
 
 void SoundManager::setVolume(int soundId, int volume) {
+    if (Arguments::muted) {
+        return;
+    }
     Mix_Volume(soundArray[soundId].channel, volume);
 }
 
 void SoundManager::stopSound(int soundId) {
+    if (Arguments::muted) {
+        return;
+    }
     Mix_HaltChannel(soundArray[soundId].channel);
 }
 
 void SoundManager::setDistanceToPlayer(int soundId, float distance, float xDistance,
                                        int threshold) {
+    if (Arguments::muted) {
+        return;
+    }
     // distance from 0 to 255
     int dist, xDist;
     if (distance > threshold) {
@@ -140,33 +188,18 @@ void SoundManager::setDistanceToPlayer(int soundId, float distance, float xDista
 }
 
 bool SoundManager::soundPlaying(int soundId) {
+    if (Arguments::muted) {
+        return false;
+    }
     return soundArray[soundId].playing;
-}
-
-void SoundManager::channelDone(int channel) {
-    // remove all effects from channel
-    if (!Mix_UnregisterAllEffects(channel)) {
-        printf("Mix_UnregisterAllEffects: %s\n", Mix_GetError());
-    }
-    int ID = getIdFromChannel(channel);
-    soundArray[ID].playing = false;
-    soundArray[ID].channel = -1;
-}
-
-int SoundManager::getIdFromChannel(int channel) {
-    for (int i = 0; i < Sound::MAX; i++) {
-        if (soundArray[i].channel == channel) {
-            return i;
-        }
-    }
-    // should not happen
-    return -1;
 }
 
 void SoundManager::quit() {
     // clean up our resources
     for (SoundObject object : soundArray) {
-        Mix_FreeChunk(object.sound);
+        if (object.sound != nullptr) {
+            Mix_FreeChunk(object.sound);
+        }
     }
 
     // quit SDL_mixer
@@ -174,6 +207,9 @@ void SoundManager::quit() {
 }
 
 void SoundManager::mute() {
+    if (Arguments::muted) {
+        return;
+    }
     if (muted) {
         setVolume(curMusicChannel, musicVolume);
         setVolume(1 - curMusicChannel, 0);

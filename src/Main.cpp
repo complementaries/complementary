@@ -14,6 +14,8 @@ int main(int argc, char** args) {
         }
     }
 
+    std::cout << "running in " << std::filesystem::current_path() << "\n";
+
 #ifndef NDEBUG
     if (!std::filesystem::exists("assets")) {
         puts("Attempted to fix the working directory.\n");

@@ -3,6 +3,7 @@
 #include <SDL_image.h>
 #include <array>
 #include <cstdio>
+#include <filesystem>
 
 #include "graphics/Buffer.h"
 #include "graphics/RenderState.h"
@@ -24,9 +25,10 @@ bool Font::init() {
     }
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addVector2().addRGBA());
     texture.init();
-    SDL_Surface* font = IMG_Load("assets/font.png");
+    const char* path = "assets/font.png";
+    SDL_Surface* font = IMG_Load(path);
     if (font == nullptr) {
-        printf("cannot load font: %s\n", IMG_GetError());
+        fprintf(stderr, "cannot load font file '%s'\n", path);
         return true;
     }
     Color* data = static_cast<Color*>(font->pixels);

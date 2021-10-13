@@ -28,7 +28,7 @@ bool Font::init() {
     const char* path = "assets/font.png";
     SDL_Surface* font = IMG_Load(path);
     if (font == nullptr) {
-        fprintf(stderr, "cannot load font file '%s'\n", path);
+        fprintf(stderr, "cannot load font file '%s': %s\n", path, IMG_GetError());
         return true;
     }
     Color* data = static_cast<Color*>(font->pixels);

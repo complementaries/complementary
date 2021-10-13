@@ -24,7 +24,11 @@ static int width = 850;
 static int height = 480;
 
 bool Window::init() {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+    int flags = SDL_INIT_VIDEO;
+    if (!Arguments::muted) {
+        flags |= SDL_INIT_AUDIO;
+    }
+    if (SDL_Init(flags) != 0) {
         fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
         return true;
     }

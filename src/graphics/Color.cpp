@@ -1,7 +1,8 @@
 #include "Color.h"
 
 Color ColorUtils::floatRgba(float red, float green, float blue, float alpha) {
-    return rgba((int)(red * 255.f), (int)(green * 255.f), (int)(blue * 255.f));
+    return rgba((int)(red * 255.f), (int)(green * 255.f), (int)(blue * 255.f),
+                (int)(alpha * 255.f));
 }
 
 std::tuple<int, int, int, int> ColorUtils::unpack(Color color) {

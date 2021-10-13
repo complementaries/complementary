@@ -50,7 +50,7 @@ static void renderIcon(const Vector& min, const Vector& max, Ability a, int alph
     if (a == Ability::NONE) {
         return;
     }
-    int id = a - 1;
+    int id = static_cast<int>(a) - 1;
     Vector tMin((id % 2) * 0.5f, (id / 2) * 0.5f);
     renderBox(min, max, tMin, tMin + Vector(0.5f, 0.5f),
               ColorUtils::setAlpha(AbilityUtils::getColor(a), alpha));

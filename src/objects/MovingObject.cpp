@@ -58,7 +58,7 @@ void MovingObject::onFaceCollision(Face playerFace) {
     if (playerFace != Face::UP) {
         Player::addBaseVelocity(velocity);
     }
-    if (data.spiky[FaceUtils::invert(playerFace)]) {
+    if (data.spiky[static_cast<int>(FaceUtils::invert(playerFace))]) {
         Player::kill();
     }
 }
@@ -73,7 +73,7 @@ void MovingObject::render(float lag, Color color) {
     Vector size = data.size - offset * 2.0f;
     Vector p = lastPosition + (position - lastPosition) * lag;
     ObjectRenderer::drawRectangle(p + offset, size, color);
-    if (data.spiky[Face::UP]) {
+    if (data.spiky[static_cast<int>(Face::UP)]) {
         for (int i = data.size.x * 3 - 1; i > 1; i--) {
             Vector a = p + Vector(0.3333f * i, 0.33f);
             Vector b = p + Vector(0.3333f * (i - 1), 0.33f);
@@ -89,7 +89,7 @@ void MovingObject::render(float lag, Color color) {
         ObjectRenderer::drawTriangle(a, b, c, color);
         ObjectRenderer::drawRectangle(p - Vector(0.0f, 0.05f), Vector(data.size.x, 0.05f), color);
     }
-    if (data.spiky[Face::DOWN]) {
+    if (data.spiky[static_cast<int>(Face::DOWN)]) {
         for (int i = data.size.x * 3 - 1; i > 1; i--) {
             Vector a = p + Vector(0.3333f * i, data.size.y - 0.33f);
             Vector b = p + Vector(0.3333f * (i - 1), data.size.y - 0.33f);
@@ -104,7 +104,7 @@ void MovingObject::render(float lag, Color color) {
         a = p + data.size - Vector(0.5f, 0.4f);
         ObjectRenderer::drawTriangle(a, b, c, color);
     }
-    if (data.spiky[Face::LEFT]) {
+    if (data.spiky[static_cast<int>(Face::LEFT)]) {
         for (int i = data.size.y * 3 - 1; i > 1; i--) {
             Vector a = p + Vector(0.3333f, 0.3333f * i);
             Vector b = p + Vector(0.3333f, 0.3333f * (i - 1));
@@ -119,7 +119,7 @@ void MovingObject::render(float lag, Color color) {
         a = p + Vector(0.4f, data.size.y - 0.5f);
         ObjectRenderer::drawTriangle(a, b, c, color);
     }
-    if (data.spiky[Face::RIGHT]) {
+    if (data.spiky[static_cast<int>(Face::RIGHT)]) {
         for (int i = data.size.y * 3 - 1; i > 1; i--) {
             Vector a = p + Vector(data.size.x - 0.3333f, 0.3333f * i);
             Vector b = p + Vector(data.size.x - 0.3333f, 0.3333f * (i - 1));
@@ -170,17 +170,18 @@ std::shared_ptr<ObjectBase> MovingObject::clone() {
 
 #ifndef NDEBUG
 void MovingObject::initTileEditorData(std::vector<TileEditorProp>& props) {
-    props.insert(props.end(), {TileEditorProp::Int("Size X", data.size.x, 0, 5),
-                               TileEditorProp::Int("Size Y", data.size.y, 0, 5),
-                               TileEditorProp::Float("Goal 1 X", data.goalA.x, 0.f, 200.f),
-                               TileEditorProp::Float("Goal 1 Y", data.goalA.y, 0.f, 200.f),
-                               TileEditorProp::Float("Goal 2 X", data.goalB.x, 0.f, 200.f),
-                               TileEditorProp::Float("Goal 2 Y", data.goalB.y, 0.f, 200.f),
-                               TileEditorProp::Float("Speed", data.speed, 0.f, 0.5f),
-                               TileEditorProp::Bool("LEFT", data.spiky[Face::LEFT]),
-                               TileEditorProp::Bool("RIGHT", data.spiky[Face::RIGHT]),
-                               TileEditorProp::Bool("UP", data.spiky[Face::UP]),
-                               TileEditorProp::Bool("DOWN", data.spiky[Face::DOWN])});
+    props.insert(props.end(),
+                 {TileEditorProp::Int("Size X", data.size.x, 0, 5),
+                  TileEditorProp::Int("Size Y", data.size.y, 0, 5),
+                  TileEditorProp::Float("Goal 1 X", data.goalA.x, 0.f, 200.f),
+                  TileEditorProp::Float("Goal 1 Y", data.goalA.y, 0.f, 200.f),
+                  TileEditorProp::Float("Goal 2 X", data.goalB.x, 0.f, 200.f),
+                  TileEditorProp::Float("Goal 2 Y", data.goalB.y, 0.f, 200.f),
+                  TileEditorProp::Float("Speed", data.speed, 0.f, 0.5f),
+                  TileEditorProp::Bool("LEFT", data.spiky[static_cast<int>(Face::LEFT)]),
+                  TileEditorProp::Bool("RIGHT", data.spiky[static_cast<int>(Face::RIGHT)]),
+                  TileEditorProp::Bool("UP", data.spiky[static_cast<int>(Face::UP)]),
+                  TileEditorProp::Bool("DOWN", data.spiky[static_cast<int>(Face::DOWN)])});
 }
 
 void MovingObject::applyTileEditorData(float* props) {

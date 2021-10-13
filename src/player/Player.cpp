@@ -124,11 +124,11 @@ bool Player::init() {
 }
 
 static bool wasColliding(Face face) {
-    return lastCollision[face];
+    return lastCollision[static_cast<int>(face)];
 }
 
 bool Player::isColliding(Face face) {
-    return collision[face];
+    return collision[static_cast<int>(face)];
 }
 
 bool Player::isColliding(const ObjectBase& o) {
@@ -222,21 +222,22 @@ static void tickCollision() {
         Vector min = position + FaceUtils::getDirection(face) * step;
         Vector max = min + data.size;
 
-        collision[face] = Objects::handleFaceCollision(min, data.size, face);
+        int faceAsInt = static_cast<int>(face);
+        collision[faceAsInt] = Objects::handleFaceCollision(min, data.size, face);
 
         int minX = floorf(min[0]);
         int minY = floorf(min[1]);
         int maxX = floorf(max[0]);
         int maxY = floorf(max[1]);
         if (minX < 0 || minY < 0 || maxX >= Tilemap::getWidth() || maxY >= Tilemap::getHeight()) {
-            collision[face] = true;
+            collision[faceAsInt] = true;
             continue;
         }
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 const Tile& tile = Tilemap::getTile(x, y);
                 if (tile.isSolid()) {
-                    collision[face] = true;
+                    collision[faceAsInt] = true;
                     tile.onFaceCollision(face);
                 }
             }
@@ -663,10 +664,10 @@ void Player::renderImGui() {
     ImGui::Indent();
 
     if (ImGui::Button("Switch ability")) {
-        int ability = abilities[worldType];
-        ability++;
+        Ability ability = abilities[worldType];
+        ability = static_cast<Ability>(static_cast<int>(ability) + 1);
         if (ability >= Ability::MAX) {
-            ability = 0;
+            ability = static_cast<Ability>(0);
         }
         abilities[worldType] = static_cast<Ability>(ability);
     }
@@ -724,10 +725,10 @@ void Player::renderImGui() {
     ImGui::Spacing();
 
     ImGui::PushDisabled();
-    ImGui::Checkbox("Left", &(collision[Face::LEFT]));
-    ImGui::Checkbox("Right", &(collision[Face::RIGHT]));
-    ImGui::Checkbox("Up", &(collision[Face::UP]));
-    ImGui::Checkbox("Down", &(collision[Face::DOWN]));
+    ImGui::Checkbox("Left", &(collision[static_cast<int>(Face::LEFT)]));
+    ImGui::Checkbox("Right", &(collision[static_cast<int>(Face::RIGHT)]));
+    ImGui::Checkbox("Up", &(collision[static_cast<int>(Face::UP)]));
+    ImGui::Checkbox("Down", &(collision[static_cast<int>(Face::DOWN)]));
     ImGui::PopDisabled();
 
     if (ImGui::Button("Respawn")) {

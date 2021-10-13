@@ -3,7 +3,7 @@
 
 #include "graphics/Color.h"
 
-enum Ability { NONE, DOUBLE_JUMP, GLIDER, DASH, WALL_JUMP, MAX };
+enum class Ability { NONE, DOUBLE_JUMP, GLIDER, DASH, WALL_JUMP, MAX };
 
 namespace AbilityUtils {
     Color getColor(Ability a);

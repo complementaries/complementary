@@ -158,20 +158,45 @@ void ParticleSystem::tick() {
         position = Player::getPosition();
     }
 
+    Vector particlePosition = position;
+
     if (playing && (data.duration <= 0.f || currentLifetime < data.duration)) {
         int emissionInterval = random.next(data.minEmissionInterval, data.maxEmissionInterval + 1);
         if (emissionInterval <= 0 || currentLifetime % emissionInterval == 0) {
             int emissionRate = random.next(data.minEmissionRate, data.maxEmissionRate + 1);
             for (int i = 0; i < emissionRate; i++) {
+                if (data.spawnPositionType == SpawnPositionType::BOX_EDGE) {
+                    Face spawnFace = static_cast<Face>(random.next(0, static_cast<int>(Face::MAX)));
+                    if (spawnFace == Face::LEFT) {
+                        particlePosition.x = position.x - data.boxSize.x * 0.5f;
+                        particlePosition.y = position.y + random.nextFloat(-data.boxSize.y * 0.5f,
+                                                                           data.boxSize.y * 0.5f);
+                    } else if (spawnFace == Face::RIGHT) {
+                        particlePosition.x = position.x + data.boxSize.x * 0.5f;
+                        particlePosition.y = position.y + random.nextFloat(-data.boxSize.y * 0.5f,
+                                                                           data.boxSize.y * 0.5f);
+                    } else if (spawnFace == Face::UP) {
+                        particlePosition.x = position.x + random.nextFloat(-data.boxSize.x * 0.5f,
+                                                                           data.boxSize.x * 0.5f);
+                        particlePosition.y = position.y - data.boxSize.y * 0.5f;
+                    } else if (spawnFace == Face::DOWN) {
+                        particlePosition.x = position.x + random.nextFloat(-data.boxSize.x * 0.5f,
+                                                                           data.boxSize.x * 0.5f);
+                        particlePosition.y = position.y + data.boxSize.y * 0.5f;
+                    }
+                }
+
                 float startVelocityX =
                     random.nextFloat(data.minStartVelocity.x, data.maxStartVelocity.x);
                 float startVelocityY =
                     random.nextFloat(data.minStartVelocity.y, data.maxStartVelocity.y);
                 Vector startVelocity(startVelocityX, startVelocityY);
                 switch (data.type) {
-                    case ParticleType::TRIANGLE: spawnTriangle(position, startVelocity); break;
-                    case ParticleType::SQUARE: spawnSquare(position, startVelocity); break;
-                    case ParticleType::CIRCLE: spawnCircle(position, startVelocity); break;
+                    case ParticleType::TRIANGLE:
+                        spawnTriangle(particlePosition, startVelocity);
+                        break;
+                    case ParticleType::SQUARE: spawnSquare(particlePosition, startVelocity); break;
+                    case ParticleType::CIRCLE: spawnCircle(particlePosition, startVelocity); break;
                 }
             }
         }
@@ -271,10 +296,10 @@ void ParticleSystem::spawnCircle(const Vector& position, const Vector& velocity)
 }
 
 bool ParticleSystem::isInBox(const Particle& particle) const {
-    return particle.position.x > position.x - data.boxSize.x &&
-           particle.position.x < position.x + data.boxSize.x &&
-           particle.position.y > position.y - data.boxSize.y &&
-           particle.position.y < position.y + data.boxSize.y;
+    return particle.position.x > position.x - data.boxSize.x * 0.5f &&
+           particle.position.x < position.x + data.boxSize.x * 0.5f &&
+           particle.position.y > position.y - data.boxSize.y * 0.5f &&
+           particle.position.y < position.y + data.boxSize.y * 0.5f;
 }
 
 std::shared_ptr<ObjectBase> ParticleSystem::clone() {

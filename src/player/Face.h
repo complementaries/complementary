@@ -6,7 +6,7 @@
 #include "math/Vector.h"
 
 static constexpr int FACES = 4;
-enum Face { LEFT, RIGHT, UP, DOWN };
+enum class Face { LEFT, RIGHT, UP, DOWN, MAX };
 typedef std::array<Face, FACES> Faces;
 
 namespace FaceUtils {

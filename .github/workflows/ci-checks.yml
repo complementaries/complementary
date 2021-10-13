@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1-mesa-dev libglu1-mesa-dev lxde libxi-dev xorg-dev alsa-base alsa-utils 
+          sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1-mesa-dev libglu1-mesa-dev lxde libxi-dev xorg-dev alsa alsa-base alsa-utils 
           pip3 install meson
 
       - name: Build

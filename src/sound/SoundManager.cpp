@@ -39,7 +39,8 @@ bool SoundManager::init() {
         return false;
     }
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
-        fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
+        fprintf(stderr, "SDL Mixer failed to initialise: %s\n", SDL_GetError());
+        Arguments::muted = true;
         return true;
     }
 

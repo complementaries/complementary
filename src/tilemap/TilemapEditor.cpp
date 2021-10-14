@@ -11,6 +11,7 @@ static float getPropMin(int n, short* tiledata, float* params);
 static float getPropMax(int n, short* tiledata, float* params);
 static float getPropScale(int n, short* tiledata, float* params);
 
+#define STBTE_MAX_PROPERTIES 12
 #define STBTE_PROP_TYPE getPropType
 #define STBTE_PROP_NAME getPropName
 #define STBTE_PROP_MIN getPropMin

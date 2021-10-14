@@ -24,16 +24,22 @@ static int width = 850;
 static int height = 480;
 
 bool Window::init() {
-    int flags = SDL_INIT_VIDEO;
-    if (!Arguments::muted) {
-        flags |= SDL_INIT_AUDIO;
-    }
-    if (SDL_Init(flags) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
         return true;
     }
+    if (!Arguments::muted) {
+        if (SDL_Init(SDL_INIT_AUDIO) != 0) {
+            fprintf(stderr, "SDL audio failed to initialise: %s\n", SDL_GetError());
+            Arguments::muted = true;
+        }
+    }
 
-    if (SoundManager::init() || SoundManager::loadSounds()) {
+    if (SoundManager::init()) {
+        fprintf(stderr, "Disabled audio due to sound manager init failure\n");
+    }
+
+    if (SoundManager::loadSounds()) {
         return true;
     }
 

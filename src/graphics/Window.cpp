@@ -126,7 +126,9 @@ static void pollEvents() {
                             Input::Internal::setButtonPressed(ButtonType::SWITCH);
                             break;
                         }
-                        case SDLK_RSHIFT: Input::Internal::setButtonPressed(ButtonType::SWITCH);
+                        case SDLK_RSHIFT:
+                            Input::Internal::setButtonPressed(ButtonType::SWITCH);
+                            [[fallthrough]];
                         case SDLK_LSHIFT:
                             Input::Internal::setButtonPressed(ButtonType::ABILITY);
                             break;
@@ -143,7 +145,9 @@ static void pollEvents() {
                 switch (e.key.keysym.sym) {
                     case SDLK_SPACE: Input::Internal::setButtonReleased(ButtonType::JUMP); break;
                     case SDLK_RETURN: Input::Internal::setButtonReleased(ButtonType::SWITCH); break;
-                    case SDLK_RSHIFT: Input::Internal::setButtonReleased(ButtonType::SWITCH);
+                    case SDLK_RSHIFT:
+                        Input::Internal::setButtonReleased(ButtonType::SWITCH);
+                        [[fallthrough]];
                     case SDLK_LSHIFT:
                         Input::Internal::setButtonReleased(ButtonType::ABILITY);
                         break;

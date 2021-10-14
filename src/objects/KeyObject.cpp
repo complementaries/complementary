@@ -55,7 +55,7 @@ void KeyObject::tick() {
         renderPosition = position;
         return;
     } else if (added) {
-        alpha -= 3;
+        alpha -= 5;
         if (alpha < 0) {
             alpha = 0;
         }
@@ -78,34 +78,21 @@ void KeyObject::tick() {
 
 void KeyObject::renderColor(float lag, Color color) {
     color = ColorUtils::setAlpha(color, alpha);
-    Vector pos = lastRenderPosition + (renderPosition - lastRenderPosition) * lag +
-                 Vector(0.0f, sinf((counter + lag) * (6.283185307f / 150.0f)) * 0.125f);
+    Vector pos =
+        lastRenderPosition + (renderPosition - lastRenderPosition) * lag +
+        Vector(0.0f, sinf((counter + lag) * (6.283185307f / 150.0f)) * 0.125f * !collected);
 
-    Vector a = pos + Vector(0.0f, 0.5f);
-    Vector b = pos + Vector(0.5f, 0.0f);
-    Vector c = pos + Vector(1.0f, 0.5f);
+    Vector a = pos + Vector(0.1f, 0.5f);
+    Vector b = pos + Vector(0.5f, 0.1f);
+    Vector c = pos + Vector(0.9f, 0.5f);
     ObjectRenderer::drawTriangle(a, b, c, color);
-    b = pos + Vector(0.5f, 1.0f);
+    b = pos + Vector(0.5f, 0.9f);
     ObjectRenderer::drawTriangle(a, b, c, color);
-
-    constexpr float oversize = 1.0f;
-    int base = 255 * Player::invertColors();
-    Color borderColor = ColorUtils::rgba(base, base, base, 0);
-    Color midColor = ColorUtils::rgba(base, base, base, alpha);
-    a = pos + Vector(-oversize, 0.5f);
-    b = pos + Vector(0.5f, -oversize);
-    c = pos + Vector(0.5f, 0.5f);
-    ObjectRenderer::drawTriangle(a, b, c, borderColor, borderColor, midColor);
-    a = pos + Vector(1.0f + oversize, 0.5f);
-    ObjectRenderer::drawTriangle(a, b, c, borderColor, borderColor, midColor);
-    b = pos + Vector(0.5f, 1.0f + oversize);
-    ObjectRenderer::drawTriangle(a, b, c, borderColor, borderColor, midColor);
-    a = pos + Vector(-oversize, 0.5f);
-    ObjectRenderer::drawTriangle(a, b, c, borderColor, borderColor, midColor);
 }
 
 void KeyObject::lateRender(float lag) {
-    renderColor(lag, ColorUtils::GRAY);
+    constexpr Color colors[] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
+    renderColor(lag, colors[Player::invertColors()]);
 }
 
 void KeyObject::renderEditor(float lag) {

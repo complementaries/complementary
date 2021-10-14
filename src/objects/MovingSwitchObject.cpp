@@ -32,7 +32,7 @@ void MovingSwitchObject::render(float lag) {
 }
 
 void MovingSwitchObject::renderEditor(float lag) {
-    constexpr Color color[2] = {ColorUtils::rgba(40, 40, 40), ColorUtils::rgba(215, 215, 215)};
+    constexpr Color color[2] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
     MovingObject::render(lag, color[seen]);
 }
 

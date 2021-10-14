@@ -20,9 +20,9 @@ namespace ColorUtils {
     Color setAlpha(Color c, int alpha);
 
     constexpr static Color WHITE = 0xFFFFFFFF;
-    constexpr static Color LIGHT_GRAY = 0xFFC0C0C0;
     constexpr static Color GRAY = 0xFF808080;
-    constexpr static Color DARK_GRAY = 0xFF404040;
+    constexpr static Color DARK_GRAY = ColorUtils::rgba(85, 85, 85);
+    constexpr static Color LIGHT_GRAY = ColorUtils::rgba(195, 195, 195);
     constexpr static Color BLACK = 0xFF000000;
     constexpr static Color RED = 0xFF0000FF;
     constexpr static Color PINK = 0xFFAFAFFF;

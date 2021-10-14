@@ -6,6 +6,8 @@
 
 #include <memory>
 
+constexpr int START_ALPHA = 400;
+
 DoorObject::DoorObject() : DoorObject(Vector(), Vector(1.0f, 1.0f), 0) {
 }
 
@@ -13,14 +15,14 @@ DoorObject::DoorObject(DoorObjectData data) : DoorObject(Vector(), data.size, da
 }
 
 DoorObject::DoorObject(const Vector& position, const Vector& size, int type)
-    : maxKeys(0), keys(0), alpha(255) {
+    : maxKeys(0), keys(0), alpha(START_ALPHA) {
     this->position = position;
     data.size = size;
     data.type = type;
 }
 
 bool DoorObject::isSolid() const {
-    return alpha > 0;
+    return alpha > 150;
 }
 
 bool DoorObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {
@@ -37,26 +39,31 @@ void DoorObject::tick() {
 
 void DoorObject::render(float lag, Color color) {
     (void)lag;
-    color = ColorUtils::setAlpha(color, alpha);
+    color = ColorUtils::setAlpha(color, std::min(alpha, 255));
     ObjectRenderer::drawRectangle(position, data.size, color);
     if (alpha < 255) {
         return;
     }
-    color = Player::invertColors() ? ColorUtils::BLACK : ColorUtils::WHITE;
+
+    Color keyholeColor;
+    Color background = Player::invertColors() ? ColorUtils::BLACK : ColorUtils::WHITE;
     if (maxKeys != 0) {
-        color = ColorUtils::mix(color, ColorUtils::GRAY, static_cast<float>(keys) / maxKeys);
+        keyholeColor = ColorUtils::mix(background, color, static_cast<float>(keys) / maxKeys);
+    } else {
+        keyholeColor = background;
     }
     Vector mid = position + data.size * 0.5f;
     Vector a = mid + Vector(-0.4f, 0.0f);
     Vector b = mid + Vector(0.4f, 0.0f);
     Vector c = mid + Vector(0.0f, -0.4f);
-    ObjectRenderer::drawTriangle(a, b, c, color);
+    ObjectRenderer::drawTriangle(a, b, c, keyholeColor);
     c = mid + Vector(0.0f, 0.4f);
-    ObjectRenderer::drawTriangle(a, b, c, color);
+    ObjectRenderer::drawTriangle(a, b, c, keyholeColor);
 }
 
 void DoorObject::render(float lag) {
-    render(lag, ColorUtils::GRAY);
+    constexpr Color colors[] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
+    render(lag, colors[Player::invertColors()]);
 }
 
 void DoorObject::renderEditor(float lag) {
@@ -98,5 +105,5 @@ void DoorObject::addKey() {
 void DoorObject::reset() {
     keys = 0;
     maxKeys = 0;
-    alpha = 255;
+    alpha = START_ALPHA;
 }

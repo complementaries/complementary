@@ -1,10 +1,12 @@
 #include "Buffer.h"
 
-Buffer::Buffer() : bytes(0), data(new char[SIZE]) {
+char Buffer::data[Buffer::SIZE];
+
+Buffer::Buffer() : bytes(0) /*, data(new char[SIZE])*/ {
 }
 
 Buffer::~Buffer() {
-    delete[] data;
+    /*delete[] data;*/
 }
 
 const void* Buffer::getData() const {

@@ -395,7 +395,7 @@ void Player::tick() {
     addForce(Face::RIGHT,
              powf(std::abs(Input::getHorizontal()), data.joystickExponent) * data.moveSpeed * sign);
 
-    if (hasAbility(Ability::GLIDER) && jumpTicks == 0 &&
+    if (hasAbility(Ability::GLIDER) && data.velocity.y > 0 &&
         Input::getButton(ButtonType::ABILITY).pressed) {
         addForce(Face::DOWN, data.gliderGravity);
     } else {
@@ -646,7 +646,7 @@ void Player::render(float lag) {
 
     // TEMP: indicator if we're gliding
     // TODO: remove
-    if (abilities[worldType] == Ability::GLIDER && Input::getButton(ButtonType::ABILITY).pressed) {
+    if (isGliding()) {
         color = ColorUtils::CYAN;
     }
     float shear = lastTopShear + (topShear - lastTopShear) * lag;

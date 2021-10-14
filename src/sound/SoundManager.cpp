@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-const static int musicVolume = MIX_MAX_VOLUME;
+const static int musicVolume = 0;
 const static int lightSoundID = 0;
 const static int darkSoundID = 1;
 const static int soundEffectsGroup = 1;

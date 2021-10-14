@@ -35,7 +35,8 @@ bool TextureRenderer::init() {
 
 static void renderBox(const Vector& min, const Vector& max, const Vector& tMin, const Vector& tMax,
                       Color c) {
-    Buffer data;
+    static Buffer data;
+    data.clear();
     data.add(min.x).add(min.y).add(tMin.x).add(tMin.y).add(c);
     data.add(max.x).add(min.y).add(tMax.x).add(tMin.y).add(c);
     data.add(min.x).add(max.y).add(tMin.x).add(tMax.y).add(c);

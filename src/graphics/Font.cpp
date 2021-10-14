@@ -62,7 +62,8 @@ void Font::prepare() {
 
 void Font::draw(const Vector& pos, float size, Color color, const char* s) {
     texture.bindTo(0);
-    Buffer data;
+    static Buffer data;
+    data.clear();
     int index = 0;
 
     float x = pos.x;

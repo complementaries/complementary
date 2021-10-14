@@ -640,7 +640,8 @@ void Player::render(float lag) {
     model.transform(-renderOffset);
     shader.setMatrix("model", model);
 
-    Buffer buf;
+    static Buffer buf;
+    buf.clear();
     Color color = AbilityUtils::getColor(abilities[worldType]);
 
     // TEMP: indicator if we're gliding

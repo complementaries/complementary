@@ -66,7 +66,8 @@ static void prepareRendering() {
     if (!dirty) {
         return;
     }
-    Buffer data;
+    static Buffer data;
+    data.clear();
 
     Color c = Tiles::AIR.getColor();
     data.add(0.0f).add(0.0f).add(c);

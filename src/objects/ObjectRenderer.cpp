@@ -7,6 +7,7 @@
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
+static Buffer data;
 
 bool ObjectRenderer::init() {
     if (shader.compile({"assets/shaders/object.vs", "assets/shaders/object.fs"})) {
@@ -34,7 +35,7 @@ void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector
 
 void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color xc,
                                   Color yc, Color zc) {
-    Buffer data;
+    data.clear();
     data.add(x).add(xc);
     data.add(y).add(yc);
     data.add(z).add(zc);
@@ -43,7 +44,7 @@ void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector
 }
 
 void ObjectRenderer::drawRectangle(const Vector& position, const Vector& size, Color c) {
-    Buffer data;
+    data.clear();
     float minX = position[0];
     float minY = position[1];
     float maxX = minX + size[0];

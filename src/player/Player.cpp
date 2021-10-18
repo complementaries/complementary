@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -96,6 +97,8 @@ static float topShear = 0.0f;
 static int stickingToWall = 0;
 
 static int dead = 0;
+
+static float gliderScale = 0.0f;
 
 bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
@@ -304,7 +307,7 @@ void Player::restart() {
     position = Tilemap::getSpawnPoint();
     lastPosition = position;
     Objects::reset();
-    Player::setAbilities(Ability::NONE, Ability::NONE);
+    Player::setAbilities(Ability::GLIDER, Ability::GLIDER);
     baseVelocity = Vector();
     lastRenderForce = 0.0f;
     renderForce = 0.0f;
@@ -657,6 +660,46 @@ void Player::tick() {
         addRenderForce(0.25f, Face::LEFT);
     }
     renderForce *= 0.95f;
+
+    if (isGliding() && !isColliding(Face::DOWN)) {
+        gliderScale += 0.04f;
+    } else {
+        gliderScale -= 0.02f;
+    }
+    gliderScale = std::clamp(gliderScale, 0.0f, 1.0f);
+}
+
+static void addGlider(Buffer& buf, Color color) {
+    float oy = -0.25f + 0.75f * gliderScale;
+    float gliderWidth = 1.5f * gliderScale;
+    float gliderLeft = 0.5f - 0.75f * gliderScale;
+    float gliderRight = gliderLeft + gliderWidth;
+    float dia = 0.5f * gliderScale;
+    float thickness = 0.3f * gliderScale;
+
+    buf.add(gliderLeft).add(-oy).add(color);
+    buf.add(gliderRight).add(-oy).add(color);
+    buf.add(gliderLeft).add(-oy + thickness).add(color);
+
+    buf.add(gliderRight).add(-oy).add(color);
+    buf.add(gliderLeft).add(-oy + thickness).add(color);
+    buf.add(gliderRight).add(-oy + thickness).add(color);
+
+    buf.add(gliderLeft).add(-oy).add(color);
+    buf.add(gliderLeft).add(-oy + thickness).add(color);
+    buf.add(gliderLeft - dia).add(-oy + dia).add(color);
+
+    buf.add(gliderLeft).add(-oy + thickness).add(color);
+    buf.add(gliderLeft - dia).add(-oy + dia).add(color);
+    buf.add(gliderLeft - dia).add(-oy + dia + thickness).add(color);
+
+    buf.add(gliderRight).add(-oy).add(color);
+    buf.add(gliderRight).add(-oy + thickness).add(color);
+    buf.add(gliderRight + dia).add(-oy + dia).add(color);
+
+    buf.add(gliderRight).add(-oy + thickness).add(color);
+    buf.add(gliderRight + dia).add(-oy + dia).add(color);
+    buf.add(gliderRight + dia).add(-oy + dia + thickness).add(color);
 }
 
 void Player::render(float lag) {
@@ -687,11 +730,6 @@ void Player::render(float lag) {
     buf.clear();
     Color color = AbilityUtils::getColor(abilities[worldType]);
 
-    // TEMP: indicator if we're gliding
-    // TODO: remove
-    if (isGliding()) {
-        color = ColorUtils::CYAN;
-    }
     float shear = lastTopShear + (topShear - lastTopShear) * lag;
     buf.add(0.0f).add(0.0f).add(color);
     buf.add(1.0f).add(0.0f).add(color);
@@ -699,9 +737,10 @@ void Player::render(float lag) {
     buf.add(shear + 1.0f).add(1.0f).add(color);
     buf.add(1.0f).add(0.0f).add(color);
     buf.add(shear + 0.0f).add(1.0f).add(color);
+    addGlider(buf, color);
 
     buffer.setData(buf.getData(), buf.getSize());
-    buffer.drawTriangles(6);
+    buffer.drawTriangles(buf.getSize() / (sizeof(float) * 2 + sizeof(Color)));
 }
 
 void Player::renderImGui() {

@@ -136,7 +136,12 @@ static void pollEvents() {
                         case SDLK_a: Input::Internal::setButtonPressed(ButtonType::LEFT); break;
                         case SDLK_RIGHT:
                         case SDLK_d: Input::Internal::setButtonPressed(ButtonType::RIGHT); break;
+                        case SDLK_UP:
+                        case SDLK_w: Input::Internal::setButtonPressed(ButtonType::UP); break;
+                        case SDLK_DOWN:
+                        case SDLK_s: Input::Internal::setButtonPressed(ButtonType::DOWN); break;
                         case SDLK_m: SoundManager::mute(); break;
+                        case SDLK_p: Input::Internal::setButtonPressed(ButtonType::PAUSE); break;
                     }
                 }
                 break;
@@ -155,6 +160,11 @@ static void pollEvents() {
                     case SDLK_a: Input::Internal::setButtonReleased(ButtonType::LEFT); break;
                     case SDLK_RIGHT:
                     case SDLK_d: Input::Internal::setButtonReleased(ButtonType::RIGHT); break;
+                    case SDLK_UP:
+                    case SDLK_w: Input::Internal::setButtonReleased(ButtonType::UP); break;
+                    case SDLK_DOWN:
+                    case SDLK_s: Input::Internal::setButtonReleased(ButtonType::DOWN); break;
+                    case SDLK_p: Input::Internal::setButtonReleased(ButtonType::PAUSE); break;
                 }
                 break;
             }
@@ -181,6 +191,15 @@ static void pollEvents() {
                     case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
                         Input::Internal::setButtonPressed(ButtonType::RIGHT);
                         break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+                        Input::Internal::setButtonPressed(ButtonType::UP);
+                        break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                        Input::Internal::setButtonPressed(ButtonType::DOWN);
+                        break;
+                    case SDL_CONTROLLER_BUTTON_START:
+                        Input::Internal::setButtonPressed(ButtonType::PAUSE);
+                        break;
                 }
                 break;
             }
@@ -206,6 +225,15 @@ static void pollEvents() {
                         break;
                     case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
                         Input::Internal::setButtonReleased(ButtonType::RIGHT);
+                        break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+                        Input::Internal::setButtonReleased(ButtonType::UP);
+                        break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                        Input::Internal::setButtonReleased(ButtonType::DOWN);
+                        break;
+                    case SDL_CONTROLLER_BUTTON_START:
+                        Input::Internal::setButtonReleased(ButtonType::PAUSE);
                         break;
                 }
                 break;
@@ -335,17 +363,18 @@ void Window::run() {
 
         SDL_GL_SwapWindow(window);
     }
-}
 
-void Window::exit() {
     if (Input::getController() != NULL) {
         SDL_GameControllerClose(Input::getController());
     }
     Input::setController(nullptr);
     SDL_DestroyWindow(window);
     SDL_Quit();
-
     SoundManager::quit();
+}
+
+void Window::exit() {
+    running = false;
 }
 
 int Window::getWidth() {

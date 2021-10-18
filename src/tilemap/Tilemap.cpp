@@ -45,6 +45,10 @@ int Tilemap::getHeight() {
     return height;
 }
 
+Vector Tilemap::getSize() {
+    return Vector(width, height);
+}
+
 void Tilemap::setWidth(int newWidth) {
     width = newWidth;
 }

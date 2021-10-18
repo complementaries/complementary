@@ -10,6 +10,9 @@ enum class ButtonType {
     ABILITY,
     LEFT,
     RIGHT,
+    UP,
+    DOWN,
+    PAUSE,
 
     MAX
 };

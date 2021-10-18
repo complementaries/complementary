@@ -74,6 +74,9 @@ const char* Input::getButtonName(ButtonType type) {
         case ButtonType::ABILITY: return "Ability";
         case ButtonType::LEFT: return "Left";
         case ButtonType::RIGHT: return "Right";
+        case ButtonType::UP: return "Up";
+        case ButtonType::DOWN: return "Down";
+        case ButtonType::PAUSE: return "Pause";
         default: return "?";
     }
 }

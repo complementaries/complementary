@@ -24,8 +24,8 @@ static GL::VertexBuffer buffer;
 static Vector lastPosition;
 static Vector position;
 static Vector baseVelocity;
-static float lastRenderForce;
-static float renderForce;
+static float lastRenderForce = 0.0f;
+static float renderForce = 0.0f;
 static Vector renderOffset;
 static Vector lastVelocity;
 static std::shared_ptr<ParticleSystem> deathParticles;
@@ -296,11 +296,50 @@ static void move() {
 }
 
 static void onKill() {
+    Player::restart();
+    Game::fadeIn(3);
+}
+
+void Player::restart() {
     position = Tilemap::getSpawnPoint();
     lastPosition = position;
     Objects::reset();
     Player::setAbilities(Ability::NONE, Ability::NONE);
-    Game::fadeIn(3);
+    baseVelocity = Vector();
+    lastRenderForce = 0.0f;
+    renderForce = 0.0f;
+    renderOffset = Vector();
+    lastVelocity = Vector();
+    data.velocity = Vector();
+    data.acceleration = Vector();
+    fakeGrounded = 0;
+    leftWall = false;
+    rightWall = false;
+    leftWallBuffer = 0;
+    rightWallBuffer = 0;
+    // worldType = false;
+    wallJumpCooldown = 0;
+    jumpTicks = 0;
+    wallJumpTicks = 0;
+    wallJumpDirection = Vector();
+    leftWallJumpCooldown = 0;
+    rightWallJumpCooldown = 0;
+    jumpBufferTicks = 0;
+    leftWallJumpBuffer = 0;
+    rightWallJumpBuffer = 0;
+    dashTicks = 0;
+    dashCoolDown = 0;
+    dashVelocity = Vector();
+    dashDirection = 1.0f;
+    dashUseable = false;
+    jumpCount = 0;
+    idleTicks = 0;
+    idle = false;
+    lastTopShear = 0.0f;
+    topShear = 0.0f;
+    stickingToWall = 0;
+    dead = 0;
+    Tilemap::forceReload();
 }
 
 void Player::kill() {

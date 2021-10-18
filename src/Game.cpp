@@ -9,6 +9,7 @@
 #include "Clock.h"
 #include "Game.h"
 #include "Input.h"
+#include "Menu.h"
 #include "graphics/Buffer.h"
 #include "graphics/Font.h"
 #include "graphics/RenderState.h"
@@ -57,6 +58,7 @@ bool Game::init() {
     }
 
     nextLevel();
+    Menu::showStartMenu();
 
     return false;
 }
@@ -83,6 +85,18 @@ void Game::nextLevel() {
     levelIndex = (levelIndex + 1) % levelNames.size();
 }
 
+static void switchWorld() {
+    if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
+        Player::toggleWorld();
+        RenderState::addRandomizedShake(1.0f);
+        RenderState::startMixing();
+        RenderState::startGlowing();
+
+        SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
+        SoundManager::switchMusic();
+    }
+}
+
 void Game::tick() {
     tps.update();
     if (paused) {
@@ -95,17 +109,8 @@ void Game::tick() {
     fade = std::clamp(fade + fadeAdd, 0, 255);
     RenderState::tick();
 
-    if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
-        Player::toggleWorld();
-        RenderState::addRandomizedShake(1.0f);
-        RenderState::startMixing();
-        RenderState::startGlowing();
-
-        SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
-        SoundManager::switchMusic();
-    }
-
     if (tilemapEditor) {
+        switchWorld();
         tilemapEditor->tick(Window::SECONDS_PER_TICK);
         if (Input::getButton(ButtonType::ABILITY).pressedFirstFrame) {
             tilemapEditor->flush();
@@ -122,12 +127,20 @@ void Game::tick() {
         }
         tilemapEditor->setZoom(zoom);
     } else {
+        Menu::tick();
+        if (Menu::isActive()) {
+            return;
+        }
+        switchWorld();
         Objects::tick();
         Player::tick();
     }
 }
 
 void Game::render(float lag) {
+    if (Menu::isActive()) {
+        lag = 0.0f;
+    }
     fps.update();
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -151,19 +164,18 @@ void Game::render(float lag) {
     RenderState::disableBlending();
     RenderState::renderEffects(lag);
 
+    glDisable(GL_DEPTH_TEST);
     RenderState::enableBlending();
-
+    TextureRenderer::render(lag);
+    ObjectRenderer::prepare(Matrix());
+    ObjectRenderer::drawRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
+                                  ColorUtils::setAlpha(ColorUtils::BLACK, fade));
     Font::prepare();
     char buffer[256];
     snprintf(buffer, 256, "FPS: %2.0f TPS: %3.0f", fps.getUpdatesPerSecond(),
              tps.getUpdatesPerSecond());
     Font::draw(Vector(0.0f, 0.0f), 2.0f, ColorUtils::RED, buffer);
-
-    TextureRenderer::render(lag);
-
-    ObjectRenderer::prepare(Matrix());
-    ObjectRenderer::drawRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
-                                  ColorUtils::setAlpha(ColorUtils::BLACK, fade));
+    Menu::render(lag);
     RenderState::disableBlending();
 }
 

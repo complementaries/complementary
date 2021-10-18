@@ -16,6 +16,7 @@ namespace Player {
     void addForce(Face face, float force);
     void addBaseVelocity(const Vector& v);
     void moveForced(const Vector& v);
+    void restart();
     void kill();
     bool invertColors();
     void toggleWorld();

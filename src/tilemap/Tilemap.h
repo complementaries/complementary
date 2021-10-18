@@ -12,6 +12,7 @@ namespace Tilemap {
     int getHeight();
     void setWidth(int newWidth);
     void setHeight(int newHeight);
+    Vector getSize();
 
     const Tile& getTile(int x, int y);
     void setTile(int x, int y, const Tile& tile);

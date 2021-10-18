@@ -445,6 +445,8 @@ void Player::tick() {
                 addTopShear(-0.5f);
                 leftWallJumpBuffer = 0;
                 rightWallJumpBuffer = 0;
+                leftWallBuffer = 0;
+                rightWallBuffer = 0;
 
                 PlayerParticles::setParticlePosition(wallJumpParticles, -1, 1, data.size.x / 8.0f,
                                                      data.size.y / 8.0f);
@@ -462,6 +464,8 @@ void Player::tick() {
                 addTopShear(0.5f);
                 leftWallJumpBuffer = 0;
                 rightWallJumpBuffer = 0;
+                leftWallBuffer = 0;
+                rightWallBuffer = 0;
 
                 PlayerParticles::setParticlePosition(
                     wallJumpParticles, 1, 1, -1.0f * data.size.x / 8.0f, data.size.y / 8.0f);

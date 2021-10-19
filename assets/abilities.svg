@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <bx:grid x="0" y="0" width="25.16" height="25.947"/>
+  </defs>
+  <path style="stroke-width: 0px; stroke: rgb(0, 0, 0);" d="M 271.032 283.221 L 401.949 288.334 L 359.38 321.635 L 449.386 436.159 L 324.951 366.189 L 295.325 411.355 L 271.032 283.221 Z" transform="matrix(0.999339, -0.036355, 0.036355, 0.999339, -13.17149, 13.066897)" bx:origin="0.458 0.559"/>
+  <rect x="468.726" y="253.458" width="26.592" height="241.986" style="stroke: rgb(0, 0, 0);"/>
+  <rect x="76.465" y="247.701" width="26.79" height="244.208" style="stroke-width: 0px; stroke: rgb(0, 0, 0);" transform="matrix(0, 1, -1, 0, 493.908905, 142.981079)"/>
+  <path style="stroke-width: 0px; stroke: rgb(0, 0, 0);" d="M 244.234 363.258 L 151.292 267.613 L 150.96 337.311 L 4.972 363.258 L 150.96 389.205 L 151.292 457.758 L 244.234 363.258 Z"/>
+  <path style="stroke: rgb(0, 0, 0); stroke-width: 0px; fill: rgb(255, 0, 0);" d="M 146.618 353.99"/>
+  <path style="stroke-width: 0px; stroke: rgb(0, 0, 0);" d="M 122.684 138.715 L 182.209 192.321 L 123.381 174.569 L 65.599 191.278 L 122.684 138.715 Z"/>
+  <path style="stroke-width: 0px; stroke: rgb(0, 0, 0);" d="M 123.08 3.595 L 217.034 88.208 L 124.179 60.187 L 32.974 86.562 L 123.08 3.595 Z"/>
+  <path style="stroke-width: 0px; stroke: rgb(0, 0, 0);" d="M 107.411 166.718 L 123.419 207.452 L 139.436 166.695 L 107.411 166.718 Z"/>
+  <path style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" d="M 191.035 197.21"/>
+  <path style="stroke-width: 0px; stroke: rgb(0, 0, 0);" d="M 96.531 45.73 L 123.77 124.132 L 152.479 45.698 L 96.531 45.73 Z"/>
+  <rect x="312.26" y="94.657" width="122.104" height="122.104" style="stroke: rgb(0, 0, 0);"/>
+  <path style="stroke-width: 0px; stroke: rgb(0, 0, 0);" d="M 251.208 78.746 L 291.931 33.605 L 456.402 33.605 L 495.416 82.147 L 495.416 105.557 L 455.302 57.809 L 291.529 57.405 L 251.208 102.096 L 251.208 78.746 Z"/>
+  <path style="stroke-width: 0px; stroke: rgb(0, 0, 0);" d="M 62.192 316.474 L 133.206 302.355 L 133.176 329.525 L 62.192 316.474 Z"/>
+  <path style="stroke-width: 0px; stroke: rgb(0, 0, 0);" d="M 62.241 411.26 L 133.255 397.141 L 133.225 424.311 L 62.241 411.26 Z"/>
+</svg>

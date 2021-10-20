@@ -33,6 +33,7 @@ static std::shared_ptr<ParticleSystem> deathParticles;
 static std::shared_ptr<ParticleSystem> walkParticles;
 static std::shared_ptr<ParticleSystem> wallJumpParticles;
 static std::shared_ptr<ParticleSystem> wallStickParticles;
+static std::shared_ptr<ParticleSystem> dashParticles;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -123,6 +124,8 @@ bool Player::init() {
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/wallstick.cmob");
     wallStickParticles->destroyOnLevelLoad = false;
 
+    dashParticles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/dash.cmob");
+    dashParticles->destroyOnLevelLoad = false;
     return false;
 }
 
@@ -579,6 +582,8 @@ void Player::tick() {
     }
     if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
         dashTicks == 0 && dashCoolDown == 0 && dashUseable) {
+        PlayerParticles::setParticleColor(dashParticles, true);
+        dashParticles->play();
         dashTicks = data.maxDashTicks;
         dashUseable = false;
         dashCoolDown = data.maxDashCooldown + dashTicks;
@@ -599,10 +604,16 @@ void Player::tick() {
         data.velocity =
             dashVelocity * cosf(static_cast<float>(M_PI) * 0.5f *
                                 (1.0f - static_cast<float>(dashTicks) / data.maxDashTicks));
+        if (data.velocity.x > 0) {
+            PlayerParticles::setParticlePosition(dashParticles, -1, -1, 0, 0.5);
+        } else {
+            PlayerParticles::setParticlePosition(dashParticles, 1, -1, 0, 0.5);
+        }
     } else {
         data.velocity *= actualDrag;
         data.velocity += (Vector(1.0f, 1.0f) - actualDrag) * baseVelocity;
         baseVelocity = Vector();
+        dashParticles->stop();
     }
 
     float fallStrenght = data.velocity.y;
@@ -613,7 +624,7 @@ void Player::tick() {
     if (isColliding(Face::DOWN)) {
         fakeGrounded = data.coyoteTicks;
         dashUseable = true;
-        if (std::abs(data.velocity.x) > 0.02f) {
+        if (std::abs(data.velocity.x) > 0.02f && dashTicks <= 0) {
             PlayerParticles::setParticleColor(walkParticles, true);
 
             if (data.velocity.x > 0) {

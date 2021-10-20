@@ -6,10 +6,12 @@
 #include <string>
 #include <vector>
 
+#include "AbilityCutscene.h"
 #include "Clock.h"
 #include "Game.h"
 #include "Input.h"
 #include "Menu.h"
+#include "Savegame.h"
 #include "graphics/Buffer.h"
 #include "graphics/Font.h"
 #include "graphics/RenderState.h"
@@ -53,9 +55,12 @@ static Clock fps;
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Objects::init() || TilemapEditor::init() || RenderState::init() ||
-        ParticleRenderer::init() || Font::init() || TextureRenderer::init() || Player::init()) {
+        ParticleRenderer::init() || Font::init() || TextureRenderer::init() || Player::init() ||
+        Savegame::init() || AbilityCutscene::init()) {
         return true;
     }
+
+    Savegame::load();
 
     nextLevel();
     Menu::showStartMenu();
@@ -85,16 +90,14 @@ void Game::nextLevel() {
     levelIndex = (levelIndex + 1) % levelNames.size();
 }
 
-static void switchWorld() {
-    if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
-        Player::toggleWorld();
-        RenderState::addRandomizedShake(1.0f);
-        RenderState::startMixing();
-        RenderState::startGlowing();
+void Game::switchWorld() {
+    Player::toggleWorld();
+    RenderState::addRandomizedShake(1.0f);
+    RenderState::startMixing();
+    RenderState::startGlowing();
 
-        SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
-        SoundManager::switchMusic();
-    }
+    SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
+    SoundManager::switchMusic();
 }
 
 void Game::tick() {
@@ -110,7 +113,9 @@ void Game::tick() {
     RenderState::tick();
 
     if (tilemapEditor) {
-        switchWorld();
+        if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
+            switchWorld();
+        }
         tilemapEditor->tick(Window::SECONDS_PER_TICK);
         if (Input::getButton(ButtonType::ABILITY).pressedFirstFrame) {
             tilemapEditor->flush();
@@ -131,8 +136,13 @@ void Game::tick() {
         if (Menu::isActive()) {
             return;
         }
-        switchWorld();
+        AbilityCutscene::tick();
+        Player::setAllowedToMove(!AbilityCutscene::isActive());
+        if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
+            switchWorld();
+        }
         Objects::tick();
+
         Player::tick();
     }
 }
@@ -176,6 +186,7 @@ void Game::render(float lag) {
              tps.getUpdatesPerSecond());
     Font::draw(Vector(0.0f, 0.0f), 2.0f, ColorUtils::RED, buffer);
     Menu::render(lag);
+    AbilityCutscene::render(lag);
     RenderState::disableBlending();
 }
 

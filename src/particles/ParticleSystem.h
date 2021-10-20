@@ -42,6 +42,7 @@ struct ParticleSystemData final {
     bool clampPositionInBounds = false;
     SpawnPositionType spawnPositionType = SpawnPositionType::CENTER; // Does nothing yet
     Vector boxSize = Vector(0.5f, 0.5f);
+    float attractSpeed = 0.f;
 };
 
 struct Particle final {

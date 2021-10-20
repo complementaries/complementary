@@ -7,6 +7,7 @@ namespace Game {
     void render(float lag);
     void renderImGui();
     void nextLevel();
+    void switchWorld();
 
     void onWindowResize(int width, int height);
     void onMouseEvent(void* eventPointer);

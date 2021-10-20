@@ -6,8 +6,10 @@
 #include <imgui.h>
 #include <imgui/ImGuiUtils.h>
 
+#include "AbilityCutscene.h"
 #include "Game.h"
 #include "Input.h"
+#include "Savegame.h"
 #include "graphics/Buffer.h"
 #include "graphics/RenderState.h"
 #include "graphics/gl/Shader.h"
@@ -39,6 +41,8 @@ static std::shared_ptr<ParticleSystem> jumpParticles;
 static std::shared_ptr<ParticleSystem> walljumpParticlesLeft;
 static std::shared_ptr<ParticleSystem> walljumpParticlesRight;
 static std::shared_ptr<ParticleSystem> walljumpParticles;
+static bool useOverrideColor = false;
+static Color overrideColor;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -76,6 +80,8 @@ static int leftWallBuffer = 0;
 static int rightWallBuffer = 0;
 
 static bool worldType = false;
+static bool allowedToMove = true;
+static bool gravityEnabled = true;
 static int wallJumpCooldown = 0;
 static int jumpTicks = 0;
 static int wallJumpTicks = 0;
@@ -335,7 +341,7 @@ void Player::restart() {
     position = Tilemap::getSpawnPoint();
     lastPosition = position;
     Objects::reset();
-    Player::setAbilities(Ability::GLIDER, Ability::GLIDER);
+    Player::setAbilities(Ability::NONE, Ability::NONE);
     baseVelocity = Vector();
     lastRenderForce = 0.0f;
     renderForce = 0.0f;
@@ -383,9 +389,37 @@ void Player::kill() {
     Game::fadeOut(3);
 }
 
+bool Player::isAllowedToMove() {
+    return allowedToMove;
+}
+
+void Player::setAllowedToMove(bool value) {
+    allowedToMove = value;
+}
+
+void Player::setGravityEnabled(bool value) {
+    gravityEnabled = value;
+}
+
+void Player::setOverrideColor(Color color) {
+    overrideColor = color;
+    useOverrideColor = true;
+}
+
+void Player::resetOverrideColor() {
+    useOverrideColor = false;
+}
+
 void Player::setAbilities(Ability dark, Ability light) {
     abilities[0] = dark;
     abilities[1] = light;
+
+    if (dark != Ability::NONE && light != Ability::NONE) {
+        if (!Savegame::abilitiesUnlocked(dark, light)) {
+            AbilityCutscene::show();
+        }
+        Savegame::unlockAbilities(dark, light);
+    }
 }
 
 bool Player::hasAbility(Ability a) {
@@ -459,17 +493,21 @@ void Player::tick() {
     leftWallJumpCooldown -= leftWallJumpCooldown > 0;
     rightWallJumpCooldown -= rightWallJumpCooldown > 0;
 
-    int sign = Input::getHorizontal() < 0
-                   ? -1 + static_cast<float>(leftWallJumpCooldown) / data.wallJumpMoveCooldown
-                   : 1 - static_cast<float>(rightWallJumpCooldown) / data.wallJumpMoveCooldown;
-    addForce(Face::RIGHT,
-             powf(std::abs(Input::getHorizontal()), data.joystickExponent) * data.moveSpeed * sign);
+    if (allowedToMove) {
+        int sign = Input::getHorizontal() < 0
+                       ? -1 + static_cast<float>(leftWallJumpCooldown) / data.wallJumpMoveCooldown
+                       : 1 - static_cast<float>(rightWallJumpCooldown) / data.wallJumpMoveCooldown;
+        addForce(Face::RIGHT, powf(std::abs(Input::getHorizontal()), data.joystickExponent) *
+                                  data.moveSpeed * sign);
+    }
 
-    if (hasAbility(Ability::GLIDER) && data.velocity.y > 0 &&
-        Input::getButton(ButtonType::ABILITY).pressed) {
-        addForce(Face::DOWN, data.gliderGravity);
-    } else {
-        addForce(Face::DOWN, data.gravity);
+    if (gravityEnabled) {
+        if (hasAbility(Ability::GLIDER) && data.velocity.y > 0 &&
+            Input::getButton(ButtonType::ABILITY).pressed && allowedToMove) {
+            addForce(Face::DOWN, data.gliderGravity);
+        } else {
+            addForce(Face::DOWN, data.gravity);
+        }
     }
 
     if (Input::getHorizontal() > 0.0f) {
@@ -478,14 +516,15 @@ void Player::tick() {
         dashDirection = -1.0f;
     }
 
-    if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
+    if (Input::getButton(ButtonType::JUMP).pressedFirstFrame && allowedToMove) {
         jumpBufferTicks = data.maxJumpBufferTicks;
     }
     jumpBufferTicks -= jumpBufferTicks > 0;
 
-    if (leftWallBuffer > 0 && Input::getButton(ButtonType::LEFT).pressed) {
+    if (leftWallBuffer > 0 && Input::getButton(ButtonType::LEFT).pressed && allowedToMove) {
         leftWallJumpBuffer = 15;
-    } else if (rightWallBuffer > 0 && Input::getButton(ButtonType::RIGHT).pressed) {
+    } else if (rightWallBuffer > 0 && Input::getButton(ButtonType::RIGHT).pressed &&
+               allowedToMove) {
         rightWallJumpBuffer = 15;
     }
     if (jumpBufferTicks > 0) {
@@ -582,14 +621,14 @@ void Player::tick() {
     rightWallBuffer -= rightWallBuffer > 0;
     leftWallJumpBuffer -= leftWallJumpBuffer > 0;
     rightWallJumpBuffer -= rightWallJumpBuffer > 0;
-    if (!Input::getButton(ButtonType::JUMP).pressed && jumpTicks > 0) {
+    if (!Input::getButton(ButtonType::JUMP).pressed && jumpTicks > 0 && allowedToMove) {
         jumpTicks = 0;
     }
     if (jumpTicks > 0) {
         addForce(Face::UP, data.jumpBoost * (1.0f / powf(1.1f, data.maxJumpTicks + 1 - jumpTicks)));
         jumpTicks--;
     }
-    if (!Input::getButton(ButtonType::JUMP).pressed && wallJumpTicks > 0) {
+    if (!Input::getButton(ButtonType::JUMP).pressed && wallJumpTicks > 0 && allowedToMove) {
         wallJumpTicks = 0;
     }
     if (wallJumpTicks > 0) {
@@ -609,7 +648,7 @@ void Player::tick() {
     if (hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
         PlayerParticles::setParticleColor(wallStickParticles, true);
 
-        if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
+        if (leftWall && Input::getButton(ButtonType::LEFT).pressed && allowedToMove) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::LEFT);
 
@@ -621,7 +660,7 @@ void Player::tick() {
                 wallStickParticles->play();
                 stickingToWall = 1;
             }
-        } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed) {
+        } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed && allowedToMove) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::RIGHT);
 
@@ -642,7 +681,7 @@ void Player::tick() {
         stickingToWall = 0;
     }
     if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
-        dashTicks == 0 && dashCoolDown == 0 && dashUseable) {
+        dashTicks == 0 && dashCoolDown == 0 && dashUseable && allowedToMove) {
         PlayerParticles::setParticleColor(dashParticles, true);
         dashParticles->play();
         dashTicks = data.maxDashTicks;
@@ -800,7 +839,7 @@ void Player::render(float lag) {
 
     static Buffer buf;
     buf.clear();
-    Color color = AbilityUtils::getColor(abilities[worldType]);
+    Color color = useOverrideColor ? overrideColor : AbilityUtils::getColor(abilities[worldType]);
 
     float shear = lastTopShear + (topShear - lastTopShear) * lag;
     buf.add(0.0f).add(0.0f).add(color);

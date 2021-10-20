@@ -14,6 +14,7 @@ static Matrix viewMatrix;
 static Vector shake;
 static int shakeTicks = 0;
 static Random rng;
+static float scale = 1;
 
 static GLuint texture = 0;
 static GLuint textureDepth = 0;
@@ -94,6 +95,7 @@ void RenderState::updateViewMatrix(float lag) {
     Vector realSize(Tilemap::getWidth() * factor, Tilemap::getHeight() * factor);
     viewMatrix.unit()
         .transform(realSize / Vector(-Window::getWidth(), Window::getHeight()))
+        .scale(Vector(scale, scale))
         .scale(Vector(factor / Window::getWidth(), -factor / Window::getHeight()) * 2.0f);
     viewMatrix.transform(getShake(shakeTicks + lag));
 }
@@ -139,6 +141,10 @@ void RenderState::resize(int width, int height) {
     glBindTexture(GL_TEXTURE_2D, textureDepth);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT,
                  GL_FLOAT, nullptr);
+}
+
+void RenderState::setScale(float inScale) {
+    scale = inScale;
 }
 
 static void clear() {

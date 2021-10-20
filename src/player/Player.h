@@ -18,6 +18,11 @@ namespace Player {
     void moveForced(const Vector& v);
     void restart();
     void kill();
+    bool isAllowedToMove();
+    void setAllowedToMove(bool value);
+    void setGravityEnabled(bool value);
+    void setOverrideColor(Color color);
+    void resetOverrideColor();
     bool invertColors();
     void toggleWorld();
     Vector getPosition();

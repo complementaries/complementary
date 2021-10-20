@@ -13,6 +13,7 @@ namespace RenderState {
     void addRandomizedShake(float strength);
     void tick();
     void resize(int width, int height);
+    void setScale(float scale);
 
     void bindAndClearDefaultFramebuffer();
 

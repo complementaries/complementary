@@ -47,10 +47,13 @@ static void renderBox(const Vector& min, const Vector& max, const Vector& tMin, 
     buffer.drawTriangles(6);
 }
 
-static void renderIcon(const Vector& min, const Vector& max, Ability a, int alpha) {
+void TextureRenderer::renderIcon(const Vector& min, const Vector& max, Ability a, int alpha) {
     if (a == Ability::NONE) {
         return;
     }
+    shader.use();
+    RenderState::setViewMatrix(shader);
+    abilities.bindTo();
     int id = static_cast<int>(a) - 1;
     Vector tMin((id % 2) * 0.5f, (id / 2) * 0.5f);
     renderBox(min, max, tMin, tMin + Vector(0.5f, 0.5f),
@@ -59,9 +62,6 @@ static void renderIcon(const Vector& min, const Vector& max, Ability a, int alph
 
 void TextureRenderer::render(float lag) {
     (void)lag;
-    shader.use();
-    RenderState::setViewMatrix(shader);
-    abilities.bindTo();
     Vector wSize(Tilemap::getWidth(), Tilemap::getHeight());
     Vector size(4.0f, 4.0f);
     renderIcon(wSize - size, wSize, Player::getAbility(), 255);

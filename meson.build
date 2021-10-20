@@ -42,6 +42,8 @@ src = [
   'src/Menu.cpp',
   'src/Input.cpp',
   'src/Arguments.cpp',
+  'src/AbilityCutscene.cpp',
+  'src/Savegame.cpp',
   'src/Main.cpp'
 ]
 

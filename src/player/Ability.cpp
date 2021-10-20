@@ -9,3 +9,14 @@ Color AbilityUtils::getColor(Ability a) {
         default: return ColorUtils::GRAY;
     }
 }
+
+const char* AbilityUtils::getName(Ability a) {
+    switch (a) {
+        case Ability::DOUBLE_JUMP: return "Double Jump";
+        case Ability::GLIDER: return "Glider";
+        case Ability::DASH: return "Dash";
+        case Ability::WALL_JUMP: return "Wall Jump";
+        case Ability::NONE: return "None";
+        default: return "???";
+    }
+}

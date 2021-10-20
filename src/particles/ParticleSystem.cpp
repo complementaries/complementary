@@ -141,6 +141,7 @@ void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
         Particle& p = particles[i];
         p.lastPosition = p.position;
         p.velocity[1] += data.gravity;
+        p.velocity += (position - p.position) * data.attractSpeed;
         Vector nextPosition = p.position + p.velocity;
         if (!data.clampPositionInBounds || isInBox(p)) {
             if (data.enableCollision) {
@@ -160,7 +161,7 @@ void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
 
 void ParticleSystem::tick() {
     if (data.followPlayer) {
-        position = Player::getPosition();
+        position = Player::getCenter();
     }
 
     Vector particlePosition = position;
@@ -322,8 +323,9 @@ void ParticleSystem::renderImGui() {
     ImGui::DragFloat2("Min start velocity", data.minStartVelocity.data(), 0.05f);
     ImGui::DragFloat2("Max start velocity", data.maxStartVelocity.data(), 0.05f);
     ImGui::DragFloat("Gravity", &data.gravity);
-    ImGui::DragInt("Particle lifetime", &data.maxLifetime);
+    ImGui::DragFloat("Attract speed", &data.attractSpeed, 0.01f);
 
+    ImGui::DragInt("Particle lifetime", &data.maxLifetime);
     ImGuiUtils::ColorPicker("Start color", &data.startColor);
     ImGuiUtils::ColorPicker("End color", &data.endColor);
     ImGui::DragFloat2("Size over lifetime", &data.startSize);

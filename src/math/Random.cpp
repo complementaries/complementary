@@ -35,6 +35,9 @@ int Random::next() {
 }
 
 int Random::next(int min, int exclusiveMax) {
+    if (min >= exclusiveMax) { // prevents crash when editing values
+        return min;
+    }
     return min + next() % (exclusiveMax - min);
 }
 

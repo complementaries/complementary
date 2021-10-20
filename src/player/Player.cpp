@@ -34,6 +34,9 @@ static std::shared_ptr<ParticleSystem> walkParticles;
 static std::shared_ptr<ParticleSystem> wallJumpParticles;
 static std::shared_ptr<ParticleSystem> wallStickParticles;
 static std::shared_ptr<ParticleSystem> dashParticles;
+static std::shared_ptr<ParticleSystem> jumpParticlesLeft;
+static std::shared_ptr<ParticleSystem> jumpParticlesRight;
+static std::shared_ptr<ParticleSystem> jumpParticles;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -126,6 +129,17 @@ bool Player::init() {
 
     dashParticles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/dash.cmob");
     dashParticles->destroyOnLevelLoad = false;
+
+    jumpParticlesLeft =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/jumpside.cmob");
+    jumpParticlesLeft->destroyOnLevelLoad = false;
+
+    jumpParticlesRight =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/jumpside.cmob");
+    jumpParticlesRight->destroyOnLevelLoad = false;
+
+    jumpParticles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/jump.cmob");
+    jumpParticles->destroyOnLevelLoad = false;
     return false;
 }
 
@@ -476,6 +490,20 @@ void Player::tick() {
             fakeGrounded = 0;
             SoundManager::playSoundEffect(Sound::JUMP);
             addTopShear(-data.velocity.x * 12.f);
+            PlayerParticles::setParticleColor(jumpParticlesLeft, true);
+            PlayerParticles::setParticleColor(jumpParticlesRight, true);
+            PlayerParticles::setParticleColor(jumpParticles, true);
+            PlayerParticles::setParticlePosition(jumpParticlesLeft, -1, 1, 0,
+                                                 -jumpParticlesLeft->data.startSize / 2.0f);
+            PlayerParticles::setParticlePosition(jumpParticlesRight, 1, 1, 0,
+                                                 -jumpParticlesRight->data.startSize / 2.0f);
+            PlayerParticles::setParticlePosition(jumpParticles, -1, 1, 0.5,
+                                                 -jumpParticles->data.startSize / 2.0f);
+            PlayerParticles::setParticleVelocities(jumpParticlesLeft, -1, -1, -1, -1);
+            PlayerParticles::setParticleVelocities(jumpParticlesRight, 1, 1, -1, -1);
+            jumpParticlesLeft->play();
+            jumpParticlesRight->play();
+            jumpParticles->play();
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
             PlayerParticles::setParticleColor(wallJumpParticles, false);
 

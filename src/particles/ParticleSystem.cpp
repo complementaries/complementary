@@ -18,6 +18,7 @@ static GL::Shader shader;
 static GL::VertexBuffer buffer;
 static Buffer rawData;
 static int vertices = 0;
+static float collisionFactor = 0.9f;
 constexpr float step = 0.01f;
 
 bool ParticleRenderer::init() {
@@ -60,6 +61,10 @@ void ParticleSystem::stop() {
     this->playing = false;
 }
 
+float ParticleSystem::getColliderOffset() {
+    return this->data.startSize / 2.0f * collisionFactor;
+}
+
 template <typename T>
 T interpolate(const T& from, const T& to, float factor) {
     return from * (1.0f - factor) + to * factor;
@@ -68,7 +73,7 @@ T interpolate(const T& from, const T& to, float factor) {
 static bool isColliding(const ParticleSystemData& s, Particle& p, const Vector& position,
                         const Vector& size) {
     float factor = static_cast<float>(p.lifetime) / s.maxLifetime;
-    float halfSize = 0.5f * interpolate(s.startSize, s.endSize, factor);
+    float halfSize = 0.5f * interpolate(s.startSize, s.endSize, factor) * collisionFactor;
     float minX = p.position.x - halfSize;
     float minY = p.position.y - halfSize;
     float maxX = p.position.x + halfSize;
@@ -214,7 +219,7 @@ void ParticleSystem::tick() {
 }
 
 float ParticleSystem::getZ() const {
-    return data.enableCollision ? -0.1f : -0.5f;
+    return data.enableCollision ? -0.1f : -0.1f;
 }
 
 void ParticleSystem::renderTriangles(float lag) {

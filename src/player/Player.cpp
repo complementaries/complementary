@@ -31,12 +31,14 @@ static Vector renderOffset;
 static Vector lastVelocity;
 static std::shared_ptr<ParticleSystem> deathParticles;
 static std::shared_ptr<ParticleSystem> walkParticles;
-static std::shared_ptr<ParticleSystem> wallJumpParticles;
 static std::shared_ptr<ParticleSystem> wallStickParticles;
 static std::shared_ptr<ParticleSystem> dashParticles;
 static std::shared_ptr<ParticleSystem> jumpParticlesLeft;
 static std::shared_ptr<ParticleSystem> jumpParticlesRight;
 static std::shared_ptr<ParticleSystem> jumpParticles;
+static std::shared_ptr<ParticleSystem> walljumpParticlesLeft;
+static std::shared_ptr<ParticleSystem> walljumpParticlesRight;
+static std::shared_ptr<ParticleSystem> walljumpParticles;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -119,10 +121,6 @@ bool Player::init() {
     walkParticles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/walk.cmob");
     walkParticles->destroyOnLevelLoad = false;
 
-    wallJumpParticles =
-        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/walljump.cmob");
-    wallJumpParticles->destroyOnLevelLoad = false;
-
     wallStickParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/wallstick.cmob");
     wallStickParticles->destroyOnLevelLoad = false;
@@ -140,6 +138,19 @@ bool Player::init() {
 
     jumpParticles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/jump.cmob");
     jumpParticles->destroyOnLevelLoad = false;
+
+    walljumpParticlesLeft =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/walljumpside.cmob");
+    walljumpParticlesLeft->destroyOnLevelLoad = false;
+
+    walljumpParticlesRight =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/walljumpside.cmob");
+    walljumpParticlesRight->destroyOnLevelLoad = false;
+
+    walljumpParticles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/walljump.cmob");
+    walljumpParticles->destroyOnLevelLoad = false;
+
     return false;
 }
 
@@ -493,19 +504,23 @@ void Player::tick() {
             PlayerParticles::setParticleColor(jumpParticlesLeft, true);
             PlayerParticles::setParticleColor(jumpParticlesRight, true);
             PlayerParticles::setParticleColor(jumpParticles, true);
+            // TODO: Find out why multiply with 0.9f breaks these particle velocities
             PlayerParticles::setParticlePosition(jumpParticlesLeft, -1, 1, 0,
                                                  -jumpParticlesLeft->data.startSize / 2.0f);
             PlayerParticles::setParticlePosition(jumpParticlesRight, 1, 1, 0,
                                                  -jumpParticlesRight->data.startSize / 2.0f);
+            // -------------------------------------------------------------------------------
             PlayerParticles::setParticlePosition(jumpParticles, -1, 1, 0.5,
-                                                 -jumpParticles->data.startSize / 2.0f);
+                                                 -jumpParticles->getColliderOffset());
             PlayerParticles::setParticleVelocities(jumpParticlesLeft, -1, -1, -1, -1);
             PlayerParticles::setParticleVelocities(jumpParticlesRight, 1, 1, -1, -1);
             jumpParticlesLeft->play();
             jumpParticlesRight->play();
             jumpParticles->play();
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
-            PlayerParticles::setParticleColor(wallJumpParticles, false);
+            PlayerParticles::setParticleColor(walljumpParticlesLeft, true);
+            PlayerParticles::setParticleColor(walljumpParticlesRight, true);
+            PlayerParticles::setParticleColor(walljumpParticles, true);
 
             if (leftWallJumpBuffer > 0) {
                 wallJumpDirection = Vector(1.0f, -1.0f);
@@ -521,10 +536,18 @@ void Player::tick() {
                 leftWallBuffer = 0;
                 rightWallBuffer = 0;
 
-                PlayerParticles::setParticlePosition(wallJumpParticles, -1, 1, data.size.x / 8.0f,
-                                                     data.size.y / 8.0f);
-                PlayerParticles::setParticleVelocities(wallJumpParticles, 1, 1, 1, 1);
-                wallJumpParticles->play();
+                PlayerParticles::setParticlePosition(walljumpParticlesLeft, -1, -1,
+                                                     walljumpParticlesLeft->getColliderOffset(), 0);
+                PlayerParticles::setParticlePosition(
+                    walljumpParticlesRight, -1, 1, walljumpParticlesRight->getColliderOffset(), 0);
+                PlayerParticles::setParticlePosition(walljumpParticles, -1, -1,
+                                                     walljumpParticles->getColliderOffset(), 0.5);
+                PlayerParticles::setParticleVelocities(walljumpParticlesLeft, 1, 1, -1, -1);
+                PlayerParticles::setParticleVelocities(walljumpParticlesRight, 1, 1, 1, 1);
+                PlayerParticles::setParticleVelocities(walljumpParticles, 1, 1, -1, -1);
+                walljumpParticlesLeft->play();
+                walljumpParticlesRight->play();
+                walljumpParticles->play();
 
             } else if (rightWallJumpBuffer > 0) {
                 wallJumpDirection = Vector(-1.0f, -1.0f);
@@ -541,9 +564,17 @@ void Player::tick() {
                 rightWallBuffer = 0;
 
                 PlayerParticles::setParticlePosition(
-                    wallJumpParticles, 1, 1, -1.0f * data.size.x / 8.0f, data.size.y / 8.0f);
-                PlayerParticles::setParticleVelocities(wallJumpParticles, -1, -1, 1, 1);
-                wallJumpParticles->play();
+                    walljumpParticlesLeft, 1, 1, -walljumpParticlesLeft->getColliderOffset(), 0);
+                PlayerParticles::setParticlePosition(
+                    walljumpParticlesRight, 1, -1, -walljumpParticlesRight->getColliderOffset(), 0);
+                PlayerParticles::setParticlePosition(walljumpParticles, 1, -1,
+                                                     -walljumpParticles->getColliderOffset(), 0.5);
+                PlayerParticles::setParticleVelocities(walljumpParticlesLeft, -1, -1, 1, 1);
+                PlayerParticles::setParticleVelocities(walljumpParticlesRight, -1, -1, -1, -1);
+                PlayerParticles::setParticleVelocities(walljumpParticles, -1, -1, -1, -1);
+                walljumpParticlesLeft->play();
+                walljumpParticlesRight->play();
+                walljumpParticles->play();
             }
         }
     }
@@ -576,14 +607,15 @@ void Player::tick() {
     data.acceleration = Vector();
     Vector actualDrag = data.drag;
     if (hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
-        PlayerParticles::setParticleColor(wallStickParticles, false);
+        PlayerParticles::setParticleColor(wallStickParticles, true);
 
         if (leftWall && Input::getButton(ButtonType::LEFT).pressed) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::LEFT);
 
-            PlayerParticles::setParticlePosition(wallStickParticles, -1, 1, data.size.x / 8.0f,
-                                                 data.size.y / 8.0f);
+            PlayerParticles::setParticlePosition(wallStickParticles, -1, 1,
+                                                 wallStickParticles->getColliderOffset(),
+                                                 wallStickParticles->getColliderOffset());
             PlayerParticles::setParticleVelocities(wallStickParticles, 1, 1, 1, 1);
             if (stickingToWall == 0) {
                 wallStickParticles->play();
@@ -594,7 +626,8 @@ void Player::tick() {
             setRenderForceFace(Face::RIGHT);
 
             PlayerParticles::setParticlePosition(wallStickParticles, 1, 1,
-                                                 -1.0f * data.size.x / 8.0f, data.size.y / 8.0f);
+                                                 -wallStickParticles->getColliderOffset(),
+                                                 wallStickParticles->getColliderOffset());
             PlayerParticles::setParticleVelocities(wallStickParticles, -1, -1, 1, 1);
             if (stickingToWall == 0) {
                 wallStickParticles->play();
@@ -657,12 +690,12 @@ void Player::tick() {
 
             if (data.velocity.x > 0) {
                 PlayerParticles::setParticleVelocities(walkParticles, -1, 1, -1, -1);
-                PlayerParticles::setParticlePosition(walkParticles, -1, 1, 0,
-                                                     -1.0f * walkParticles->data.startSize / 2.0f);
+                PlayerParticles::setParticlePosition(walkParticles, -1, 1,
+                                                     walkParticles->data.startSize * 2.0f, 0);
             } else {
                 PlayerParticles::setParticleVelocities(walkParticles, 1, -1, -1, -1);
-                PlayerParticles::setParticlePosition(walkParticles, 1, 1, 0,
-                                                     -1.0f * walkParticles->data.startSize / 2.0f);
+                PlayerParticles::setParticlePosition(walkParticles, 1, 1,
+                                                     -walkParticles->data.startSize * 2.0f, 0);
             }
 
             walkParticles->play();

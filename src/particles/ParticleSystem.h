@@ -66,6 +66,8 @@ class ParticleSystem : public Object<ParticleSystemData> {
 
     std::shared_ptr<ObjectBase> clone() override;
 
+    float getColliderOffset();
+
   private:
     std::vector<Particle> triangles;
     std::vector<Particle> squares;

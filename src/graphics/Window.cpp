@@ -17,6 +17,7 @@
 
 typedef long long int Nanos;
 static constexpr Nanos NANOS_PER_TICK = 1'000'000'000L * Window::SECONDS_PER_TICK;
+static constexpr int MSAA_SAMPLES = 8;
 
 static SDL_Window* window = nullptr;
 static bool running = false;
@@ -60,6 +61,8 @@ bool Window::init() {
         return true;
     }
 
+    glEnable(GL_MULTISAMPLE);
+
     std::cout << glGetString(GL_VERSION) << "\n";
 
     GLenum glewError = glewInit();
@@ -70,6 +73,15 @@ bool Window::init() {
 
     if (SDL_GL_SetSwapInterval(Arguments::vsync) < 0) {
         fprintf(stderr, "unable to set swap interval to %d\n", Arguments::vsync);
+    }
+
+    if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1) < 0 ||
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, MSAA_SAMPLES) < 0) {
+        fprintf(stderr, "Failed to enable multisampling.\n");
+    }
+
+    if (SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1) < 0) {
+        fprintf(stderr, "Failed to enable GPU acceleration.\n");
     }
 
     // Imgui setup

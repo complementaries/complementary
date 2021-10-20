@@ -20,6 +20,7 @@ class ObjectBase {
     virtual bool isSolid() const;
     virtual bool collidesWith(const Vector& position, const Vector& size) const;
     virtual void tick();
+    virtual void lateTick();
     virtual void render(float lag);
     virtual void lateRender(float lag);
     virtual void renderEditor(float lag);

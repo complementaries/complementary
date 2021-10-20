@@ -36,6 +36,7 @@ namespace Objects {
     void handleCollision(const Vector& position, const Vector& size);
 
     void tick();
+    void lateTick();
     void render(float lag);
 
     void load(const char* path);

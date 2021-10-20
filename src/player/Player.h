@@ -28,6 +28,7 @@ namespace Player {
     Vector getPosition();
     void setPosition(const Vector& pos);
     Vector getCenter(float lag = 0.0f);
+    Vector getVelocity();
 
     void setAbilities(Ability dark, Ability light);
     bool hasAbility(Ability a);
@@ -50,10 +51,11 @@ namespace PlayerParticles {
     void setParticlePosition(std::shared_ptr<ParticleSystem> particles, int xCoord, int yCoord,
                              float xOffset,
                              float yOffset); // x and y coords relative to player center (top/left:
-                                             // -1, bottom/right: 1, center: 2)
+                                             // -1, bottom/right: 1, center: 0)
 
-    void setParticleColor(std::shared_ptr<ParticleSystem> particles,
-                          bool playerColor); // either player color or inverted world color
+    void setParticleColor(std::shared_ptr<ParticleSystem> particles); // player color
+
+    void setParticleColors();
 }
 
 #endif

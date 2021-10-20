@@ -43,6 +43,7 @@ static std::shared_ptr<ParticleSystem> walljumpParticlesRight;
 static std::shared_ptr<ParticleSystem> walljumpParticles;
 static bool useOverrideColor = false;
 static Color overrideColor;
+static std::shared_ptr<ParticleSystem> colorSwitchParticles;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -157,6 +158,10 @@ bool Player::init() {
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/walljump.cmob");
     walljumpParticles->destroyOnLevelLoad = false;
 
+    colorSwitchParticles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/switch.cmob");
+    colorSwitchParticles->destroyOnLevelLoad = false;
+
     return false;
 }
 
@@ -226,6 +231,10 @@ void Player::setPosition(const Vector& pos) {
 
 Vector Player::getCenter(float lag) {
     return lastPosition + (position - lastPosition) * lag + data.size * 0.5f;
+}
+
+Vector Player::getVelocity() {
+    return data.velocity;
 }
 
 static void tickWallJumpCollision(Face face, bool& wall) {
@@ -383,7 +392,6 @@ void Player::kill() {
     SoundManager::playSoundEffect(Sound::DEATH);
     deathParticles->position = getCenter();
     deathParticles->play();
-    PlayerParticles::setParticleColor(deathParticles, true);
     dead = deathParticles->data.duration + deathParticles->data.maxLifetime;
     RenderState::addRandomizedShake(1.0f);
     Game::fadeOut(3);
@@ -419,7 +427,11 @@ void Player::setAbilities(Ability dark, Ability light) {
             AbilityCutscene::show();
         }
         Savegame::unlockAbilities(dark, light);
+    } else if (!hasAbility(dark) && !hasAbility(light)) {
+        colorSwitchParticles->play();
+        PlayerParticles::setParticlePosition(colorSwitchParticles, 0, 0, 0, 0);
     }
+    PlayerParticles::setParticleColors();
 }
 
 bool Player::hasAbility(Ability a) {
@@ -445,6 +457,11 @@ bool Player::invertColors() {
 void Player::toggleWorld() {
     worldType = !worldType;
     Tilemap::forceReload();
+    if (!hasAbility(Ability::NONE)) {
+        PlayerParticles::setParticleColors();
+        PlayerParticles::setParticlePosition(colorSwitchParticles, 0, 0, 0, 0);
+        colorSwitchParticles->play();
+    }
 }
 
 static void tickIdleAndRunAnimation() {
@@ -540,9 +557,6 @@ void Player::tick() {
             fakeGrounded = 0;
             SoundManager::playSoundEffect(Sound::JUMP);
             addTopShear(-data.velocity.x * 12.f);
-            PlayerParticles::setParticleColor(jumpParticlesLeft, true);
-            PlayerParticles::setParticleColor(jumpParticlesRight, true);
-            PlayerParticles::setParticleColor(jumpParticles, true);
             // TODO: Find out why multiply with 0.9f breaks these particle velocities
             PlayerParticles::setParticlePosition(jumpParticlesLeft, -1, 1, 0,
                                                  -jumpParticlesLeft->data.startSize / 2.0f);
@@ -557,10 +571,6 @@ void Player::tick() {
             jumpParticlesRight->play();
             jumpParticles->play();
         } else if (hasAbility(Ability::WALL_JUMP) && wallJumpCooldown == 0) {
-            PlayerParticles::setParticleColor(walljumpParticlesLeft, true);
-            PlayerParticles::setParticleColor(walljumpParticlesRight, true);
-            PlayerParticles::setParticleColor(walljumpParticles, true);
-
             if (leftWallJumpBuffer > 0) {
                 wallJumpDirection = Vector(1.0f, -1.0f);
                 addForce(wallJumpDirection * data.wallJumpInit);
@@ -646,8 +656,6 @@ void Player::tick() {
     data.acceleration = Vector();
     Vector actualDrag = data.drag;
     if (hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
-        PlayerParticles::setParticleColor(wallStickParticles, true);
-
         if (leftWall && Input::getButton(ButtonType::LEFT).pressed && allowedToMove) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::LEFT);
@@ -682,7 +690,6 @@ void Player::tick() {
     }
     if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
         dashTicks == 0 && dashCoolDown == 0 && dashUseable && allowedToMove) {
-        PlayerParticles::setParticleColor(dashParticles, true);
         dashParticles->play();
         dashTicks = data.maxDashTicks;
         dashUseable = false;
@@ -706,8 +713,10 @@ void Player::tick() {
                                 (1.0f - static_cast<float>(dashTicks) / data.maxDashTicks));
         if (data.velocity.x > 0) {
             PlayerParticles::setParticlePosition(dashParticles, -1, -1, 0, 0.5);
+            PlayerParticles::setParticleVelocities(dashParticles, 1, 1, 1, 1);
         } else {
             PlayerParticles::setParticlePosition(dashParticles, 1, -1, 0, 0.5);
+            PlayerParticles::setParticleVelocities(dashParticles, -1, -1, 1, 1);
         }
     } else {
         data.velocity *= actualDrag;
@@ -725,8 +734,6 @@ void Player::tick() {
         fakeGrounded = data.coyoteTicks;
         dashUseable = true;
         if (std::abs(data.velocity.x) > 0.02f && dashTicks <= 0) {
-            PlayerParticles::setParticleColor(walkParticles, true);
-
             if (data.velocity.x > 0) {
                 PlayerParticles::setParticleVelocities(walkParticles, -1, 1, -1, -1);
                 PlayerParticles::setParticlePosition(walkParticles, -1, 1,
@@ -981,20 +988,28 @@ void PlayerParticles::setParticleVelocities(std::shared_ptr<ParticleSystem> part
 
 void PlayerParticles::setParticlePosition(std::shared_ptr<ParticleSystem> particles, int xCoord,
                                           int yCoord, float xOffset, float yOffset) {
-    particles->position = Player::getCenter() + Vector(data.size.x / 2.0f * xCoord + xOffset,
-                                                       data.size.y / 2.0f * yCoord + yOffset);
+    particles->position = Player::getCenter() + Vector((xCoord * data.size.x) / 2.0f + xOffset,
+                                                       (yCoord * data.size.y) / 2.0f + yOffset);
 }
 
-void PlayerParticles::setParticleColor(std::shared_ptr<ParticleSystem> particles,
-                                       bool playerColor) {
-    Color color;
-    if (playerColor) {
-        color = AbilityUtils::getColor(abilities[worldType]);
-    } else {
-        color = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
-    }
+void PlayerParticles::setParticleColor(std::shared_ptr<ParticleSystem> particles) {
+    Color color = AbilityUtils::getColor(abilities[worldType]);
 
     particles->data.startColor = color;
     color = ColorUtils::setAlpha(color, 0);
     particles->data.endColor = color;
+}
+
+void PlayerParticles::setParticleColors() {
+    setParticleColor(deathParticles);
+    setParticleColor(walkParticles);
+    setParticleColor(wallStickParticles);
+    setParticleColor(dashParticles);
+    setParticleColor(jumpParticlesLeft);
+    setParticleColor(jumpParticlesRight);
+    setParticleColor(jumpParticles);
+    setParticleColor(walljumpParticlesLeft);
+    setParticleColor(walljumpParticlesRight);
+    setParticleColor(walljumpParticles);
+    setParticleColor(colorSwitchParticles);
 }

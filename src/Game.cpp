@@ -144,6 +144,7 @@ void Game::tick() {
         Objects::tick();
 
         Player::tick();
+        Objects::lateTick();
     }
 }
 

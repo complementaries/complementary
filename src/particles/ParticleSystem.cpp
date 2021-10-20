@@ -110,7 +110,11 @@ static bool isColliding(const ParticleSystemData& s, Particle& p) {
 }
 
 static void move(const ParticleSystemData& s, Particle& p) {
-    Vector energy = p.velocity;
+    Vector addVelocity = Vector(0, 0);
+    if (s.followPlayer) {
+        addVelocity = Player::getVelocity();
+    }
+    Vector energy = p.velocity + addVelocity;
     while (energy[0] != 0.0f || energy[1] != 0.0f) {
         for (int i = 0; i < 2; i++) {
             if (energy[i] == 0.0f) {
@@ -137,12 +141,16 @@ static void move(const ParticleSystemData& s, Particle& p) {
 }
 
 void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
+    Vector addVelocity = Vector(0, 0);
+    if (data.followPlayer) {
+        addVelocity = Player::getVelocity();
+    }
     for (unsigned int i = 0; i < particles.size(); i++) {
         Particle& p = particles[i];
         p.lastPosition = p.position;
         p.velocity[1] += data.gravity;
         p.velocity += (position - p.position) * data.attractSpeed;
-        Vector nextPosition = p.position + p.velocity;
+        Vector nextPosition = p.position + p.velocity + addVelocity;
         if (!data.clampPositionInBounds || isInBox(p)) {
             if (data.enableCollision) {
                 move(data, p);
@@ -159,7 +167,7 @@ void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
     }
 }
 
-void ParticleSystem::tick() {
+void ParticleSystem::lateTick() {
     if (data.followPlayer) {
         position = Player::getCenter();
     }
@@ -213,6 +221,7 @@ void ParticleSystem::tick() {
     tickParticles(circles);
 
     currentLifetime++;
+
     if (data.destroyOnEnd && data.duration > 0.f &&
         currentLifetime >= data.duration + data.maxLifetime) {
         destroy();

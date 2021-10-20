@@ -139,6 +139,12 @@ void Objects::tick() {
     }
 }
 
+void Objects::lateTick() {
+    for (auto& o : objects) {
+        o->lateTick();
+    }
+}
+
 void Objects::render(float lag) {
     ObjectRenderer::prepare();
     for (auto& o : objects) {

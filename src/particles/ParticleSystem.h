@@ -59,7 +59,7 @@ class ParticleSystem : public Object<ParticleSystemData> {
     ParticleSystem(const ParticleSystemData& data);
     void play();
     void stop();
-    void tick() override;
+    void lateTick() override;
     void render(float lag) override;
     void renderImGui() override;
     void forceMoveParticles(const Vector& position, const Vector& size,

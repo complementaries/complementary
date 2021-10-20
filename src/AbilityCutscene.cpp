@@ -76,7 +76,7 @@ void AbilityCutscene::tick() {
         alpha -= 5;
     }
 
-    PlayerParticles::setParticleColor(particles, true);
+    PlayerParticles::setParticleColor(particles);
     currentTicks++;
 }
 

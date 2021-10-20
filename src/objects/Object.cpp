@@ -29,6 +29,9 @@ bool ObjectBase::collidesWith(const Vector& position, const Vector& size) const 
 void ObjectBase::tick() {
 }
 
+void ObjectBase::lateTick() {
+}
+
 void ObjectBase::render(float lag) {
     (void)lag;
 }

@@ -1,6 +1,7 @@
 #include "ColorObject.h"
 
 #include "ObjectRenderer.h"
+#include "Objects.h"
 #include "player/Player.h"
 #include <memory>
 
@@ -19,6 +20,11 @@ bool ColorObject::isSolid() const {
     return true;
 }
 
+void ColorObject::postInit() {
+    particles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/colorblock.cmob");
+}
+
 void ColorObject::onFaceCollision(Face playerFace) {
     (void)playerFace;
     Player::setAbilities(data.abilities[0], data.abilities[1]);
@@ -27,6 +33,19 @@ void ColorObject::onFaceCollision(Face playerFace) {
 bool ColorObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {
     return position[0] < pPosition[0] + pSize[0] && position[0] + data.size[0] > pPosition[0] &&
            position[1] < pPosition[1] + pSize[1] && position[1] + data.size[1] > pPosition[1];
+}
+
+void ColorObject::tick() {
+    particles->play();
+    Color color = AbilityUtils::getColor(data.abilities[Player::invertColors()]);
+    Vector size = this->getSize();
+    particles->position = position;
+    particles->data.boxSize = size * 1.1f;
+    particles->position = position + size / 2.0f;
+    particles->data.startColor = color;
+    particles->data.endColor = color;
+    particles->data.minStartVelocity = -size * 0.01f;
+    particles->data.maxStartVelocity = size * 0.01f;
 }
 
 void ColorObject::render(float lag) {

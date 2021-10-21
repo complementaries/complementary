@@ -3,6 +3,7 @@
 
 #include "Object.h"
 #include "math/Vector.h"
+#include "particles/ParticleSystem.h"
 #include "player/Ability.h"
 
 struct ColorObjectData {
@@ -16,12 +17,17 @@ class ColorObject : public Object<ColorObjectData> {
     ColorObject(ColorObjectData data);
     ColorObject(const Vector& position, const Vector& size, Ability a, Ability b);
 
+    void tick() override;
+    void postInit() override;
     bool isSolid() const override;
     void onFaceCollision(Face playerFace) override;
     bool collidesWith(const Vector& position, const Vector& size) const override;
     void render(float lag) override;
     std::shared_ptr<ObjectBase> clone() override;
     Vector getSize() const override;
+
+  private:
+    std::shared_ptr<ParticleSystem> particles;
 
 #ifndef NDEBUG
     void initTileEditorData(std::vector<TileEditorProp>& props) override;

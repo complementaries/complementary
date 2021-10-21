@@ -2,7 +2,7 @@
 #define MOVINGSWITCHOBJECT_H
 
 #include "MovingObject.h"
-#include "particles\ParticleSystem.h"
+#include "particles/ParticleSystem.h"
 
 class MovingSwitchObject : public MovingObject {
   public:
@@ -11,6 +11,7 @@ class MovingSwitchObject : public MovingObject {
                        bool seen);
 
     void tick() override;
+    void postInit() override;
     bool isSolid() const override;
     void render(float lag) override;
     void renderEditor(float lag) override;

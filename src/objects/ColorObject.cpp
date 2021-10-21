@@ -43,7 +43,7 @@ void ColorObject::tick() {
     particles->data.boxSize = size * 1.1f;
     particles->position = position + size / 2.0f;
     particles->data.startColor = color;
-    particles->data.endColor = ColorUtils::setAlpha(color, 0.99f);
+    particles->data.endColor = ColorUtils::setAlpha(color, 150);
     particles->data.minStartVelocity = -size * 0.01f;
     particles->data.maxStartVelocity = size * 0.01f;
 }

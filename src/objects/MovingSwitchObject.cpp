@@ -27,7 +27,7 @@ void MovingSwitchObject::tick() {
         seenParticles->play();
         hiddenParticles->stop();
         seenParticles->data.startColor = color[seen];
-        seenParticles->data.endColor = ColorUtils::setAlpha(color[seen], 0.99f);
+        seenParticles->data.endColor = ColorUtils::setAlpha(color[seen], 150);
         seenParticles->data.boxSize = size * 1.1f;
         seenParticles->data.minStartVelocity = -size * 0.01f;
         seenParticles->data.maxStartVelocity = size * 0.01f;

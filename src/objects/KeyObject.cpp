@@ -25,6 +25,8 @@ KeyObject::KeyObject(const Vector& position, int type)
 void KeyObject::postInit() {
     lastRenderPosition = position;
     renderPosition = position;
+    particles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/key.cmob");
+    firstTick = true;
 }
 
 void KeyObject::onCollision() {
@@ -52,7 +54,15 @@ void KeyObject::tick() {
 
     lastRenderPosition = renderPosition;
     if (!collected) {
+        if (firstTick) {
+            particles->play();
+            firstTick = false;
+        }
         renderPosition = position;
+        constexpr Color colors[] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
+        particles->data.startColor = colors[Player::invertColors()];
+        particles->data.endColor = ColorUtils::setAlpha(colors[Player::invertColors()], 0);
+        particles->position = position + this->getSize() / 2.0f;
         return;
     } else if (added) {
         alpha -= 5;
@@ -61,6 +71,7 @@ void KeyObject::tick() {
         }
         return;
     }
+    particles->stop();
     Vector diff = goal - renderPosition;
     float length = diff.getLength();
     float speed = 0.25f;
@@ -129,6 +140,7 @@ void KeyObject::reset() {
     lastRenderPosition = position;
     renderPosition = position;
     goal = Vector();
+    firstTick = true;
 }
 
 bool KeyObject::isKeyOfType(int type) const {

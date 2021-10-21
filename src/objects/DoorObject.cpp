@@ -25,6 +25,11 @@ bool DoorObject::isSolid() const {
     return alpha > 150;
 }
 
+void DoorObject::postInit() {
+    particles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/door.cmob");
+    firstTick = true;
+}
+
 bool DoorObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {
     return position[0] < pPosition[0] + pSize[0] && position[0] + data.size[0] > pPosition[0] &&
            position[1] < pPosition[1] + pSize[1] && position[1] + data.size[1] > pPosition[1];
@@ -34,6 +39,14 @@ void DoorObject::tick() {
     alpha -= (keys == maxKeys && maxKeys != 0) * 3;
     if (alpha < 0) {
         alpha = 0;
+    }
+    if (firstTick && keys == maxKeys && maxKeys != 0) {
+        particles->play();
+        constexpr Color colors[] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
+        particles->data.startColor = colors[Player::invertColors()];
+        particles->data.endColor = ColorUtils::setAlpha(colors[Player::invertColors()], 0);
+        particles->position = position + this->getSize() / 2.0f;
+        firstTick = false;
     }
 }
 
@@ -106,4 +119,5 @@ void DoorObject::reset() {
     keys = 0;
     maxKeys = 0;
     alpha = START_ALPHA;
+    firstTick = true;
 }

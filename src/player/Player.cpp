@@ -7,6 +7,7 @@
 #include <imgui/ImGuiUtils.h>
 
 #include "AbilityCutscene.h"
+#include "Arguments.h"
 #include "Game.h"
 #include "Input.h"
 #include "Savegame.h"
@@ -419,17 +420,22 @@ void Player::setOverrideColor(Color color) {
     useOverrideColor = true;
 }
 
+Color Player::getOverrideColor() {
+    return overrideColor;
+}
+
 void Player::resetOverrideColor() {
     useOverrideColor = false;
 }
 
 void Player::setAbilities(Ability dark, Ability light) {
+    Ability lastAbility = Player::getAbility();
     abilities[0] = dark;
     abilities[1] = light;
 
     if (dark != Ability::NONE && light != Ability::NONE) {
-        if (!Savegame::abilitiesUnlocked(dark, light)) {
-            AbilityCutscene::show();
+        if (!Savegame::abilitiesUnlocked(dark, light) && !Arguments::skipAnim) {
+            AbilityCutscene::show(lastAbility);
         }
         Savegame::unlockAbilities(dark, light);
     } else if (!hasAbility(dark) && !hasAbility(light)) {

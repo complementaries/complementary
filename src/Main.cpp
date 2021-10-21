@@ -11,6 +11,8 @@ int main(int argc, char** args) {
             Arguments::muted = true;
         } else if (strcmp(args[i], "--no-vsync") == 0) {
             Arguments::vsync = false;
+        } else if (strcmp(args[i], "--skip-anim") == 0) {
+            Arguments::skipAnim = true;
         }
     }
 

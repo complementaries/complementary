@@ -3,6 +3,7 @@
 
 #include "Object.h"
 #include "math/Vector.h"
+#include "particles/ParticleSystem.h"
 #include "player/Ability.h"
 
 struct KeyObjectData {
@@ -26,6 +27,9 @@ class KeyObject : public Object<KeyObjectData> {
     void reset() override;
     bool isKeyOfType(int type) const override;
 
+  private:
+    std::shared_ptr<ParticleSystem> particles;
+    bool firstTick;
 #ifndef NDEBUG
     void initTileEditorData(std::vector<TileEditorProp>& props) override;
     void applyTileEditorData(float* props) override;

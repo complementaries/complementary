@@ -3,6 +3,7 @@
 
 #include "Object.h"
 #include "math/Vector.h"
+#include "particles/ParticleSystem.h"
 #include "player/Ability.h"
 
 struct DoorObjectData {
@@ -19,6 +20,7 @@ class DoorObject : public Object<DoorObjectData> {
     bool isSolid() const override;
     bool collidesWith(const Vector& position, const Vector& size) const override;
     void tick() override;
+    void postInit() override;
     void render(float lag) override;
     void renderEditor(float lag) override;
     std::shared_ptr<ObjectBase> clone() override;
@@ -38,6 +40,8 @@ class DoorObject : public Object<DoorObjectData> {
     int maxKeys;
     int keys;
     int alpha;
+    std::shared_ptr<ParticleSystem> particles;
+    bool firstTick;
 };
 
 #endif

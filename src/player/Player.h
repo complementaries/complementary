@@ -22,6 +22,7 @@ namespace Player {
     void setAllowedToMove(bool value);
     void setGravityEnabled(bool value);
     void setOverrideColor(Color color);
+    Color getOverrideColor();
     void resetOverrideColor();
     bool invertColors();
     void toggleWorld();

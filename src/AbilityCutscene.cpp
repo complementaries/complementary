@@ -29,10 +29,10 @@ bool AbilityCutscene::init() {
     return false;
 }
 
-void AbilityCutscene::show() {
+void AbilityCutscene::show(Ability previous) {
     currentTicks = 0;
     Player::setGravityEnabled(false);
-    Player::setOverrideColor(ColorUtils::GRAY);
+    Player::setOverrideColor(AbilityUtils::getColor(previous));
 }
 
 void AbilityCutscene::tick() {
@@ -48,9 +48,9 @@ void AbilityCutscene::tick() {
     }
     if (currentTicks >= 50 && currentTicks < 200) {
         Player::addBaseVelocity(Vector(0, sinf((currentTicks - 50) * 0.02f) * 0.01));
-        Color playerColor =
-            ColorUtils::mix(ColorUtils::GRAY, AbilityUtils::getColor(Player::getAbility()),
-                            (static_cast<float>(currentTicks) - 50.f) / 150.f);
+        Color playerColor = ColorUtils::mix(Player::getOverrideColor(),
+                                            AbilityUtils::getColor(Player::getAbility()),
+                                            (static_cast<float>(currentTicks) - 50.f) / 150.f);
 
         Player::setOverrideColor(playerColor);
     }

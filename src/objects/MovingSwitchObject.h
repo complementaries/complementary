@@ -2,6 +2,7 @@
 #define MOVINGSWITCHOBJECT_H
 
 #include "MovingObject.h"
+#include "particles\ParticleSystem.h"
 
 class MovingSwitchObject : public MovingObject {
   public:
@@ -19,6 +20,8 @@ class MovingSwitchObject : public MovingObject {
 
   private:
     bool seen;
+    std::shared_ptr<ParticleSystem> hiddenParticles;
+    std::shared_ptr<ParticleSystem> seenParticles;
 };
 
 #endif

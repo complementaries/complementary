@@ -1,5 +1,6 @@
 #include "MovingSwitchObject.h"
 
+#include "Objects.h"
 #include "objects/ObjectRenderer.h"
 #include "player/Player.h"
 
@@ -9,13 +10,33 @@ MovingSwitchObject::MovingSwitchObject() {
 MovingSwitchObject::MovingSwitchObject(const Vector& size, const Vector& a, const Vector& b,
                                        float speed, bool seen)
     : MovingObject(size, a, b, speed), seen(seen) {
+    hiddenParticles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/switchobjectOFF.cmob");
+    hiddenParticles->destroyOnLevelLoad = false;
+    seenParticles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/switchobjectON.cmob");
+    seenParticles->destroyOnLevelLoad = false;
 }
 
 void MovingSwitchObject::tick() {
+    constexpr Color color[2] = {ColorUtils::BLACK, ColorUtils::WHITE};
     if (isSolid()) {
         MovingObject::tick();
+        seenParticles->play();
+        hiddenParticles->stop();
+        seenParticles->data.startColor = color[seen];
+        seenParticles->data.endColor = color[seen];
+        seenParticles->data.boxSize = this->getSize() * 1.1f;
+        seenParticles->position = position + this->getSize() / 2.0f;
+
     } else {
         lastPosition = position;
+        seenParticles->stop();
+        hiddenParticles->play();
+        hiddenParticles->data.startColor = color[!seen];
+        hiddenParticles->data.endColor = color[!seen];
+        hiddenParticles->data.boxSize = this->getSize();
+        hiddenParticles->position = position + this->getSize() / 2.0f;
     }
 }
 

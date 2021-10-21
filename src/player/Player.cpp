@@ -41,6 +41,7 @@ static std::shared_ptr<ParticleSystem> jumpParticles;
 static std::shared_ptr<ParticleSystem> walljumpParticlesLeft;
 static std::shared_ptr<ParticleSystem> walljumpParticlesRight;
 static std::shared_ptr<ParticleSystem> walljumpParticles;
+static std::shared_ptr<ParticleSystem> gliderParticles;
 static bool useOverrideColor = false;
 static Color overrideColor;
 static std::shared_ptr<ParticleSystem> colorSwitchParticles;
@@ -161,6 +162,10 @@ bool Player::init() {
     colorSwitchParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/switch.cmob");
     colorSwitchParticles->destroyOnLevelLoad = false;
+
+    gliderParticles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/glider.cmob");
+    gliderParticles->destroyOnLevelLoad = false;
 
     return false;
 }
@@ -522,8 +527,14 @@ void Player::tick() {
         if (hasAbility(Ability::GLIDER) && data.velocity.y > 0 &&
             Input::getButton(ButtonType::ABILITY).pressed && allowedToMove) {
             addForce(Face::DOWN, data.gliderGravity);
+            gliderParticles->data.boxSize.x = 1.5f;
+            PlayerParticles::setParticlePosition(
+                gliderParticles, -1, -1, -(data.size.x - gliderParticles->data.boxSize.x) / 2.0f,
+                -0.25f);
+            gliderParticles->play();
         } else {
             addForce(Face::DOWN, data.gravity);
+            gliderParticles->stop();
         }
     }
 
@@ -1012,4 +1023,5 @@ void PlayerParticles::setParticleColors() {
     setParticleColor(walljumpParticlesRight);
     setParticleColor(walljumpParticles);
     setParticleColor(colorSwitchParticles);
+    setParticleColor(gliderParticles);
 }

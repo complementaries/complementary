@@ -151,6 +151,9 @@ void SoundManager::setVolume(int soundId, int volume) {
 
 void SoundManager::setMusicVolume(int volumePercent) {
     musicVolume = maxMusicVolume * (float)volumePercent / 100.0f;
+    if (!muted) {
+        setVolume(curMusicChannel, musicVolume);
+    }
 }
 
 void SoundManager::stopSound(int soundId) {

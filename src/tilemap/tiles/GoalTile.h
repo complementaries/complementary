@@ -2,17 +2,24 @@
 #define GOALTILE_H
 
 #include "Tile.h"
+#include "objects/Objects.h"
+#include "particles/ParticleSystem.h"
 
 class GoalTile : public Tile {
   public:
-    GoalTile();
+    static void init();
 
-    inline bool isWall() const override {
-        return false;
-    }
+    GoalTile(Face face);
+
+    bool isWall() const override;
     void onCollision(int x, int y) const override;
     void render(Buffer& buffer, float x, float y) const override;
     void renderEditor(Buffer& buffer, float x, float y, float z) const override;
+    void onLoad(int x, int y) const;
+
+  private:
+    static std::shared_ptr<ParticleSystem> prototype;
+    Face face;
 };
 
 #endif

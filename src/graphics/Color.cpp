@@ -21,7 +21,7 @@ std::tuple<float, float, float, float> ColorUtils::unpackFloat(Color color) {
 }
 
 Color ColorUtils::invert(Color c) {
-    return 0xFFFFFFFFu - (c & 0xFFFFFF);
+    return (0xFFFFFFu - (c & 0xFFFFFF)) | (c & 0xFF000000);
 }
 
 Color ColorUtils::mix(Color a, Color b, float factor) {

@@ -2,6 +2,7 @@
 #define OBJECT_H
 
 #include <cstddef>
+#include <cstring>
 #include <fstream>
 #include <memory>
 #include <vector>
@@ -67,6 +68,7 @@ template <typename T>
 class Object : public ObjectBase {
   public:
     void read(std::ifstream& in) override {
+        memset(reinterpret_cast<char*>(&data), 0, sizeof(T));
         in.read(reinterpret_cast<char*>(&data), sizeof(T));
     }
     void write(std::ofstream& out) override {

@@ -13,7 +13,10 @@ class Tiles {
     static BoxTile WALL;
     static SpikeTile SPIKES;
     static SpawnTile SPAWN_POINT;
-    static GoalTile GOAL;
+    static GoalTile GOAL_LEFT;
+    static GoalTile GOAL_RIGHT;
+    static GoalTile GOAL_UP;
+    static GoalTile GOAL_DOWN;
 
     static void init();
     static const Tile& get(char id);

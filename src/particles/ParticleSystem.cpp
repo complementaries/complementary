@@ -234,7 +234,11 @@ void ParticleSystem::lateTick() {
 }
 
 float ParticleSystem::getZ() const {
-    return data.enableCollision ? -0.1f : -0.1f;
+    switch (data.layer) {
+        case Layer::BEHIND_TILEMAP: return -0.1f;
+        case Layer::OVER_TILEMAP: return -0.5f;
+    }
+    return 0.0f;
 }
 
 void ParticleSystem::renderTriangles(float lag) {
@@ -246,6 +250,9 @@ void ParticleSystem::renderTriangles(float lag) {
         float h = 0.866025f * size; // sqrtf(0.75)
         float a = 0.333333f * h;    // sin(30°) / (1 + sin(30°))
         Color c = ColorUtils::mix(data.startColor, data.endColor, factor);
+        if (data.invertColor && Player::invertColors()) {
+            c = ColorUtils::invert(c);
+        }
 
         rawData.add(particlePosition + Vector(0.0f, a - h)).add(z).add(c);
         rawData.add(particlePosition + Vector(-0.5 * size, a)).add(z).add(c);
@@ -261,6 +268,9 @@ void ParticleSystem::renderSquares(float lag) {
         float factor = (p.lifetime + lag) / data.maxLifetime;
         float halfSize = 0.5f * interpolate(data.startSize, data.endSize, factor);
         Color c = ColorUtils::mix(data.startColor, data.endColor, factor);
+        if (data.invertColor && Player::invertColors()) {
+            c = ColorUtils::invert(c);
+        }
 
         Vector leftBottom = particlePosition + Vector(-halfSize, halfSize);
         Vector rightTop = particlePosition + Vector(halfSize, -halfSize);
@@ -282,6 +292,9 @@ void ParticleSystem::renderCircles(float lag) {
         float factor = (p.lifetime + lag) / data.maxLifetime;
         float radius = 0.5f * interpolate(data.startSize, data.endSize, factor);
         Color c = ColorUtils::mix(data.startColor, data.endColor, factor);
+        if (data.invertColor && Player::invertColors()) {
+            c = ColorUtils::invert(c);
+        }
 
         Vector last = particlePosition + Vector(0.0f, radius);
         constexpr float full = 6.283185307f;
@@ -348,10 +361,14 @@ void ParticleSystem::renderImGui() {
     ImGui::Checkbox("Destroy on end", &data.destroyOnEnd);
     ImGui::Checkbox("Enable collision", &data.enableCollision);
     ImGui::Checkbox("Clamp pos. in bounds", &data.clampPositionInBounds);
+    ImGui::Checkbox("invert color", &data.invertColor);
 
     const char* spawnPosTypes[] = {"Center", "Box Edge", "Box"};
     ImGui::ListBox("Spawn pos type", (int*)&data.spawnPositionType, spawnPosTypes, 3);
     ImGui::DragFloat2("Box Size", data.boxSize.data());
+
+    const char* layers[] = {"behinde tilemap", "over tilemap"};
+    ImGui::ListBox("Layer", (int*)&data.layer, layers, 2);
 
     ImGui::Text("Current duration: %d, particle count: %zu", currentLifetime,
                 triangles.size() + squares.size() + circles.size());

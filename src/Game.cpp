@@ -58,13 +58,21 @@ bool Game::init() {
         Savegame::init() || AbilityCutscene::init()) {
         return true;
     }
-
+    GoalTile::init();
     Savegame::load();
 
     nextLevel();
     Menu::showStartMenu();
 
     return false;
+}
+
+static void onTileLoad() {
+    for (int x = 0; x < Tilemap::getWidth(); x++) {
+        for (int y = 0; y < Tilemap::getHeight(); y++) {
+            Tilemap::getTile(x, y).onLoad(x, y);
+        }
+    }
 }
 
 void Game::nextLevel() {
@@ -85,6 +93,7 @@ void Game::nextLevel() {
     Tilemap::load(formattedTilemapName);
     Objects::clear();
     Objects::load(formattedObjectmapName);
+    onTileLoad();
 
     levelIndex = (levelIndex + 1) % levelNames.size();
 }
@@ -118,6 +127,7 @@ void Game::tick() {
         tilemapEditor->tick(Window::SECONDS_PER_TICK);
         if (Input::getButton(ButtonType::ABILITY).pressedFirstFrame) {
             tilemapEditor->flush();
+            onTileLoad();
             delete tilemapEditor;
             tilemapEditor = nullptr;
         }

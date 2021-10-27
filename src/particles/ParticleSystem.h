@@ -16,6 +16,8 @@ enum class ParticleType {
 
 enum class SpawnPositionType { CENTER, BOX_EDGE, BOX };
 
+enum class Layer { BEHIND_TILEMAP, OVER_TILEMAP };
+
 struct ParticleSystemData final {
     int duration = 0;
     ParticleType type = ParticleType::SQUARE;
@@ -40,6 +42,8 @@ struct ParticleSystemData final {
     SpawnPositionType spawnPositionType = SpawnPositionType::CENTER; // Does nothing yet
     Vector boxSize = Vector(0.5f, 0.5f);
     float attractSpeed = 0.f;
+    Layer layer = Layer::BEHIND_TILEMAP;
+    bool invertColor = false;
 };
 
 struct Particle final {

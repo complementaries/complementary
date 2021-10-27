@@ -53,3 +53,8 @@ void Tile::renderEditor(Buffer& buffer, float x, float y, float z) const {
 bool Tile::operator==(const Tile& other) const {
     return this == &other;
 }
+
+void Tile::onLoad(int x, int y) const {
+    (void)x;
+    (void)y;
+}

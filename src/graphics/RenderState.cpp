@@ -14,7 +14,6 @@ static Matrix viewMatrix;
 static Vector shake;
 static int shakeTicks = 0;
 static Random rng;
-static float scale = 1;
 
 static GLuint texture = 0;
 static GLuint textureDepth = 0;
@@ -41,6 +40,8 @@ static float lastGlowAlpha = 0.0f;
 static float glowAlpha = 0.0f;
 static float lastGlowScale = 1.0f;
 static float glowScale = 1.0f;
+
+static float zoom = 1.0f;
 
 bool RenderState::init() {
     glGenFramebuffers(1, &framebuffer.id);
@@ -95,9 +96,24 @@ void RenderState::updateViewMatrix(float lag) {
     Vector realSize(Tilemap::getWidth() * factor, Tilemap::getHeight() * factor);
     viewMatrix.unit()
         .transform(realSize / Vector(-Window::getWidth(), Window::getHeight()))
-        .scale(Vector(scale, scale))
+        .scale(Vector(factor / Window::getWidth(), -factor / Window::getHeight()) * 2.0f);
+}
+
+void RenderState::updatePlayerViewMatrix(float lag) {
+    int x = Window::getWidth() / Tilemap::getWidth();
+    int y = Window::getHeight() / Tilemap::getHeight();
+    float factor = std::min(x, y);
+    Vector realSize(Tilemap::getWidth() * factor, Tilemap::getHeight() * factor);
+    viewMatrix.unit()
+        .transform(realSize / Vector(-Window::getWidth(), Window::getHeight()))
         .scale(Vector(factor / Window::getWidth(), -factor / Window::getHeight()) * 2.0f);
     viewMatrix.transform(getShake(shakeTicks + lag));
+
+    Vector c = Player::getCenter(lag);
+    viewMatrix.transform(c).scale(Vector(zoom, zoom)).transform(-c);
+    float ft = std::min(zoom - 1.0f, 1.0f);
+    Vector diff = (realSize / factor * 0.5f - c) / zoom * ft;
+    viewMatrix.transform(diff);
 }
 
 void RenderState::updateEditorViewMatrix(float lag) {
@@ -141,10 +157,6 @@ void RenderState::resize(int width, int height) {
     glBindTexture(GL_TEXTURE_2D, textureDepth);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT,
                  GL_FLOAT, nullptr);
-}
-
-void RenderState::setScale(float inScale) {
-    scale = inScale;
 }
 
 static void clear() {
@@ -223,4 +235,8 @@ void RenderState::enableBlending() {
 
 void RenderState::disableBlending() {
     glDisable(GL_BLEND);
+}
+
+void RenderState::setZoom(float z) {
+    zoom = z;
 }

@@ -170,7 +170,7 @@ void Game::render(float lag) {
         tilemapEditor->render();
         return;
     }
-    RenderState::updateViewMatrix(lag);
+    RenderState::updatePlayerViewMatrix(lag);
     RenderState::prepareEffectFramebuffer();
     Tilemap::renderBackground();
     Player::render(lag);
@@ -184,6 +184,7 @@ void Game::render(float lag) {
     RenderState::disableBlending();
     RenderState::renderEffects(lag);
 
+    RenderState::updateViewMatrix(lag);
     glDisable(GL_DEPTH_TEST);
     RenderState::enableBlending();
     TextureRenderer::render(lag);
@@ -200,12 +201,17 @@ void Game::render(float lag) {
     RenderState::disableBlending();
 }
 
+static float globalZoom = 1.0f;
+
 void Game::renderImGui() {
     if (tilemapEditor) {
         return;
     }
 
     ImGui::Begin("DevGUI");
+
+    ImGui::SliderFloat("Test Zoom", &globalZoom, 1, 5);
+    RenderState::setZoom(globalZoom);
 
     if (ImGui::Button("Fade Out")) {
         fadeOut();

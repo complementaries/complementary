@@ -14,10 +14,7 @@ enum class ParticleType {
     CIRCLE,
 };
 
-enum class SpawnPositionType {
-    CENTER,
-    BOX_EDGE,
-};
+enum class SpawnPositionType { CENTER, BOX_EDGE, BOX };
 
 struct ParticleSystemData final {
     int duration = 0;

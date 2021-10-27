@@ -198,6 +198,11 @@ void ParticleSystem::lateTick() {
                                                                            data.boxSize.x * 0.5f);
                         particlePosition.y = position.y + data.boxSize.y * 0.5f;
                     }
+                } else if (data.spawnPositionType == SpawnPositionType::BOX) {
+                    particlePosition.x = position.x + random.nextFloat(-data.boxSize.x * 0.5f,
+                                                                       data.boxSize.x * 0.5f);
+                    particlePosition.y = position.y + random.nextFloat(-data.boxSize.y * 0.5f,
+                                                                       data.boxSize.y * 0.5f);
                 }
 
                 float startVelocityX =
@@ -344,8 +349,8 @@ void ParticleSystem::renderImGui() {
     ImGui::Checkbox("Enable collision", &data.enableCollision);
     ImGui::Checkbox("Clamp pos. in bounds", &data.clampPositionInBounds);
 
-    const char* spawnPosTypes[] = {"Center", "Box Edge"};
-    ImGui::ListBox("Spawn pos type", (int*)&data.spawnPositionType, spawnPosTypes, 2);
+    const char* spawnPosTypes[] = {"Center", "Box Edge", "Box"};
+    ImGui::ListBox("Spawn pos type", (int*)&data.spawnPositionType, spawnPosTypes, 3);
     ImGui::DragFloat2("Box Size", data.boxSize.data());
 
     ImGui::Text("Current duration: %d, particle count: %zu", currentLifetime,

@@ -95,12 +95,21 @@ static bool isColliding(const ParticleSystemData& s, Particle& p) {
     for (int x = minX; x <= maxX; x++) {
         for (int y = minY; y <= maxY; y++) {
             const Tile& tile = Tilemap::getTile(x, y);
-            if (tile == Tiles::SPIKES) {
-                // Make the hitbox of spikes a bit smaller because it looks weird if
-                // the particles hover above the spike triangles
-                return p.position.y > y + 0.25f;
-            }
-            if (tile.isSolid()) {
+            // Make the hitbox of spikes a bit smaller because it looks weird if
+            // the particles hover above the spike triangles
+            if (tile == Tiles::SPIKES_UP) {
+                if (p.position.y - 0.25f > y) {
+                    return true;
+                }
+            } else if (tile == Tiles::SPIKES_LEFT) {
+                if (p.position.x - 0.25f > x) {
+                    return true;
+                }
+            } else if (tile == Tiles::SPIKES_RIGHT) {
+                if (p.position.x < x + 0.75f) {
+                    return true;
+                }
+            } else if (tile.isSolid()) {
                 return true;
             }
         }

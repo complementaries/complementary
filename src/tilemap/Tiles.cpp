@@ -8,7 +8,10 @@ static std::vector<Tile*> tiles;
 
 Tile Tiles::AIR{ColorUtils::rgba(0xFF, 0xFF, 0xFF), false, nullptr};
 BoxTile Tiles::WALL{ColorUtils::rgba(0x00, 0x00, 0x00), true};
-SpikeTile Tiles::SPIKES;
+SpikeTile Tiles::SPIKES_LEFT{Face::LEFT};
+SpikeTile Tiles::SPIKES_RIGHT{Face::RIGHT};
+SpikeTile Tiles::SPIKES_UP{Face::UP};
+SpikeTile Tiles::SPIKES_DOWN{Face::DOWN};
 SpawnTile Tiles::SPAWN_POINT;
 GoalTile Tiles::GOAL_LEFT{Face::LEFT};
 GoalTile Tiles::GOAL_RIGHT{Face::RIGHT};
@@ -23,7 +26,10 @@ void Tiles::addTile(Tile& tile) {
 void Tiles::init() {
     addTile(AIR);
     addTile(WALL);
-    addTile(SPIKES);
+    addTile(SPIKES_LEFT);
+    addTile(SPIKES_RIGHT);
+    addTile(SPIKES_UP);
+    addTile(SPIKES_DOWN);
     addTile(SPAWN_POINT);
     addTile(GOAL_LEFT);
     addTile(GOAL_RIGHT);

@@ -11,7 +11,10 @@ class Tiles {
   public:
     static Tile AIR;
     static BoxTile WALL;
-    static SpikeTile SPIKES;
+    static SpikeTile SPIKES_LEFT;
+    static SpikeTile SPIKES_RIGHT;
+    static SpikeTile SPIKES_UP;
+    static SpikeTile SPIKES_DOWN;
     static SpawnTile SPAWN_POINT;
     static GoalTile GOAL_LEFT;
     static GoalTile GOAL_RIGHT;

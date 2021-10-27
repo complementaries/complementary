@@ -9,8 +9,7 @@
 
 struct MovingObjectData {
     Vector size;
-    Vector goalA;
-    Vector goalB;
+    Vector goal;
     float speed;
     bool spiky[4];
 };
@@ -19,14 +18,17 @@ class MovingObject : public Object<MovingObjectData> {
   public:
     MovingObject();
     MovingObject(const MovingObjectData& data);
-    MovingObject(const Vector& size, const Vector& a, const Vector& b, float speed);
+    MovingObject(const Vector& size, const Vector& goal, float speed);
+
+    void postInit() override;
+    void reset() override;
 
     void tick() override;
     bool isSolid() const override;
     void onFaceCollision(Face playerFace) override;
     bool collidesWith(const Vector& position, const Vector& size) const override;
     void render(float lag) override;
-    void renderEditor(float lag) override;
+    void renderEditor(float lag, bool inPalette) override;
     void render(float lag, Color color);
     std::shared_ptr<ObjectBase> clone() override;
     Vector getSize() const override;
@@ -37,8 +39,11 @@ class MovingObject : public Object<MovingObjectData> {
 #endif
 
   protected:
+    void renderAt(float lag, Color color, Vector position);
     Vector lastPosition;
     Vector velocity;
+    Vector initialPosition;
+    bool movingBack;
 };
 
 #endif

@@ -7,16 +7,14 @@
 MovingObject::MovingObject() {
 }
 
-MovingObject::MovingObject(const MovingObjectData& data) {
+MovingObject::MovingObject(const MovingObjectData& data) : movingBack(false) {
     this->data = data;
 }
 
-MovingObject::MovingObject(const Vector& size, const Vector& a, const Vector& b, float speed) {
-    this->position = a;
-    lastPosition = a;
+MovingObject::MovingObject(const Vector& size, const Vector& goal, float speed)
+    : movingBack(false) {
     data.size = size;
-    data.goalA = a;
-    data.goalB = b;
+    data.goal = goal;
     data.speed = speed;
     data.spiky[0] = true;
     data.spiky[1] = false;
@@ -24,14 +22,26 @@ MovingObject::MovingObject(const Vector& size, const Vector& a, const Vector& b,
     data.spiky[3] = false;
 }
 
+void MovingObject::postInit() {
+    initialPosition = position;
+    lastPosition = position;
+}
+
+void MovingObject::reset() {
+    position = initialPosition;
+    lastPosition = position;
+}
+
 void MovingObject::tick() {
     lastPosition = position;
 
-    velocity = data.goalB - position;
+    auto goal = movingBack ? initialPosition : initialPosition + data.goal;
+    velocity = goal - position;
+    // printf("velocity %f %f\n", velocity.x, velocity.y);
     float length = velocity.getLength();
     if (length < data.speed) {
-        position = data.goalB;
-        std::swap(data.goalA, data.goalB);
+        position = goal;
+        movingBack = !movingBack;
     } else {
         velocity *= data.speed / length;
         position += velocity;
@@ -68,10 +78,9 @@ bool MovingObject::collidesWith(const Vector& pPosition, const Vector& pSize) co
            position[1] < pPosition[1] + pSize[1] && position[1] + data.size[1] > pPosition[1];
 }
 
-void MovingObject::render(float lag, Color color) {
+void MovingObject::renderAt(float lag, Color color, Vector p) {
     Vector offset(0.33f, 0.33f);
     Vector size = data.size - offset * 2.0f;
-    Vector p = lastPosition + (position - lastPosition) * lag;
     ObjectRenderer::drawRectangle(p + offset, size, color);
     if (data.spiky[static_cast<int>(Face::UP)]) {
         for (int i = data.size.x * 3 - 1; i > 1; i--) {
@@ -156,12 +165,20 @@ void MovingObject::render(float lag, Color color) {
     ObjectRenderer::drawTriangle(a, b, c, color);
 }
 
+void MovingObject::render(float lag, Color color) {
+    renderAt(lag, color, lastPosition + (position - lastPosition) * lag);
+}
+
 void MovingObject::render(float lag) {
     render(lag, ColorUtils::GRAY);
 }
 
-void MovingObject::renderEditor(float lag) {
+void MovingObject::renderEditor(float lag, bool inPalette) {
     render(lag);
+    if (!inPalette) {
+        auto color = ColorUtils::setAlpha(ColorUtils::GRAY, 120);
+        renderAt(lag, color, position + data.goal);
+    }
 }
 
 std::shared_ptr<ObjectBase> MovingObject::clone() {
@@ -173,10 +190,8 @@ void MovingObject::initTileEditorData(std::vector<TileEditorProp>& props) {
     props.insert(props.end(),
                  {TileEditorProp::Int("Size X", data.size.x, 0, 5),
                   TileEditorProp::Int("Size Y", data.size.y, 0, 5),
-                  TileEditorProp::Float("Goal 1 X", data.goalA.x, 0.f, 200.f),
-                  TileEditorProp::Float("Goal 1 Y", data.goalA.y, 0.f, 200.f),
-                  TileEditorProp::Float("Goal 2 X", data.goalB.x, 0.f, 200.f),
-                  TileEditorProp::Float("Goal 2 Y", data.goalB.y, 0.f, 200.f),
+                  TileEditorProp::Float("Goal X", data.goal.x, -20.f, 20.f),
+                  TileEditorProp::Float("Goal Y", data.goal.y, -20.f, 20.f),
                   TileEditorProp::Float("Speed", data.speed, 0.f, 0.5f),
                   TileEditorProp::Bool("LEFT", data.spiky[static_cast<int>(Face::LEFT)]),
                   TileEditorProp::Bool("RIGHT", data.spiky[static_cast<int>(Face::RIGHT)]),
@@ -187,15 +202,13 @@ void MovingObject::initTileEditorData(std::vector<TileEditorProp>& props) {
 void MovingObject::applyTileEditorData(float* props) {
     data.size.x = props[0];
     data.size.y = props[1];
-    data.goalA.x = props[2];
-    data.goalA.y = props[3];
-    data.goalB.x = props[4];
-    data.goalB.y = props[5];
-    data.speed = props[6];
-    data.spiky[0] = props[7];
-    data.spiky[1] = props[8];
-    data.spiky[2] = props[9];
-    data.spiky[3] = props[10];
+    data.goal.x = props[2];
+    data.goal.y = props[3];
+    data.speed = props[4];
+    data.spiky[0] = props[5];
+    data.spiky[1] = props[6];
+    data.spiky[2] = props[7];
+    data.spiky[3] = props[8];
 }
 #endif
 

@@ -7,12 +7,13 @@
 MovingSwitchObject::MovingSwitchObject() {
 }
 
-MovingSwitchObject::MovingSwitchObject(const Vector& size, const Vector& a, const Vector& b,
-                                       float speed, bool seen)
-    : MovingObject(size, a, b, speed), seen(seen) {
+MovingSwitchObject::MovingSwitchObject(const Vector& size, const Vector& goal, float speed,
+                                       bool seen)
+    : MovingObject(size, goal, speed), seen(seen) {
 }
 
 void MovingSwitchObject::postInit() {
+    MovingObject::postInit();
     hiddenParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/switchobjectOFF.cmob");
     seenParticles =
@@ -57,14 +58,19 @@ void MovingSwitchObject::render(float lag) {
     MovingObject::render(lag, color[seen]);
 }
 
-void MovingSwitchObject::renderEditor(float lag) {
-    constexpr Color color[2] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
-    MovingObject::render(lag, color[seen]);
+void MovingSwitchObject::renderEditor(float lag, bool inPalette) {
+    constexpr Color colors[2] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
+    Color color = colors[seen];
+    MovingObject::render(lag, color);
+
+    if (!inPalette) {
+        color = ColorUtils::setAlpha(color, 120);
+        renderAt(lag, color, position + data.goal);
+    }
 }
 
 std::shared_ptr<ObjectBase> MovingSwitchObject::clone() {
-    return std::make_shared<MovingSwitchObject>(data.size, data.goalA, data.goalB, data.speed,
-                                                seen);
+    return std::make_shared<MovingSwitchObject>(data.size, data.goal, data.speed, seen);
 }
 
 void MovingSwitchObject::read(std::ifstream& in) {

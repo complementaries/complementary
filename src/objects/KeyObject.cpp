@@ -112,7 +112,8 @@ void KeyObject::lateRender(float lag) {
     renderColor(lag, colors[Player::invertColors()]);
 }
 
-void KeyObject::renderEditor(float lag) {
+void KeyObject::renderEditor(float lag, bool inPalette) {
+    (void)inPalette;
     lastRenderPosition = position;
     renderPosition = position;
     constexpr Color colors[] = {ColorUtils::RED, ColorUtils::GREEN, ColorUtils::BLUE};

@@ -21,7 +21,7 @@ class KeyObject : public Object<KeyObjectData> {
     void onCollision() override;
     bool collidesWith(const Vector& position, const Vector& size) const override;
     void lateRender(float lag) override;
-    void renderEditor(float lag) override;
+    void renderEditor(float lag, bool inPalette) override;
     std::shared_ptr<ObjectBase> clone() override;
     Vector getSize() const override;
     void reset() override;

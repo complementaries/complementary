@@ -59,6 +59,7 @@ static GL::Shader shader;
 struct QueueData {
     std::shared_ptr<ObjectBase> object;
     float zLayer;
+    bool inPalette;
 };
 
 static std::vector<QueueData> objectQueue;
@@ -113,6 +114,8 @@ TilemapEditor::TilemapEditor(int screenWidth, int screenHeight) {
             }
         }
     }
+
+    Objects::reset();
 
     for (auto& object : Objects::getObjects()) {
         if (object->prototypeId < 0 ||
@@ -188,7 +191,7 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
             // The first prop is a boolean which stores whether the props have been initialized
             prototype->applyTileEditorData(data + 1);
         }
-        objectQueue.push_back({prototype, zLayer});
+        objectQueue.push_back({prototype, zLayer, data == nullptr});
     }
     zLayer -= 0.0002f;
 }
@@ -312,7 +315,7 @@ void TilemapEditor::render() {
     RenderState::enableBlending();
     for (unsigned int i = 0; i < objectQueue.size(); i++) {
         ObjectRenderer::setZ(objectQueue[i].zLayer);
-        objectQueue[i].object->renderEditor(1.0f);
+        objectQueue[i].object->renderEditor(1.0f, objectQueue[i].inPalette);
     }
     objectQueue.clear();
     RenderState::disableBlending();
@@ -355,8 +358,7 @@ void TilemapEditor::flush() {
             short objectId = tiles[1]; // Object layer
             if (objectId >= OBJECT_ID_OFFSET) {
                 int prototypeIndex = objectId - OBJECT_ID_OFFSET;
-                auto obj = Objects::instantiateObject(prototypeIndex);
-                obj->position = Vector(x, y);
+                auto obj = Objects::instantiateObject(prototypeIndex, Vector(x, y));
 
                 float* props = stbte_get_properties(stbTileMap, x, y);
                 if (props[0] != 0) {

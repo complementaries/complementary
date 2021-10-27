@@ -22,7 +22,7 @@ class DoorObject : public Object<DoorObjectData> {
     void tick() override;
     void postInit() override;
     void render(float lag) override;
-    void renderEditor(float lag) override;
+    void renderEditor(float lag, bool inPalette) override;
     std::shared_ptr<ObjectBase> clone() override;
     Vector getSize() const override;
     bool isDoorOfType(int type) const override;

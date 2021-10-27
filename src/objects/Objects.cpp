@@ -28,13 +28,12 @@ bool Objects::init() {
     addPrototype(std::make_shared<ColorObject>(Vector(), Vector(1.0f, 1.0f), Ability::DOUBLE_JUMP,
                                                Ability::GLIDER));
     addPrototype(std::make_shared<WindObject>(Vector(), Vector(1.0f, 1.0f), Vector(0.02f, 0.0f)));
-    addPrototype(std::make_shared<MovingObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
-                                                Vector(1.0f, 24.0f), 0.025f));
+    addPrototype(std::make_shared<MovingObject>(Vector(2.0f, 1.0f), Vector(3.0f, 3.0f), 0.025f));
     addPrototype(std::make_shared<ParticleSystem>(Vector(24, 15)));
-    addPrototype(std::make_shared<MovingSwitchObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
-                                                      Vector(1.0f, 24.0f), 0.025f, true));
-    addPrototype(std::make_shared<MovingSwitchObject>(Vector(2.0f, 1.0f), Vector(5.0f, 20.0f),
-                                                      Vector(1.0f, 24.0f), 0.025f, false));
+    addPrototype(
+        std::make_shared<MovingSwitchObject>(Vector(2.0f, 1.0f), Vector(3.0f, 3.0f), 0.025f, true));
+    addPrototype(std::make_shared<MovingSwitchObject>(Vector(2.0f, 1.0f), Vector(3.0f, 3.0f),
+                                                      0.025f, false));
     addPrototype(std::make_shared<KeyObject>(Vector(), 0));
     addPrototype(std::make_shared<KeyObject>(Vector(), 1));
     addPrototype(std::make_shared<KeyObject>(Vector(), 2));
@@ -82,8 +81,9 @@ std::vector<std::shared_ptr<ObjectBase>> Objects::getObjects() {
     return objects;
 }
 
-std::shared_ptr<ObjectBase> Objects::instantiateObject(int prototypeId) {
+std::shared_ptr<ObjectBase> Objects::instantiateObject(int prototypeId, Vector position) {
     auto object = prototypes[prototypeId]->clone();
+    object->position = position;
     object->prototypeId = prototypeId;
     add(object);
     return objects[objects.size() - 1];
@@ -254,7 +254,7 @@ void Objects::save(const char* path) {
     }
 }
 
-std::shared_ptr<ObjectBase> Objects::loadObject(const char* path) {
+std::shared_ptr<ObjectBase> Objects::loadObject(const char* path, Vector position) {
     std::ifstream stream;
     stream.open(path, std::ios::binary);
     assert(!stream.bad());

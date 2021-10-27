@@ -7,14 +7,13 @@
 class MovingSwitchObject : public MovingObject {
   public:
     MovingSwitchObject();
-    MovingSwitchObject(const Vector& size, const Vector& a, const Vector& b, float speed,
-                       bool seen);
+    MovingSwitchObject(const Vector& size, const Vector& goal, float speed, bool seen);
 
     void tick() override;
     void postInit() override;
     bool isSolid() const override;
     void render(float lag) override;
-    void renderEditor(float lag) override;
+    void renderEditor(float lag, bool inPalette) override;
     std::shared_ptr<ObjectBase> clone() override;
     void read(std::ifstream& in) override;
     void write(std::ofstream& out) override;

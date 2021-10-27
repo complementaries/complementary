@@ -79,7 +79,8 @@ void DoorObject::render(float lag) {
     render(lag, colors[Player::invertColors()]);
 }
 
-void DoorObject::renderEditor(float lag) {
+void DoorObject::renderEditor(float lag, bool inPalette) {
+    (void)inPalette;
     constexpr Color colors[] = {ColorUtils::RED, ColorUtils::GREEN, ColorUtils::BLUE};
     render(lag, colors[(data.type & 0x3) % 3]);
 }

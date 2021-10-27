@@ -15,7 +15,7 @@ namespace Objects {
 
     void add(std::shared_ptr<ObjectBase> o);
     std::vector<std::shared_ptr<ObjectBase>> getObjects();
-    std::shared_ptr<ObjectBase> instantiateObject(int prototypeIndex);
+    std::shared_ptr<ObjectBase> instantiateObject(int prototypeIndex, Vector position = Vector());
     template <typename T>
     std::shared_ptr<T> instantiate(int prototypeId) {
         auto obj = instantiateObject(prototypeId);
@@ -44,16 +44,17 @@ namespace Objects {
 
     void forceMoveParticles(const Vector& position, const Vector& size, const Vector& velocity);
 
-    std::shared_ptr<ObjectBase> loadObject(const char* path);
+    std::shared_ptr<ObjectBase> loadObject(const char* path, Vector position = Vector());
 
     template <typename T>
-    std::shared_ptr<T> loadObject(const char* path) {
-        auto obj = loadObject(path);
+    std::shared_ptr<T> loadObject(const char* path, Vector position = Vector()) {
+        auto obj = loadObject(path, position);
         return std::dynamic_pointer_cast<T>(obj);
     }
     template <typename T>
-    std::shared_ptr<T> instantiateObject(const char* path) {
-        auto object = loadObject<T>(path);
+    std::shared_ptr<T> instantiateObject(const char* path, Vector position = Vector()) {
+        auto object = loadObject<T>(path, position);
+        object->position = position;
         add(object);
         return object;
     }

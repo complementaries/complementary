@@ -100,8 +100,6 @@ libglew = static_library(
   link_args : ld_args,
   include_directories : glew_include,
   dependencies : [dep_gl, dep_egl],
-  soversion : host_system == 'windows' ? '' : meson.project_version().split('.')[0],
-  version : meson.project_version(),
   install : true,
 )
 

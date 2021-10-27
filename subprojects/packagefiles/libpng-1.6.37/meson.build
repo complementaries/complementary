@@ -60,7 +60,6 @@ endif
 
 libpng = static_library(png_libname,
     png_src,
-    version : png_libversion,
     dependencies : libpng_deps,
     c_args: c_args,
     install: true,

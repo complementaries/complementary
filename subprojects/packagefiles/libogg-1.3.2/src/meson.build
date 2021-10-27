@@ -3,7 +3,6 @@ sources = ['bitwise.c', 'framing.c']
 libogg = static_library('ogg',
   sources,
   include_directories : incdir,
-  vs_module_defs: '../win32/ogg.def',
 )
 
 bw_test = executable('bitwise', 'bitwise.c',

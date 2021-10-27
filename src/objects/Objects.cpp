@@ -273,7 +273,7 @@ std::shared_ptr<ObjectBase> Objects::loadObject(const char* path) {
     object->prototypeId = prototypeId;
 
 #ifndef NDEBUG
-    strncpy(object->filePath, path, 128);
+    strncpy(object->filePath, path, 127);
 #endif
 
     stream.read((char*)&object->position, sizeof(Vector));

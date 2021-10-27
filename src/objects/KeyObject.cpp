@@ -53,25 +53,28 @@ void KeyObject::tick() {
     counter = (counter + 1) % 150;
 
     lastRenderPosition = renderPosition;
+    constexpr Color colors[] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
+    particles->position = position + this->getSize() / 2.0f;
+    particles->data.startColor = colors[Player::invertColors()];
+    particles->data.endColor = ColorUtils::setAlpha(colors[Player::invertColors()], 0);
+    particles->data.maxEmissionInterval = 10;
+    particles->data.minEmissionInterval = 10;
     if (!collected) {
         if (firstTick) {
             particles->play();
             firstTick = false;
         }
         renderPosition = position;
-        constexpr Color colors[] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
-        particles->data.startColor = colors[Player::invertColors()];
-        particles->data.endColor = ColorUtils::setAlpha(colors[Player::invertColors()], 0);
-        particles->position = position + this->getSize() / 2.0f;
         return;
     } else if (added) {
+        particles->stop();
         alpha -= 5;
         if (alpha < 0) {
             alpha = 0;
         }
         return;
     }
-    particles->stop();
+
     Vector diff = goal - renderPosition;
     float length = diff.getLength();
     float speed = 0.25f;
@@ -85,6 +88,9 @@ void KeyObject::tick() {
             door->addKey();
         }
     }
+    particles->position = renderPosition + this->getSize() / 2.0f;
+    particles->data.maxEmissionInterval = 0;
+    particles->data.minEmissionInterval = 0;
 }
 
 void KeyObject::renderColor(float lag, Color color) {

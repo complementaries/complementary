@@ -15,9 +15,12 @@ static GL::Shader shader;
 static GL::VertexBuffer buffer;
 static GL::Texture texture;
 static std::array<float, 128> fontWidth;
+static std::array<float, 128> realFontWidth;
+static std::array<float, 128> fontStart;
 constexpr int FONT_OFFSET = 32;
 constexpr int SYMBOLS_X = 16;
 constexpr int SYMBOLS_Y = 8;
+constexpr float gap = 0.03f;
 
 bool Font::init() {
     if (shader.compile({"assets/shaders/font.vs", "assets/shaders/font.fs"})) {
@@ -38,6 +41,7 @@ bool Font::init() {
     int symbolHeight = font->h / SYMBOLS_Y;
     for (int i = 32; i < 128; i++) {
         int width = 0;
+        int start = font->w;
         for (int x = 0; x < symbolWidth; x++) {
             for (int y = 0; y < symbolHeight; y++) {
                 int o = i - FONT_OFFSET;
@@ -45,12 +49,17 @@ bool Font::init() {
                 int index = base + x + y * font->w;
                 if ((data[index] & 0xFF) < 160) {
                     width = x + 1;
+                    start = std::min(x, start);
                 }
             }
         }
-        fontWidth[i] = static_cast<float>(width) / symbolWidth;
+        fontWidth[i] = static_cast<float>(width - start) / symbolWidth;
+        fontStart[i] = static_cast<float>(start) / symbolWidth;
     }
     fontWidth[' '] = 0.25f;
+    realFontWidth = fontWidth;
+    realFontWidth['r'] *= 0.85f;
+    realFontWidth['t'] *= 0.8f;
     SDL_FreeSurface(font);
     return false;
 }
@@ -75,7 +84,7 @@ void Font::draw(const Vector& pos, float size, Color color, const char* s) {
         float minY = y;
         float maxX = minX + size * fontWidth[c];
         float maxY = minY + size;
-        float minTexX = (c % SYMBOLS_X) / static_cast<float>(SYMBOLS_X);
+        float minTexX = ((c % SYMBOLS_X) + fontStart[c]) / static_cast<float>(SYMBOLS_X);
         float minTexY = ((c - FONT_OFFSET) / SYMBOLS_X) / static_cast<float>(SYMBOLS_Y);
         float maxTexX = minTexX + 1.0f / SYMBOLS_X * fontWidth[c];
         float maxTexY = minTexY + 1.0f / SYMBOLS_Y;
@@ -86,7 +95,7 @@ void Font::draw(const Vector& pos, float size, Color color, const char* s) {
         data.add(maxX).add(maxY).add(maxTexX).add(maxTexY).add(color);
         data.add(maxX).add(minY).add(maxTexX).add(minTexY).add(color);
         data.add(minX).add(maxY).add(minTexX).add(maxTexY).add(color);
-        x += size * fontWidth[c];
+        x += size * (realFontWidth[c] + gap);
         index++;
     }
 
@@ -98,7 +107,7 @@ float Font::getWidth(float size, const char* s) {
     float width = 0.0f;
     int index = 0;
     while (s[index] != '\0') {
-        width += fontWidth[s[index] & 0x7F];
+        width += realFontWidth[s[index] & 0x7F] + gap;
         index++;
     }
     width *= size;

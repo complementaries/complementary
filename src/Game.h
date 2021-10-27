@@ -14,6 +14,7 @@ namespace Game {
 
     void fadeIn(int speed = 1);
     void fadeOut(int speed = 1);
+    void setFade(int amount);
     bool isFading();
 }
 

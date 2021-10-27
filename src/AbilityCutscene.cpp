@@ -55,6 +55,13 @@ void AbilityCutscene::tick() {
 
         Player::setOverrideColor(playerColor);
     }
+    if (currentTicks >= 50 && currentTicks <= 220) {
+        RenderState::addRandomizedShake(2.0f);
+    }
+
+    if (currentTicks < 100) {
+        RenderState::setZoom(1.0f + (static_cast<float>(currentTicks) / 100));
+    }
 
     if (currentTicks == 200) {
         Player::resetOverrideColor();
@@ -71,10 +78,16 @@ void AbilityCutscene::tick() {
 
     if (currentTicks > 240 && currentTicks < 300 && alpha < 255) {
         alpha += 5;
+        Game::setFade(static_cast<float>(alpha) * 0.55f);
     }
 
     if (currentTicks > 550 && alpha > 0) {
         alpha -= 5;
+        Game::setFade(static_cast<float>(alpha) * 0.55f);
+    }
+
+    if (currentTicks > 600) {
+        RenderState::setZoom(2.0f - (static_cast<float>(currentTicks - 600) / 100));
     }
 
     PlayerParticles::setParticleColor(particles);
@@ -103,5 +116,5 @@ void AbilityCutscene::render(float lag) {
 }
 
 bool AbilityCutscene::isActive() {
-    return currentTicks >= 0 && currentTicks <= 600;
+    return currentTicks >= 0 && currentTicks <= 700;
 }

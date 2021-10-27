@@ -18,6 +18,7 @@ namespace Player {
     void moveForced(const Vector& v);
     void restart();
     void kill();
+    bool isDead();
     bool isAllowedToMove();
     void setAllowedToMove(bool value);
     void setGravityEnabled(bool value);

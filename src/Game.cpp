@@ -201,17 +201,12 @@ void Game::render(float lag) {
     RenderState::disableBlending();
 }
 
-static float globalZoom = 1.0f;
-
 void Game::renderImGui() {
     if (tilemapEditor) {
         return;
     }
 
     ImGui::Begin("DevGUI");
-
-    ImGui::SliderFloat("Test Zoom", &globalZoom, 1, 5);
-    RenderState::setZoom(globalZoom);
 
     if (ImGui::Button("Fade Out")) {
         fadeOut();
@@ -398,6 +393,10 @@ void Game::fadeIn(int speed) {
 
 void Game::fadeOut(int speed) {
     fadeAdd = speed;
+}
+
+void Game::setFade(int amount) {
+    fade = amount;
 }
 
 bool Game::isFading() {

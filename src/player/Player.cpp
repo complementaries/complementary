@@ -406,6 +406,10 @@ void Player::kill() {
     Game::fadeOut(3);
 }
 
+bool Player::isDead() {
+    return dead <= 0;
+}
+
 bool Player::isAllowedToMove() {
     return allowedToMove;
 }

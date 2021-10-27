@@ -34,6 +34,7 @@ namespace SoundManager {
     void setVolume(int soundId, int volume);
     void setDistanceToPlayer(int soundId, float distance, float xDistance, int threshold);
     bool loadSounds();
+    void setMusicVolume(int volumePercent);
     void stopSound(int soundId);
     bool soundPlaying(int soundId);
     void quit();

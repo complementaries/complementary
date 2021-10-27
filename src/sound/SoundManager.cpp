@@ -4,13 +4,14 @@
 
 #include <iostream>
 
-const static int musicVolume = MIX_MAX_VOLUME / 4;
+const static int maxMusicVolume = MIX_MAX_VOLUME / 4;
 const static int lightSoundID = 0;
 const static int darkSoundID = 1;
 const static int soundEffectsGroup = 1;
 const static int maxChannels = 16;
 static int curMusicChannel = lightSoundID;
 static bool muted = false;
+static int musicVolume = maxMusicVolume;
 
 SoundManager::SoundObject soundArray[Sound::MAX];
 
@@ -146,6 +147,10 @@ void SoundManager::setVolume(int soundId, int volume) {
         return;
     }
     Mix_Volume(soundArray[soundId].channel, volume);
+}
+
+void SoundManager::setMusicVolume(int volumePercent) {
+    musicVolume = maxMusicVolume * (float)volumePercent / 100.0f;
 }
 
 void SoundManager::stopSound(int soundId) {

@@ -192,7 +192,7 @@ void Objects::load(const char* path) {
         stream.seekg(lastPos, std::ios_base::beg);
 
 #ifndef NDEBUG
-        strncpy(object->filePath, path, 128);
+        strncpy(object->filePath, path, 127);
         object->getTileEditorProps().clear();
         object->initTileEditorData(object->getTileEditorProps());
 #endif

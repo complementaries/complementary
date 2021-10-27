@@ -397,6 +397,7 @@ void Player::restart() {
 }
 
 void Player::kill() {
+    dashParticles->stop();
     SoundManager::playSoundEffect(Sound::DEATH);
     deathParticles->position = getCenter();
     deathParticles->play();

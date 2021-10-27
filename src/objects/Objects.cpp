@@ -1,5 +1,6 @@
 #include "Objects.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <fstream>
@@ -191,6 +192,7 @@ void Objects::load(const char* path) {
         stream.seekg(lastPos, std::ios_base::beg);
 
 #ifndef NDEBUG
+        strncpy(object->filePath, path, 128);
         object->getTileEditorProps().clear();
         object->initTileEditorData(object->getTileEditorProps());
 #endif
@@ -200,7 +202,11 @@ void Objects::load(const char* path) {
 
 void Objects::save(const char* path) {
     static char empty[8];
-    size_t objectNum = objects.size();
+
+    std::vector<std::shared_ptr<ObjectBase>> objectsToSave;
+    std::copy_if(objects.begin(), objects.end(), std::back_inserter(objectsToSave),
+                 [](auto obj) { return obj->destroyOnLevelLoad; });
+    size_t objectNum = objectsToSave.size();
 
     std::ofstream stream;
     stream.open(path, std::ios::binary);
@@ -211,10 +217,10 @@ void Objects::save(const char* path) {
 
     std::vector<int> pointers;
 
-    for (size_t i = 0; i < objects.size(); i++) {
+    for (size_t i = 0; i < objectNum; i++) {
         int filePos = stream.tellp();
         pointers.push_back(filePos);
-        objects[i]->write(stream);
+        objectsToSave[i]->write(stream);
 
         filePos = stream.tellp();
         // Align to 8 bytes
@@ -238,10 +244,10 @@ void Objects::save(const char* path) {
     stream.seekp(dataPos, std::ios_base::beg);
     stream.write((char*)&objectNum, 4);
     for (size_t i = 0; i < objectNum; i++) {
-        int prototypeId = objects[i]->prototypeId;
+        int prototypeId = objectsToSave[i]->prototypeId;
         assert(prototypeId > -1);
         stream.write((char*)&prototypeId, 4);
-        stream.write((char*)&objects[i]->position, sizeof(Vector));
+        stream.write((char*)&objectsToSave[i]->position, sizeof(Vector));
         stream.write((char*)&pointers[i], 4);
         printf("Saving object %zu with prototypeId %d at position %d\n", i, prototypeId,
                pointers[i]);
@@ -265,6 +271,10 @@ std::shared_ptr<ObjectBase> Objects::loadObject(const char* path) {
     assert(prototypeId > -1);
     auto object = prototypes[prototypeId]->clone();
     object->prototypeId = prototypeId;
+
+#ifndef NDEBUG
+    strncpy(object->filePath, path, 128);
+#endif
 
     stream.read((char*)&object->position, sizeof(Vector));
     object->read(stream);

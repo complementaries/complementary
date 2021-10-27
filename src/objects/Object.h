@@ -32,6 +32,7 @@ class ObjectBase {
     virtual void forceMoveParticles(const Vector& position, const Vector& size,
                                     const Vector& velocity);
     virtual void reset();
+    virtual bool allowSaving() const;
     virtual bool isKeyOfType(int type) const;
     virtual bool isDoorOfType(int type) const;
     virtual void addKey();
@@ -46,6 +47,8 @@ class ObjectBase {
     inline std::vector<TileEditorProp>& getTileEditorProps() {
         return tileEditorProps;
     }
+
+    char filePath[128] = {};
 
   private:
     std::vector<TileEditorProp> tileEditorProps;

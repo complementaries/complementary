@@ -123,6 +123,8 @@ bool Player::init() {
 
     load();
 
+    puts("player load");
+
     deathParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/death.cmob");
     deathParticles->destroyOnLevelLoad = false;

@@ -122,6 +122,10 @@ TilemapEditor::TilemapEditor(int screenWidth, int screenHeight) {
                     "editing!\n");
             continue;
         }
+        if (!object->allowSaving() || !object->destroyOnLevelLoad) {
+            continue;
+        }
+
         int x = object->position.x;
         int y = object->position.y;
         stbte_set_tile(stbTileMap, x, y, 1, object->prototypeId + OBJECT_ID_OFFSET);

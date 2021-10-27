@@ -113,6 +113,10 @@ void ObjectBase::forceMoveParticles(const Vector& position, const Vector& size,
 void ObjectBase::reset() {
 }
 
+bool ObjectBase::allowSaving() const {
+    return true;
+}
+
 bool ObjectBase::isKeyOfType(int type) const {
     (void)type;
     return false;

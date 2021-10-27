@@ -39,8 +39,7 @@ static std::vector<const char*> levelNames = {"map0", "map1"};
 static int levelIndex = 0;
 // TODO: make the level list configurable in the UI and get rid of this
 static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "assets/maps/map0";
-static char objectSaveLocation[MAX_LEVEL_NAME_LENGTH] = "assets/subdir/object.cmob";
-static char objectLoadLocation[MAX_LEVEL_NAME_LENGTH] = "assets/subdir/object.cmob";
+static char objectLoadLocation[MAX_LEVEL_NAME_LENGTH] = "assets/particlesystems/object.cmob";
 
 static TilemapEditor* tilemapEditor;
 static bool paused;
@@ -317,9 +316,17 @@ void Game::renderImGui() {
             destructionInfo = "[QUEUED FOR DESTRUCTION] ";
         }
 
+        // Remove common prefixes
+        const char* displayFilePath = object->filePath;
+        if (strncmp(displayFilePath, "assets/", 7) == 0) {
+            displayFilePath += 7;
+        }
+
         char header[256];
-        snprintf(header, 256, "%s#%zu: %s (prototype #%d)", destructionInfo, i,
-                 object->getTypeName(), object->prototypeId);
+        snprintf(header, 256, "%s#%zu: %s [%s] (prototype #%d)###%zu", destructionInfo, i,
+                 object->getTypeName(), displayFilePath, object->prototypeId, i);
+        char id[128];
+        snprintf(id, 128, "%zu", i);
 
         ImGui::PushID(header);
         if (ImGui::CollapsingHeader(header)) {
@@ -332,11 +339,22 @@ void Game::renderImGui() {
                 object->destroy();
             }
 
-            if (ImGui::Button("Save")) {
-                Objects::saveObject(objectSaveLocation, *object);
+            int pathStrLen = strlen(object->filePath);
+            bool isValidExtension = strncmp(object->filePath + (pathStrLen - 5), ".cmob", 5) == 0;
+            if (!isValidExtension) {
+                ImGui::PushDisabled();
             }
+
+            if (ImGui::Button("Save")) {
+                Objects::saveObject(object->filePath, *object);
+            }
+
+            if (!isValidExtension) {
+                ImGui::PopDisabled();
+            }
+
             ImGui::SameLine();
-            ImGui::InputText("##loc", objectSaveLocation, MAX_LEVEL_NAME_LENGTH);
+            ImGui::InputText("##loc", object->filePath, MAX_LEVEL_NAME_LENGTH);
         }
         ImGui::PopID();
     }

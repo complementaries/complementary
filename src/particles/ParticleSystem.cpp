@@ -369,3 +369,7 @@ void ParticleSystem::forceMoveParticles(const Vector& position, const Vector& si
         }
     }
 }
+
+bool ParticleSystem::allowSaving() const {
+    return false;
+}

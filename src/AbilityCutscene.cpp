@@ -31,6 +31,7 @@ bool AbilityCutscene::init() {
 
 void AbilityCutscene::show(Ability previous) {
     currentTicks = 0;
+    alpha = 0;
     Player::setGravityEnabled(false);
     Player::setOverrideColor(AbilityUtils::getColor(previous));
 }

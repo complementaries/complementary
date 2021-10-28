@@ -119,3 +119,7 @@ const float* Vector::data() const {
 float* Vector::data() {
     return &x;
 }
+
+Vector Vector::lerp(Vector a, Vector b, float t) {
+    return (a + t * (b - a));
+}

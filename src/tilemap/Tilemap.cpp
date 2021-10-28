@@ -134,7 +134,7 @@ void Tilemap::load(const char* path) {
     forceReload();
 
     Player::setPosition(getSpawnPoint());
-    Player::setAbilities(Ability::NONE, Ability::NONE);
+    Player::setAbilities(Ability::NONE, Ability::NONE, false);
 }
 
 Vector Tilemap::getSpawnPoint() {

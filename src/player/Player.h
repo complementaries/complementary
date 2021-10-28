@@ -22,9 +22,12 @@ namespace Player {
     bool isAllowedToMove();
     void setAllowedToMove(bool value);
     void setGravityEnabled(bool value);
+    void resetVelocity();
+    void resetDash();
     void setOverrideColor(Color color);
     Color getOverrideColor();
     void resetOverrideColor();
+    void setHidden(bool hidden);
     bool invertColors();
     void toggleWorld();
     Vector getPosition();
@@ -32,10 +35,11 @@ namespace Player {
     Vector getCenter(float lag = 0.0f);
     Vector getVelocity();
 
-    void setAbilities(Ability dark, Ability light);
+    void setAbilities(Ability dark, Ability light, bool animate);
     bool hasAbility(Ability a);
     Ability getAbility();
     Ability getPassiveAbility();
+    bool isDashing();
     bool isGliding();
 
     void tick();

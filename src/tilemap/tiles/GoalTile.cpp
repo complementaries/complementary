@@ -1,6 +1,7 @@
 #include "GoalTile.h"
 
 #include "Game.h"
+#include "GoalCutscene.h"
 #include "player/Player.h"
 #include "tilemap/Tilemap.h"
 #include "tilemap/Tiles.h"
@@ -15,7 +16,9 @@ GoalTile::GoalTile(Face face) : Tile(ColorUtils::BLACK, false, "default"), face(
 }
 
 void GoalTile::onCollision(int x, int y) const {
-    Game::nextLevel();
+    if (!GoalCutscene::isActive()) {
+        GoalCutscene::show(Vector(x, y), face);
+    }
 }
 
 bool GoalTile::isWall() const {
@@ -23,7 +26,7 @@ bool GoalTile::isWall() const {
 }
 
 void GoalTile::render(Buffer& buffer, float x, float y) const {
-    const Color color[] = {getColor(), ColorUtils::invert(getColor())};
+    const Color color[] = {getColor(), ColorUtils::setAlpha(ColorUtils::invert(getColor()), 0)};
     buffer.add(x).add(y).add(color[face == Face::LEFT || face == Face::UP]);
     buffer.add(x).add(y + 1.0f).add(color[face == Face::LEFT || face == Face::DOWN]);
     buffer.add(x + 1.0f).add(y).add(color[face == Face::RIGHT || face == Face::UP]);

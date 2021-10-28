@@ -1,5 +1,5 @@
-#ifndef ABILITY_OVERLAY_H
-#define ABILITY_OVERLAY_H
+#ifndef ABILITY_CUTSCENE_H
+#define ABILITY_CUTSCENE_H
 
 #include "player/Ability.h"
 

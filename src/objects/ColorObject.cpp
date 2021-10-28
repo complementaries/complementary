@@ -27,7 +27,7 @@ void ColorObject::postInit() {
 
 void ColorObject::onFaceCollision(Face playerFace) {
     (void)playerFace;
-    Player::setAbilities(data.abilities[0], data.abilities[1]);
+    Player::setAbilities(data.abilities[0], data.abilities[1], true);
 }
 
 bool ColorObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {

@@ -6,7 +6,7 @@
 
 #include <memory>
 
-constexpr int START_ALPHA = 400;
+constexpr int START_ALPHA = 450;
 
 DoorObject::DoorObject() : DoorObject(Vector(), Vector(1.0f, 1.0f), 0) {
 }
@@ -22,7 +22,7 @@ DoorObject::DoorObject(const Vector& position, const Vector& size, int type)
 }
 
 bool DoorObject::isSolid() const {
-    return alpha > 150;
+    return alpha > 120;
 }
 
 void DoorObject::postInit() {
@@ -36,7 +36,7 @@ bool DoorObject::collidesWith(const Vector& pPosition, const Vector& pSize) cons
 }
 
 void DoorObject::tick() {
-    alpha -= (keys == maxKeys && maxKeys != 0) * 3;
+    alpha -= (keys == maxKeys && maxKeys != 0) * 5;
     if (alpha < 0) {
         alpha = 0;
     }

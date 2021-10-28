@@ -35,6 +35,8 @@ struct Vector final {
 
     float x;
     float y;
+
+    static Vector lerp(Vector a, Vector b, float t);
 };
 
 Vector operator*(float f, const Vector& v);

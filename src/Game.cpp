@@ -9,6 +9,7 @@
 #include "AbilityCutscene.h"
 #include "Clock.h"
 #include "Game.h"
+#include "GoalCutscene.h"
 #include "Input.h"
 #include "Menu.h"
 #include "Savegame.h"
@@ -35,10 +36,10 @@
 
 static constexpr int MAX_LEVEL_NAME_LENGTH = 100;
 
-static std::vector<const char*> levelNames = {"map0", "map1"};
+static std::vector<const char*> levelNames = {"wusi", "map1"};
 static int levelIndex = 0;
 // TODO: make the level list configurable in the UI and get rid of this
-static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "assets/maps/map0";
+static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "map0";
 static char objectLoadLocation[MAX_LEVEL_NAME_LENGTH] = "assets/particlesystems/object.cmob";
 
 static TilemapEditor* tilemapEditor;
@@ -55,7 +56,7 @@ bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Objects::init() || TilemapEditor::init() || RenderState::init() ||
         ParticleRenderer::init() || Font::init() || TextureRenderer::init() || Player::init() ||
-        Savegame::init() || AbilityCutscene::init()) {
+        Savegame::init() || AbilityCutscene::init() || GoalCutscene::init()) {
         return true;
     }
     GoalTile::init();
@@ -75,26 +76,31 @@ static void onTileLoad() {
     }
 }
 
-void Game::nextLevel() {
-    const char* level = levelNames[levelIndex];
-
-    printf("Loading level %s\n", level);
+static void loadLevel(const char* name) {
+    printf("Loading level %s\n", name);
 
     char formattedTilemapName[MAX_LEVEL_NAME_LENGTH];
     char formattedObjectmapName[MAX_LEVEL_NAME_LENGTH];
 
-    if (snprintf(formattedTilemapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmtm", level) >
+    if (snprintf(formattedTilemapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmtm", name) >
         MAX_LEVEL_NAME_LENGTH - 1) {
         puts("The level file name is too long!");
     }
-    snprintf(formattedObjectmapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmom", level);
-    snprintf(currentLevelName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s", level);
+    snprintf(formattedObjectmapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmom", name);
+    snprintf(currentLevelName, MAX_LEVEL_NAME_LENGTH, "%s", name);
 
     Tilemap::load(formattedTilemapName);
     Objects::clear();
     Objects::load(formattedObjectmapName);
     onTileLoad();
 
+    Game::setFade(254);
+    Game::fadeIn(4);
+}
+
+void Game::nextLevel() {
+    const char* level = levelNames[levelIndex];
+    loadLevel(level);
     levelIndex = (levelIndex + 1) % levelNames.size();
 }
 
@@ -146,7 +152,8 @@ void Game::tick() {
             return;
         }
         AbilityCutscene::tick();
-        Player::setAllowedToMove(!AbilityCutscene::isActive());
+        GoalCutscene::tick();
+        Player::setAllowedToMove(!AbilityCutscene::isActive() && !GoalCutscene::isActive());
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
             switchWorld();
         }
@@ -175,9 +182,9 @@ void Game::render(float lag) {
     Tilemap::renderBackground();
     Player::render(lag);
 
+    RenderState::enableBlending();
     Tilemap::render();
 
-    RenderState::enableBlending();
     ParticleRenderer::prepare();
     Objects::render(lag);
     ParticleRenderer::render();
@@ -198,6 +205,7 @@ void Game::render(float lag) {
     Font::draw(Vector(0.0f, 0.0f), 2.0f, ColorUtils::RED, buffer);
     Menu::render(lag);
     AbilityCutscene::render(lag);
+    GoalCutscene::render(lag);
     RenderState::disableBlending();
 }
 
@@ -243,15 +251,12 @@ void Game::renderImGui() {
 
         ImGui::InputText("Level name", currentLevelName, 50);
         static char tileMapName[MAX_LEVEL_NAME_LENGTH];
-        snprintf(tileMapName, MAX_LEVEL_NAME_LENGTH, "%s.cmtm", currentLevelName);
+        snprintf(tileMapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmtm", currentLevelName);
         static char objectMapName[MAX_LEVEL_NAME_LENGTH];
-        snprintf(objectMapName, MAX_LEVEL_NAME_LENGTH, "%s.cmom", currentLevelName);
+        snprintf(objectMapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmom", currentLevelName);
 
         if (ImGui::Button("Load")) {
-            Tilemap::load(tileMapName);
-            Objects::clear();
-            Objects::load(objectMapName);
-            onTileLoad();
+            loadLevel(currentLevelName);
         }
 
         ImGui::SameLine();
@@ -398,6 +403,7 @@ void Game::fadeOut(int speed) {
 
 void Game::setFade(int amount) {
     fade = amount;
+    fadeAdd = 0;
 }
 
 bool Game::isFading() {

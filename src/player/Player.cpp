@@ -46,6 +46,7 @@ static std::shared_ptr<ParticleSystem> gliderParticles;
 static bool useOverrideColor = false;
 static Color overrideColor;
 static std::shared_ptr<ParticleSystem> colorSwitchParticles;
+static std::shared_ptr<ParticleSystem> loseAbilityParticles;
 
 struct PlayerData {
     Vector size{0.8f, 0.8f};
@@ -112,6 +113,7 @@ static float topShear = 0.0f;
 static int stickingToWall = 0;
 
 static int dead = 0;
+static bool hidden = false;
 
 static float gliderScale = 0.0f;
 
@@ -165,6 +167,10 @@ bool Player::init() {
     colorSwitchParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/switch.cmob");
     colorSwitchParticles->destroyOnLevelLoad = false;
+
+    loseAbilityParticles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/loseability.cmob");
+    loseAbilityParticles->destroyOnLevelLoad = false;
 
     gliderParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/glider.cmob");
@@ -351,14 +357,14 @@ static void move() {
 
 static void onKill() {
     Player::restart();
-    Game::fadeIn(3);
+    Game::fadeIn(4);
 }
 
 void Player::restart() {
     position = Tilemap::getSpawnPoint();
     lastPosition = position;
     Objects::reset();
-    Player::setAbilities(Ability::NONE, Ability::NONE);
+    Player::setAbilities(Ability::NONE, Ability::NONE, false);
     baseVelocity = Vector();
     lastRenderForce = 0.0f;
     renderForce = 0.0f;
@@ -403,7 +409,7 @@ void Player::kill() {
     deathParticles->play();
     dead = deathParticles->data.duration + deathParticles->data.maxLifetime;
     RenderState::addRandomizedShake(1.0f);
-    Game::fadeOut(3);
+    Game::fadeOut(4);
 }
 
 bool Player::isDead() {
@@ -422,6 +428,15 @@ void Player::setGravityEnabled(bool value) {
     gravityEnabled = value;
 }
 
+void Player::resetVelocity() {
+    data.velocity = Vector();
+    baseVelocity = Vector();
+}
+
+void Player::resetDash() {
+    dashTicks = 0;
+}
+
 void Player::setOverrideColor(Color color) {
     overrideColor = color;
     useOverrideColor = true;
@@ -435,20 +450,39 @@ void Player::resetOverrideColor() {
     useOverrideColor = false;
 }
 
-void Player::setAbilities(Ability dark, Ability light) {
+void Player::setHidden(bool isHidden) {
+    hidden = isHidden;
+}
+
+void Player::setAbilities(Ability dark, Ability light, bool animate) {
     Ability lastAbility = Player::getAbility();
-    abilities[0] = dark;
-    abilities[1] = light;
 
     if (dark != Ability::NONE && light != Ability::NONE) {
-        if (!Savegame::abilitiesUnlocked(dark, light) && !Arguments::skipAnim) {
-            AbilityCutscene::show(lastAbility);
+
+        if (!hasAbility(dark) && !hasAbility(light)) {
+            abilities[0] = dark;
+            abilities[1] = light;
+            if (!Savegame::abilitiesUnlocked(dark, light) && !Arguments::skipAnim) {
+                AbilityCutscene::show(lastAbility);
+            }
+            Savegame::unlockAbilities(dark, light);
+            PlayerParticles::setParticleColor(colorSwitchParticles);
+            if (animate) {
+                colorSwitchParticles->play();
+            }
+            PlayerParticles::setParticlePosition(colorSwitchParticles, 0, 0, 0, 0);
         }
-        Savegame::unlockAbilities(dark, light);
-    } else if (!hasAbility(dark) && !hasAbility(light)) {
-        colorSwitchParticles->play();
-        PlayerParticles::setParticlePosition(colorSwitchParticles, 0, 0, 0, 0);
+
+    } else if (!hasAbility(Ability::NONE)) {
+        PlayerParticles::setParticlePosition(loseAbilityParticles, 0, 0, 0, 0);
+        PlayerParticles::setParticleColor(loseAbilityParticles);
+        if (animate) {
+            loseAbilityParticles->play();
+        }
+        abilities[0] = dark;
+        abilities[1] = light;
     }
+
     PlayerParticles::setParticleColors();
 }
 
@@ -462,6 +496,10 @@ Ability Player::getAbility() {
 
 Ability Player::getPassiveAbility() {
     return abilities[!worldType];
+}
+
+bool Player::isDashing() {
+    return dashTicks > 0;
 }
 
 bool Player::isGliding() {
@@ -729,7 +767,6 @@ void Player::tick() {
     dashCoolDown -= dashCoolDown > 0;
     if (isColliding(Face::LEFT) || isColliding(Face::RIGHT)) {
         dashCoolDown -= dashTicks;
-        dashTicks = 0;
     }
     if (dashTicks > 0) {
         data.velocity =
@@ -845,7 +882,7 @@ static void addGlider(Buffer& buf, Color color) {
 }
 
 void Player::render(float lag) {
-    if (dead > 0) {
+    if (dead > 0 || hidden) {
         return;
     }
     shader.use();
@@ -966,7 +1003,6 @@ void Player::renderImGui() {
 
     ImGui::SameLine();
     if (ImGui::Button("Save")) {
-        printf("hello\n");
         save();
     }
     ImGui::Unindent();

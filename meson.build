@@ -43,6 +43,7 @@ src = [
   'src/Input.cpp',
   'src/Arguments.cpp',
   'src/AbilityCutscene.cpp',
+  'src/GoalCutscene.cpp',
   'src/Savegame.cpp',
   'src/Main.cpp'
 ]

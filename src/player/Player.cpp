@@ -618,7 +618,7 @@ void Player::tick() {
             wallJumpCooldown = 10;
             jumpBufferTicks = 0;
             addRenderForce(1.0f, Face::UP);
-            jumpCount++;
+            jumpCount += 1 + (fakeGrounded <= 0);
             data.velocity.y = 0;
             fakeGrounded = 0;
             SoundManager::playSoundEffect(Sound::JUMP);

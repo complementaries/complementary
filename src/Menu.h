@@ -1,7 +1,7 @@
 #ifndef MENU_H
 #define MENU_H
 
-enum class MenuType { START, PAUSE };
+enum class MenuType { NONE, START, PAUSE };
 
 namespace Menu {
     void tick();

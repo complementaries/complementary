@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <filesystem>
 #include <imgui.h>
 #include <string>
 #include <vector>
@@ -40,7 +41,7 @@ static constexpr int MAX_LEVEL_NAME_LENGTH = 100;
 static bool inTitleScreen = true;
 static int nextLevelIndex = -1;
 static int currentLevelIndex = 0;
-static std::vector<const char*> levelNames = {"map0", "map1", "wusi"};
+static std::vector<std::string> levelNames = {};
 // TODO: make the level list configurable in the UI and get rid of this
 static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "map0";
 static char objectLoadLocation[MAX_LEVEL_NAME_LENGTH] = "assets/particlesystems/object.cmob";
@@ -62,6 +63,18 @@ constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
 
 static void loadTitleScreen();
 
+static void findLevels() {
+    for (const auto& entry : std::filesystem::directory_iterator("assets/maps")) {
+        auto pathString = entry.path().string();
+        if (pathString.rfind("assets/maps/map", 0) == 0 &&
+            pathString.compare(pathString.size() - 5, 5, ".cmtm") == 0) {
+            auto mapName = pathString.substr(12, pathString.size() - 12 -
+                                                     5); // Cut off path and file extension
+            levelNames.push_back(mapName);
+        }
+    }
+}
+
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Objects::init() || TilemapEditor::init() || RenderState::init() ||
@@ -71,6 +84,8 @@ bool Game::init() {
     }
     GoalTile::init();
     Savegame::load();
+
+    findLevels();
 
     backgroundParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/background.cmob");
@@ -159,7 +174,7 @@ void Game::setNextLevelIndex(int next) {
 
 void Game::nextLevel() {
     if (nextLevelIndex >= 0 && nextLevelIndex < static_cast<int>(levelNames.size())) {
-        loadLevel(levelNames[nextLevelIndex]);
+        loadLevel(levelNames[nextLevelIndex].c_str());
         RenderState::setZoom(1.f);
         currentLevelIndex = nextLevelIndex;
         nextLevelIndex = -1;

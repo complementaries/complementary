@@ -22,7 +22,7 @@ struct MenuEntry {
 std::vector<MenuEntry> lines;
 static float fontSize = 4.0f;
 static unsigned int menuIndex = 1;
-static MenuType type;
+static MenuType type = MenuType::NONE;
 
 static void nothing() {
 }
@@ -31,13 +31,14 @@ static void quit() {
     Window::exit();
 }
 
-static void start() {
-    Game::exitTitleScreen();
-    Menu::clear();
-}
-
 static void unpause() {
     Menu::clear();
+    type = MenuType::NONE;
+}
+
+static void start() {
+    Game::exitTitleScreen();
+    unpause();
 }
 
 static void restart() {
@@ -115,7 +116,7 @@ void Menu::render(float lag) {
 }
 
 bool Menu::isActive() {
-    return lines.size() > 0;
+    return type != MenuType::NONE;
 }
 
 void Menu::clear() {

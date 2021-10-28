@@ -23,6 +23,9 @@ static SDL_Window* window = nullptr;
 static bool running = false;
 static int width = 850;
 static int height = 480;
+static int previousWidth = 850;
+static int previousHeight = 480;
+static bool fullscreen = false;
 
 bool Window::init() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -116,6 +119,41 @@ bool Window::init() {
     return false;
 }
 
+static void toggleFullscreen() {
+    if (!fullscreen) {
+        previousHeight = height;
+        previousWidth = width;
+
+        SDL_DisplayMode mode = {};
+        int displayIndex = SDL_GetWindowDisplayIndex(window);
+        if (displayIndex < 0) {
+            fprintf(stderr, "%s\n", SDL_GetError());
+            return;
+        }
+        if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN) < 0) {
+            fprintf(stderr, "%s\n", SDL_GetError());
+            return;
+        }
+        if (SDL_GetDesktopDisplayMode(displayIndex, &mode) < 0) {
+            fprintf(stderr, "%s\n", SDL_GetError());
+            return;
+        }
+        SDL_SetWindowSize(window, mode.w, mode.h);
+    } else {
+        if (SDL_SetWindowFullscreen(window, 0) < 0) {
+            fprintf(stderr, "%s\n", SDL_GetError());
+            return;
+        }
+
+        width = previousWidth;
+        height = previousHeight;
+        SDL_SetWindowSize(window, width, height);
+        Game::onWindowResize(width, height); // No idea why we need to call it manually here
+    }
+
+    fullscreen = !fullscreen;
+}
+
 static void pollEvents() {
     SDL_Event e;
 
@@ -177,6 +215,7 @@ static void pollEvents() {
                     case SDLK_DOWN:
                     case SDLK_s: Input::Internal::setButtonReleased(ButtonType::DOWN); break;
                     case SDLK_p: Input::Internal::setButtonReleased(ButtonType::PAUSE); break;
+                    case SDLK_F11: toggleFullscreen(); break;
                 }
                 break;
             }

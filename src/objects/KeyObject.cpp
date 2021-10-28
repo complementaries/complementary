@@ -26,7 +26,7 @@ void KeyObject::postInit() {
     lastRenderPosition = position;
     renderPosition = position;
     particles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/key.cmob");
-    firstTick = true;
+    particles->play();
 }
 
 void KeyObject::onCollision() {
@@ -60,10 +60,6 @@ void KeyObject::tick() {
     particles->data.maxEmissionInterval = 10;
     particles->data.minEmissionInterval = 10;
     if (!collected) {
-        if (firstTick) {
-            particles->play();
-            firstTick = false;
-        }
         renderPosition = position;
         return;
     } else if (added) {
@@ -147,7 +143,7 @@ void KeyObject::reset() {
     lastRenderPosition = position;
     renderPosition = position;
     goal = Vector();
-    firstTick = true;
+    particles->play();
 }
 
 bool KeyObject::isKeyOfType(int type) const {

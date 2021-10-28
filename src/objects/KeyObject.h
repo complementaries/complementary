@@ -29,7 +29,6 @@ class KeyObject : public Object<KeyObjectData> {
 
   private:
     std::shared_ptr<ParticleSystem> particles;
-    bool firstTick;
 #ifndef NDEBUG
     void initTileEditorData(std::vector<TileEditorProp>& props) override;
     void applyTileEditorData(float* props) override;

@@ -124,12 +124,15 @@ static void loadTitleScreen() {
     RenderState::setZoom(4.f, Vector(0.f, -2.f));
     Menu::showStartMenu();
     titleEffectParticles->play();
+    SoundManager::playContinuousSound(Sound::TITLE);
 }
 
 void Game::exitTitleScreen() {
     inTitleScreen = false;
     loadLevelSelect();
     titleEffectParticles->stop();
+    SoundManager::playMusic();
+    SoundManager::stopSound(Sound::TITLE);
 }
 
 void Game::loadLevelSelect() {

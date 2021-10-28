@@ -14,6 +14,7 @@ namespace Sound {
         DEATH,
         // GLIDE,
         DASH,
+        TITLE,
         MAX
     };
 }

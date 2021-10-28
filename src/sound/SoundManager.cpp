@@ -136,9 +136,10 @@ bool SoundManager::loadSounds() {
     loadSound(Sound::WORLD_SWITCH, "assets/sounds/switch.ogg", MIX_MAX_VOLUME / 4);
     loadSound(Sound::JUMP, "assets/sounds/jump.ogg", MIX_MAX_VOLUME / 2);
     loadSound(Sound::DASH, "assets/sounds/dash.ogg", MIX_MAX_VOLUME / 2);
-    loadSound(Sound::WIND, "assets/sounds/wind.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::WIND, "assets/sounds/wind.ogg", MIX_MAX_VOLUME);
     loadSound(Sound::COLLECT, "assets/sounds/collect.ogg", MIX_MAX_VOLUME / 2);
     loadSound(Sound::DEATH, "assets/sounds/death.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::TITLE, "assets/sounds/title.ogg", MIX_MAX_VOLUME / 2);
     return false;
 }
 

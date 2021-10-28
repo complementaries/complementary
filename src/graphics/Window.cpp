@@ -380,8 +380,6 @@ void Window::run() {
     if (Game::init()) {
         return;
     }
-    // TODO: find a better place to start music
-    SoundManager::playMusic();
     if (Arguments::muted) {
         SoundManager::mute();
     }

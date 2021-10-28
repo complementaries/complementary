@@ -168,6 +168,10 @@ void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
             }
         }
 
+        if (!isInBox(p)) {
+            p.lifetime += data.boxLifetimeLoss;
+        }
+
         p.lifetime++;
         if (p.lifetime >= data.maxLifetime) {
             particles[i] = particles.back();
@@ -362,6 +366,7 @@ void ParticleSystem::renderImGui() {
     ImGui::DragFloat("Attract speed", &data.attractSpeed, 0.01f);
 
     ImGui::DragInt("Particle lifetime", &data.maxLifetime);
+    ImGui::DragInt("Lifetime loss out of box", &data.boxLifetimeLoss);
     ImGuiUtils::ColorPicker("Start color", &data.startColor);
     ImGuiUtils::ColorPicker("End color", &data.endColor);
     ImGui::DragFloat2("Size over lifetime", &data.startSize);

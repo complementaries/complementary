@@ -201,6 +201,7 @@ void Objects::load(const char* path) {
 }
 
 void Objects::save(const char* path) {
+    reset();
     static char empty[8];
 
     std::vector<std::shared_ptr<ObjectBase>> objectsToSave;

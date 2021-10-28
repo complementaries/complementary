@@ -3,6 +3,7 @@
 #include "ObjectRenderer.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
+#include <iostream>
 
 MovingObject::MovingObject() {
 }
@@ -23,6 +24,7 @@ MovingObject::MovingObject(const Vector& size, const Vector& goal, float speed)
 }
 
 void MovingObject::postInit() {
+    std::cout << "bla " << data.size.x << ", " << data.size.y << std::endl;
     initialPosition = position;
     lastPosition = position;
 }

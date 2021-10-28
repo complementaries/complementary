@@ -44,6 +44,7 @@ struct ParticleSystemData final {
     float attractSpeed = 0.f;
     Layer layer = Layer::BEHIND_TILEMAP;
     bool invertColor = false;
+    int boxLifetimeLoss = 0;
 };
 
 struct Particle final {

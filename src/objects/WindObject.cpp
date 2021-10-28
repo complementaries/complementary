@@ -1,8 +1,10 @@
 #include "WindObject.h"
 
 #include "ObjectRenderer.h"
+#include "Objects.h"
 #include "player/Player.h"
 #include "sound/SoundManager.h"
+#include <iostream>
 #include <memory>
 
 WindObject::WindObject() {
@@ -26,6 +28,20 @@ void WindObject::onCollision() {
 
 void WindObject::tick() {
     handleSound(Sound::WIND);
+    constexpr Color colors[] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
+    particles->data.startColor = ColorUtils::setAlpha(colors[Player::invertColors()], 150);
+    particles->data.endColor = ColorUtils::setAlpha(colors[Player::invertColors()], 0);
+}
+
+void WindObject::postInit() {
+    particles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/wind.cmob");
+    particles->data.minStartVelocity = data.force;
+    particles->data.maxStartVelocity = data.force;
+    particles->data.boxSize = data.size;
+    std::cout << data.size.x << ", " << data.size.y << std::endl;
+    particles->data.maxLifetime = std::max(data.size.x, data.size.y) * 10;
+    particles->position = this->position;
+    particles->play();
 }
 
 void WindObject::handleSound(int soundId) {
@@ -69,8 +85,9 @@ bool WindObject::collidesWith(const Vector& pPosition, const Vector& pSize) cons
            position[1] < pPosition[1] + pSize[1] && position[1] + data.size[1] > pPosition[1];
 }
 
-void WindObject::render(float lag) {
+void WindObject::renderEditor(float lag, bool inPalette) {
     (void)lag;
+    (void)inPalette;
     ObjectRenderer::drawRectangle(position, data.size, ColorUtils::rgba(255, 0, 0, 100));
 
     // TEMP: indicator for the wind direction

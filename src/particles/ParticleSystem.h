@@ -11,7 +11,7 @@
 enum class ParticleType {
     TRIANGLE,
     SQUARE,
-    CIRCLE,
+    DIAMOND,
 };
 
 enum class SpawnPositionType { CENTER, BOX_EDGE, BOX };
@@ -75,16 +75,16 @@ class ParticleSystem : public Object<ParticleSystemData> {
   private:
     std::vector<Particle> triangles;
     std::vector<Particle> squares;
-    std::vector<Particle> circles;
+    std::vector<Particle> diamonds;
 
     void renderTriangles(float lag);
     void renderSquares(float lag);
-    void renderCircles(float lag);
+    void renderDiamonds(float lag);
     void tickParticles(std::vector<Particle>& particles);
 
     void spawnTriangle(const Vector& position, const Vector& velocity);
     void spawnSquare(const Vector& position, const Vector& velocity);
-    void spawnCircle(const Vector& position, const Vector& velocity);
+    void spawnDiamond(const Vector& position, const Vector& velocity);
 
     bool isInBox(const Particle& particle) const;
     float getZ() const;

@@ -228,7 +228,9 @@ void ParticleSystem::lateTick() {
                         spawnTriangle(particlePosition, startVelocity);
                         break;
                     case ParticleType::SQUARE: spawnSquare(particlePosition, startVelocity); break;
-                    case ParticleType::CIRCLE: spawnCircle(particlePosition, startVelocity); break;
+                    case ParticleType::DIAMOND:
+                        spawnDiamond(particlePosition, startVelocity);
+                        break;
                 }
             }
         }
@@ -236,7 +238,7 @@ void ParticleSystem::lateTick() {
 
     tickParticles(triangles);
     tickParticles(squares);
-    tickParticles(circles);
+    tickParticles(diamonds);
 
     currentLifetime++;
 
@@ -298,35 +300,31 @@ void ParticleSystem::renderSquares(float lag) {
     }
 }
 
-void ParticleSystem::renderCircles(float lag) {
+void ParticleSystem::renderDiamonds(float lag) {
     float z = getZ();
-    for (Particle& p : circles) {
+    for (Particle& p : diamonds) {
         Vector particlePosition = interpolate(p.lastPosition, p.position, lag);
         float factor = (p.lifetime + lag) / data.maxLifetime;
-        float radius = 0.5f * interpolate(data.startSize, data.endSize, factor);
+        float size = interpolate(data.startSize, data.endSize, factor);
         Color c = ColorUtils::mix(data.startColor, data.endColor, factor);
         if (data.invertColor && Player::invertColors()) {
             c = ColorUtils::invert(c);
         }
 
-        Vector last = particlePosition + Vector(0.0f, radius);
-        constexpr float full = 6.283185307f;
-        float step = full / radius * 0.05f;
-        for (float f = step; f <= full + step; f += step) {
-            Vector rotated = particlePosition + Vector(sinf(f), cosf(f)) * radius;
-            rawData.add(particlePosition).add(z).add(c);
-            rawData.add(rotated).add(z).add(c);
-            rawData.add(last).add(z).add(c);
-            last = rotated;
-            vertices += 3;
-        }
+        rawData.add(particlePosition + Vector(0.f, -0.5f * size)).add(z).add(c);
+        rawData.add(particlePosition + Vector(0.5f * size, 0.f)).add(z).add(c);
+        rawData.add(particlePosition + Vector(-0.5f * size, 0.f)).add(z).add(c);
+        rawData.add(particlePosition + Vector(0.f, 0.5f * size)).add(z).add(c);
+        rawData.add(particlePosition + Vector(0.5f * size, 0.f)).add(z).add(c);
+        rawData.add(particlePosition + Vector(-0.5f * size, 0.f)).add(z).add(c);
+        vertices += 6;
     }
 }
 
 void ParticleSystem::render(float lag) {
     renderTriangles(lag);
     renderSquares(lag);
-    renderCircles(lag);
+    renderDiamonds(lag);
 }
 
 void ParticleSystem::spawnTriangle(const Vector& position, const Vector& velocity) {
@@ -337,8 +335,8 @@ void ParticleSystem::spawnSquare(const Vector& position, const Vector& velocity)
     squares.push_back({position, position, velocity, 0});
 }
 
-void ParticleSystem::spawnCircle(const Vector& position, const Vector& velocity) {
-    circles.push_back({position, position, velocity, 0});
+void ParticleSystem::spawnDiamond(const Vector& position, const Vector& velocity) {
+    diamonds.push_back({position, position, velocity, 0});
 }
 
 bool ParticleSystem::isInBox(const Particle& particle) const {
@@ -354,7 +352,7 @@ std::shared_ptr<ObjectBase> ParticleSystem::clone() {
 
 void ParticleSystem::renderImGui() {
     ImGui::DragInt("Duration", &data.duration);
-    const char* types[] = {"Triangle", "Square", "Circle"};
+    const char* types[] = {"Triangle", "Square", "Diamond"};
     ImGui::ListBox("Particle type", (int*)&data.type, types, 3);
     ImGui::DragInt2("Emission Interval", &data.minEmissionInterval);
     ImGui::DragInt2("Emission Rate", &data.minEmissionRate);
@@ -385,7 +383,7 @@ void ParticleSystem::renderImGui() {
     ImGui::ListBox("Layer", (int*)&data.layer, layers, 2);
 
     ImGui::Text("Current duration: %d, particle count: %zu", currentLifetime,
-                triangles.size() + squares.size() + circles.size());
+                triangles.size() + squares.size() + diamonds.size());
 
     if (ImGui::Button("Play")) {
         play();

@@ -20,6 +20,7 @@
 #include "player/Player.h"
 #include "sound/SoundManager.h"
 #include "tilemap/Tilemap.h"
+#include "tilemap/Tiles.h"
 
 static constexpr float step = 0.0025f;
 
@@ -110,7 +111,7 @@ static bool idle = false;
 static float lastTopShear = 0.0f;
 static float topShear = 0.0f;
 
-static int stickingToWall = 0;
+static bool stickingToWall = false;
 
 static int dead = 0;
 static bool hidden = false;
@@ -397,7 +398,7 @@ void Player::restart() {
     idle = false;
     lastTopShear = 0.0f;
     topShear = 0.0f;
-    stickingToWall = 0;
+    stickingToWall = false;
     dead = 0;
     Tilemap::forceReload();
 }
@@ -722,6 +723,12 @@ void Player::tick() {
     data.acceleration = Vector();
     Vector actualDrag = data.drag;
     if (hasAbility(Ability::WALL_JUMP) && data.velocity[1] > 0.0f) {
+        int xLeft = position.x - data.size.x * 0.5f;
+        int xRight = position.x + data.size.x * 1.5f;
+        int y = position.y + data.size.y;
+        xLeft = std::clamp(xLeft, 0, Tilemap::getWidth() - 1);
+        xRight = std::clamp(xRight, 0, Tilemap::getWidth() - 1);
+        y = std::clamp(y, 0, Tilemap::getHeight() - 1);
         if (leftWall && Input::getButton(ButtonType::LEFT).pressed && allowedToMove) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::LEFT);
@@ -731,9 +738,12 @@ void Player::tick() {
                                                  wallStickParticles->getColliderOffset(),
                                                  wallStickParticles->getColliderOffset());
             PlayerParticles::setParticleVelocities(wallStickParticles, 1, 1, 1, 1);
-            if (stickingToWall == 0) {
+            if (!stickingToWall) {
                 wallStickParticles->play();
-                stickingToWall = 1;
+                stickingToWall = true;
+            }
+            if (Tilemap::getTile(xLeft, y).getId() <= 0) {
+                wallStickParticles->stop();
             }
         } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed && allowedToMove) {
             actualDrag[1] *= data.wallJumpDrag;
@@ -744,17 +754,20 @@ void Player::tick() {
                                                  -wallStickParticles->getColliderOffset(),
                                                  wallStickParticles->getColliderOffset());
             PlayerParticles::setParticleVelocities(wallStickParticles, -1, -1, 1, 1);
-            if (stickingToWall == 0) {
+            if (!stickingToWall) {
                 wallStickParticles->play();
-                stickingToWall = 1;
+                stickingToWall = true;
+            }
+            if (Tilemap::getTile(xRight, y).getId() <= 0) {
+                wallStickParticles->stop();
             }
         } else {
             wallStickParticles->stop();
-            stickingToWall = 0;
+            stickingToWall = false;
         }
     } else {
         wallStickParticles->stop();
-        stickingToWall = 0;
+        stickingToWall = false;
     }
     if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
         dashTicks == 0 && dashCoolDown == 0 && dashUseable && allowedToMove) {

@@ -28,7 +28,9 @@ void ColorObject::postInit() {
 
 void ColorObject::onFaceCollision(Face playerFace) {
     Player::setAbilities(data.abilities[0], data.abilities[1],
-                         Savegame::abilitiesUnlocked(data.abilities[0], data.abilities[1]));
+                         Savegame::abilitiesUnlocked(data.abilities[0], data.abilities[1]) ||
+                             data.abilities[0] == Ability::NONE ||
+                             data.abilities[1] == Ability::NONE);
 }
 
 bool ColorObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {

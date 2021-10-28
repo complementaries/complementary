@@ -435,6 +435,8 @@ void Player::resetVelocity() {
 
 void Player::resetDash() {
     dashTicks = 0;
+    dashCoolDown = 0;
+    dashUseable = true;
 }
 
 void Player::setOverrideColor(Color color) {
@@ -721,6 +723,7 @@ void Player::tick() {
         if (leftWall && Input::getButton(ButtonType::LEFT).pressed && allowedToMove) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::LEFT);
+            resetDash();
 
             PlayerParticles::setParticlePosition(wallStickParticles, -1, 1,
                                                  wallStickParticles->getColliderOffset(),
@@ -733,6 +736,7 @@ void Player::tick() {
         } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed && allowedToMove) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::RIGHT);
+            resetDash();
 
             PlayerParticles::setParticlePosition(wallStickParticles, 1, 1,
                                                  -wallStickParticles->getColliderOffset(),
@@ -760,13 +764,13 @@ void Player::tick() {
         addRenderForce(-0.5f, dashDirection < 0.0f ? Face::LEFT : Face::RIGHT);
         SoundManager::playSoundEffect(Sound::DASH);
     }
-    if (leftWall || rightWall) {
-        dashUseable = true;
+    if ((leftWall || rightWall) && Player::hasAbility(Ability::WALL_JUMP)) {
+        resetDash();
     }
     dashTicks -= dashTicks > 0;
     dashCoolDown -= dashCoolDown > 0;
     if (isColliding(Face::LEFT) || isColliding(Face::RIGHT)) {
-        dashCoolDown -= dashTicks;
+        dashParticles->stop();
     }
     if (dashTicks > 0) {
         data.velocity =

@@ -116,6 +116,7 @@ void GoalCutscene::tick() {
 
         Player::setPosition(Vector::lerp(playerPosBeforeDissolve, goalPosition,
                                          static_cast<float>(currentTicks - 200) / 300.f));
+        RenderState::addRandomizedShake(0.4f);
     }
 
     if (currentTicks >= 300) {

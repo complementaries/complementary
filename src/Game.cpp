@@ -52,6 +52,9 @@ static int fadeAdd = 0;
 static Clock tps;
 static Clock fps;
 
+static std::shared_ptr<ParticleSystem> backgroundParticles;
+constexpr int BACKGROUND_PARTICLE_ALPHA = 30;
+
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Objects::init() || TilemapEditor::init() || RenderState::init() ||
@@ -61,6 +64,11 @@ bool Game::init() {
     }
     GoalTile::init();
     Savegame::load();
+
+    backgroundParticles =
+        Objects::instantiateObject<ParticleSystem>("assets/particlesystems/background.cmob");
+    backgroundParticles->destroyOnLevelLoad = false;
+    backgroundParticles->play();
 
     nextLevel();
     Menu::showStartMenu();
@@ -74,6 +82,8 @@ static void onTileLoad() {
             Tilemap::getTile(x, y).onLoad(x, y);
         }
     }
+
+    backgroundParticles->position = Tilemap::getSize() / 2;
 }
 
 static void loadLevel(const char* name) {
@@ -112,6 +122,11 @@ void Game::switchWorld() {
 
     SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
     SoundManager::switchMusic();
+
+    auto particleColor = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
+    backgroundParticles->data.startColor = ColorUtils::setAlpha(particleColor, 0);
+    backgroundParticles->data.endColor =
+        ColorUtils::setAlpha(particleColor, BACKGROUND_PARTICLE_ALPHA);
 }
 
 void Game::tick() {

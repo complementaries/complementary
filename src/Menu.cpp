@@ -46,8 +46,8 @@ static void restart() {
 }
 
 static void quitLevel() {
-    Player::restart();
-    Menu::showStartMenu();
+    unpause();
+    Game::loadLevelSelect();
 }
 
 static void add(const char* s, MenuFunction mf) {

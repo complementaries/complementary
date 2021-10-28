@@ -2,6 +2,7 @@
 
 #include "ObjectRenderer.h"
 #include "Objects.h"
+#include "Savegame.h"
 #include "player/Player.h"
 #include <memory>
 
@@ -26,8 +27,8 @@ void ColorObject::postInit() {
 }
 
 void ColorObject::onFaceCollision(Face playerFace) {
-    (void)playerFace;
-    Player::setAbilities(data.abilities[0], data.abilities[1], true);
+    Player::setAbilities(data.abilities[0], data.abilities[1],
+                         Savegame::abilitiesUnlocked(data.abilities[0], data.abilities[1]));
 }
 
 bool ColorObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {

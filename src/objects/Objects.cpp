@@ -73,7 +73,6 @@ void Objects::add(std::shared_ptr<ObjectBase> o) {
 #ifndef NDEBUG
     o->initTileEditorData(o->getTileEditorProps());
 #endif
-    o->postInit();
     objects.emplace_back(o);
 }
 
@@ -82,6 +81,15 @@ std::vector<std::shared_ptr<ObjectBase>> Objects::getObjects() {
 }
 
 std::shared_ptr<ObjectBase> Objects::instantiateObject(int prototypeId, Vector position) {
+    auto object = prototypes[prototypeId]->clone();
+    object->position = position;
+    object->prototypeId = prototypeId;
+    add(object);
+    object->postInit();
+    return objects[objects.size() - 1];
+}
+
+std::shared_ptr<ObjectBase> Objects::instantiateObjectNoInit(int prototypeId, Vector position) {
     auto object = prototypes[prototypeId]->clone();
     object->position = position;
     object->prototypeId = prototypeId;
@@ -180,7 +188,7 @@ void Objects::load(const char* path) {
         int prototypeId;
         stream.read((char*)&prototypeId, 4);
         assert(prototypeId > -1);
-        auto object = instantiateObject(prototypeId);
+        auto object = instantiateObjectNoInit(prototypeId);
 
         stream.read((char*)&object->position, sizeof(Vector));
 

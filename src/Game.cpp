@@ -251,6 +251,7 @@ void Game::renderImGui() {
             Tilemap::load(tileMapName);
             Objects::clear();
             Objects::load(objectMapName);
+            onTileLoad();
         }
 
         ImGui::SameLine();

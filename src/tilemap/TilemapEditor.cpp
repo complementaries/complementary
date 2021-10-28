@@ -358,7 +358,7 @@ void TilemapEditor::flush() {
             short objectId = tiles[1]; // Object layer
             if (objectId >= OBJECT_ID_OFFSET) {
                 int prototypeIndex = objectId - OBJECT_ID_OFFSET;
-                auto obj = Objects::instantiateObject(prototypeIndex, Vector(x, y));
+                auto obj = Objects::instantiateObjectNoInit(prototypeIndex, Vector(x, y));
 
                 float* props = stbte_get_properties(stbTileMap, x, y);
                 if (props[0] != 0) {
@@ -369,6 +369,8 @@ void TilemapEditor::flush() {
                 // overwrite them with the new values
                 obj->getTileEditorProps().clear();
                 obj->initTileEditorData(obj->getTileEditorProps());
+
+                obj->postInit();
             }
         }
     }

@@ -27,8 +27,11 @@ namespace Objects {
         obj->prototypeId = prototype->prototypeId;
         obj->position = position;
         add(obj);
+        obj->postInit();
         return std::dynamic_pointer_cast<T>(obj);
     }
+    std::shared_ptr<ObjectBase> instantiateObjectNoInit(int prototypeIndex,
+                                                        Vector position = Vector());
 
     bool collidesWithAny(const Vector& position, const Vector& size);
     bool handleFaceCollision(const Vector& position, const Vector& size, Face face);
@@ -53,10 +56,11 @@ namespace Objects {
     }
     template <typename T>
     std::shared_ptr<T> instantiateObject(const char* path, Vector position = Vector()) {
-        auto object = loadObject<T>(path, position);
-        object->position = position;
-        add(object);
-        return object;
+        auto obj = loadObject<T>(path, position);
+        obj->position = position;
+        add(obj);
+        obj->postInit();
+        return obj;
     }
 
     void saveObject(const char* path, ObjectBase& object);

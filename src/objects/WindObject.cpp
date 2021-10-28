@@ -38,7 +38,6 @@ void WindObject::postInit() {
     particles->data.minStartVelocity = data.force;
     particles->data.maxStartVelocity = data.force;
     particles->data.boxSize = data.size;
-    std::cout << data.size.x << ", " << data.size.y << std::endl;
     particles->data.maxLifetime = std::max(data.size.x, data.size.y) * 10;
     particles->position = this->position;
     particles->play();

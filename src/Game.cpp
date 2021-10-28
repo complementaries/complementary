@@ -53,7 +53,8 @@ static Clock tps;
 static Clock fps;
 
 static std::shared_ptr<ParticleSystem> backgroundParticles;
-constexpr int BACKGROUND_PARTICLE_ALPHA = 30;
+constexpr int BACKGROUND_PARTICLE_ALPHA_BLACK = 16;
+constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
 
 bool Game::init() {
     Tiles::init();
@@ -125,8 +126,9 @@ void Game::switchWorld() {
 
     auto particleColor = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
     backgroundParticles->data.startColor = ColorUtils::setAlpha(particleColor, 0);
-    backgroundParticles->data.endColor =
-        ColorUtils::setAlpha(particleColor, BACKGROUND_PARTICLE_ALPHA);
+    backgroundParticles->data.endColor = ColorUtils::setAlpha(
+        particleColor,
+        Player::invertColors() ? BACKGROUND_PARTICLE_ALPHA_WHITE : BACKGROUND_PARTICLE_ALPHA_BLACK);
 }
 
 void Game::tick() {

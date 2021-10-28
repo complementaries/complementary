@@ -5,16 +5,18 @@
 #include <fstream>
 
 static Savegame::Data data;
+const char* SAVE_FILE_NAME = "save.bin";
+const char* SAVE_FILE_TEMP_NAME = "save.bin.tmp";
 
 bool Savegame::init() {
-    data = {};
+    reset();
     return false;
 }
 
 void Savegame::load() {
-    if (std::filesystem::exists("save.bin")) {
+    if (std::filesystem::exists(SAVE_FILE_NAME)) {
         std::ifstream stream;
-        stream.open("save.bin", std::ios::binary);
+        stream.open(SAVE_FILE_NAME, std::ios::binary);
 
         char magic[5];
         stream.read(magic, 4);
@@ -31,12 +33,17 @@ void Savegame::load() {
 
 void Savegame::save() {
     std::ofstream stream;
-    stream.open("save.bin", std::ios::binary);
+    stream.open(SAVE_FILE_TEMP_NAME, std::ios::binary);
     if (!stream.bad()) {
-
         stream.write("CSAV", 4);
         stream.write((char*)&data, sizeof(Data));
     }
+
+    std::filesystem::rename(SAVE_FILE_TEMP_NAME, SAVE_FILE_NAME);
+}
+
+void Savegame::reset() {
+    data = {};
 }
 
 void Savegame::unlockAbilities(Ability primary, Ability secondary) {

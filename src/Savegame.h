@@ -13,6 +13,7 @@ namespace Savegame {
     bool init();
     void load();
     void save();
+    void reset();
     void unlockAbilities(Ability primary, Ability secondary);
     bool abilitiesUnlocked(Ability primary, Ability secondary);
     int getCompletedLevels();

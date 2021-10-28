@@ -276,6 +276,10 @@ void Game::renderImGui() {
     if (ImGui::Button("Next level")) {
         nextLevel();
     }
+    ImGui::SameLine();
+    if (ImGui::Button("Level select")) {
+        loadLevelSelect();
+    }
 
     ImGui::SameLine();
     if (ImGui::Button(paused ? "Unpause" : "Pause")) {
@@ -291,6 +295,10 @@ void Game::renderImGui() {
         ImGui::InputInt("Completed levels", &levels);
         if (levels != Savegame::getCompletedLevels()) {
             Savegame::setCompletedLevels(levels);
+        }
+
+        if (ImGui::Button("Reset save")) {
+            Savegame::reset();
         }
     }
 

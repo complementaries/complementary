@@ -23,6 +23,7 @@
 #include "graphics/gl/VertexBuffer.h"
 #include "imgui/ImGuiUtils.h"
 #include "objects/ColorObject.h"
+#include "objects/DoorObject.h"
 #include "objects/MovingObject.h"
 #include "objects/ObjectRenderer.h"
 #include "objects/Objects.h"
@@ -36,8 +37,9 @@
 
 static constexpr int MAX_LEVEL_NAME_LENGTH = 100;
 
-static std::vector<const char*> levelNames = {"map0", "map1"};
-static int levelIndex = 0;
+static int nextLevelIndex = -1;
+static int currentLevelIndex = 0;
+static std::vector<const char*> levelNames = {"map0", "map1", "wusi"};
 // TODO: make the level list configurable in the UI and get rid of this
 static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "map0";
 static char objectLoadLocation[MAX_LEVEL_NAME_LENGTH] = "assets/particlesystems/object.cmob";
@@ -56,6 +58,8 @@ static std::shared_ptr<ParticleSystem> backgroundParticles;
 constexpr int BACKGROUND_PARTICLE_ALPHA_BLACK = 16;
 constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
 
+static void loadLevelSelect();
+
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Objects::init() || TilemapEditor::init() || RenderState::init() ||
@@ -71,7 +75,7 @@ bool Game::init() {
     backgroundParticles->destroyOnLevelLoad = false;
     backgroundParticles->play();
 
-    nextLevel();
+    loadLevelSelect();
     Menu::showStartMenu();
 
     return false;
@@ -109,10 +113,38 @@ static void loadLevel(const char* name) {
     Game::fadeIn(4);
 }
 
+static void loadLevelSelect() {
+    loadLevel("level_select");
+
+    for (auto& obj : Objects::getObjects()) {
+        // Destroy doors of accessible levels
+        auto door = std::dynamic_pointer_cast<DoorObject>(obj);
+        if (door != nullptr && door->data.type < Savegame::getCompletedLevels()) {
+            door->destroy();
+        }
+    }
+}
+
+void Game::setNextLevelIndex(int next) {
+    nextLevelIndex = next;
+}
+
 void Game::nextLevel() {
-    const char* level = levelNames[levelIndex];
-    loadLevel(level);
-    levelIndex = (levelIndex + 1) % levelNames.size();
+    if (nextLevelIndex >= 0 && nextLevelIndex < static_cast<int>(levelNames.size())) {
+        loadLevel(levelNames[nextLevelIndex]);
+        currentLevelIndex = nextLevelIndex;
+        nextLevelIndex = -1;
+    } else {
+        printf("Completed level with index %d\n", currentLevelIndex);
+        if (currentLevelIndex >= Savegame::getCompletedLevels()) {
+            printf("Updated completion count to %d\n", currentLevelIndex + 1);
+            Savegame::setCompletedLevels(currentLevelIndex + 1);
+        }
+
+        loadLevelSelect();
+        currentLevelIndex = -1;
+        nextLevelIndex = -1;
+    }
 }
 
 void Game::switchWorld() {
@@ -252,6 +284,14 @@ void Game::renderImGui() {
 
     if (paused && ImGui::Button("Next frame")) {
         singleStep = true;
+    }
+
+    if (ImGui::CollapsingHeader("Savegame", ImGuiTreeNodeFlags_DefaultOpen)) {
+        int levels = Savegame::getCompletedLevels();
+        ImGui::InputInt("Completed levels", &levels);
+        if (levels != Savegame::getCompletedLevels()) {
+            Savegame::setCompletedLevels(levels);
+        }
     }
 
     if (ImGui::CollapsingHeader("Tilemap", ImGuiTreeNodeFlags_DefaultOpen)) {

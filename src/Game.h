@@ -6,6 +6,7 @@ namespace Game {
     void tick();
     void render(float lag);
     void renderImGui();
+    void setNextLevelIndex(int index);
     void nextLevel();
     void switchWorld();
 

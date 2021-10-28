@@ -19,6 +19,7 @@ src = [
   'src/objects/MovingSwitchObject.cpp',
   'src/objects/KeyObject.cpp',
   'src/objects/DoorObject.cpp',
+  'src/objects/LevelTagObject.cpp',
   'src/objects/Object.cpp',
   'src/objects/ObjectRenderer.cpp',
   'src/objects/Objects.cpp',

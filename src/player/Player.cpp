@@ -464,10 +464,12 @@ void Player::setAbilities(Ability dark, Ability light, bool animate) {
         if (!hasAbility(dark) && !hasAbility(light)) {
             abilities[0] = dark;
             abilities[1] = light;
-            if (!Savegame::abilitiesUnlocked(dark, light) && !Arguments::skipAnim) {
-                AbilityCutscene::show(lastAbility);
+            if (!Savegame::abilitiesUnlocked(dark, light)) {
+                Savegame::unlockAbilities(dark, light);
+                if (!Arguments::skipAnim) {
+                    AbilityCutscene::show(lastAbility);
+                }
             }
-            Savegame::unlockAbilities(dark, light);
             PlayerParticles::setParticleColor(colorSwitchParticles);
             if (animate) {
                 colorSwitchParticles->play();

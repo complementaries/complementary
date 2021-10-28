@@ -55,6 +55,6 @@ int Savegame::getCompletedLevels() {
 }
 
 void Savegame::setCompletedLevels(int amount) {
-    data.unlockedAbilities = amount;
+    data.completedLevels = amount;
     save();
 }

@@ -205,7 +205,7 @@ void Objects::save(const char* path) {
 
     std::vector<std::shared_ptr<ObjectBase>> objectsToSave;
     std::copy_if(objects.begin(), objects.end(), std::back_inserter(objectsToSave),
-                 [](auto obj) { return obj->destroyOnLevelLoad; });
+                 [](auto obj) { return obj->destroyOnLevelLoad && obj->allowSaving(); });
     size_t objectNum = objectsToSave.size();
 
     std::ofstream stream;

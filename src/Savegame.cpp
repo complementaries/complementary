@@ -28,6 +28,7 @@ void Savegame::load() {
             return;
         }
         stream.read((char*)&data, sizeof(Data));
+        stream.close();
     }
 }
 
@@ -37,6 +38,7 @@ void Savegame::save() {
     if (!stream.bad()) {
         stream.write("CSAV", 4);
         stream.write((char*)&data, sizeof(Data));
+        stream.close();
     }
 
     std::filesystem::rename(SAVE_FILE_TEMP_NAME, SAVE_FILE_NAME);

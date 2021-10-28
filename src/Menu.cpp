@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "Game.h"
 #include "Input.h"
 #include "graphics/Font.h"
 #include "graphics/Window.h"
@@ -21,12 +22,18 @@ struct MenuEntry {
 std::vector<MenuEntry> lines;
 static float fontSize = 4.0f;
 static unsigned int menuIndex = 1;
+static MenuType type;
 
 static void nothing() {
 }
 
 static void quit() {
     Window::exit();
+}
+
+static void start() {
+    Game::exitTitleScreen();
+    Menu::clear();
 }
 
 static void unpause() {
@@ -85,14 +92,21 @@ void Menu::render(float lag) {
 
     Vector overSize = size * 1.1f;
     Vector pos = (Tilemap::getSize() - overSize) * 0.5f;
-    ObjectRenderer::prepare();
-    ObjectRenderer::drawRectangle(pos, overSize, ColorUtils::setAlpha(ColorUtils::GRAY, 200));
+    if (type != MenuType::START) {
+        ObjectRenderer::prepare();
+        ObjectRenderer::drawRectangle(pos, overSize, ColorUtils::setAlpha(ColorUtils::GRAY, 200));
+    }
 
     pos = (Tilemap::getSize() - Vector(0.0f, size.y)) * 0.5f;
-    Font::prepare();
     unsigned int index = 0;
     for (auto& e : lines) {
-        constexpr Color color[] = {ColorUtils::BLACK, ColorUtils::ORANGE};
+        constexpr Color color[] = {ColorUtils::BLACK, ColorUtils::WHITE};
+        ObjectRenderer::prepare();
+        if (index == menuIndex) {
+            ObjectRenderer::drawRectangle(pos - Vector(e.width * 0.5f + 0.3f, 0.f),
+                                          Vector(e.width + 0.6f, 3.5f), ColorUtils::BLACK);
+        }
+        Font::prepare();
         Font::draw(pos - Vector(e.width * 0.5f, 0.0f), fontSize, color[index == menuIndex],
                    e.text.c_str());
         pos.y += fontSize;
@@ -109,18 +123,24 @@ void Menu::clear() {
 }
 
 void Menu::showStartMenu() {
+    type = MenuType::START;
     clear();
     menuIndex = 1;
     add("[Complementary]", nothing);
-    add("Start", unpause);
+    add("Start", start);
     add("Quit", quit);
 }
 
 void Menu::showPauseMenu() {
+    type = MenuType::PAUSE;
     clear();
     menuIndex = 1;
     add("[Pause]", nothing);
     add("Continue", unpause);
     add("Restart", restart);
     add("Quit Level", quitLevel);
+}
+
+MenuType Menu::getType() {
+    return type;
 }

@@ -42,6 +42,7 @@ static float lastGlowScale = 1.0f;
 static float glowScale = 1.0f;
 
 static float zoom = 1.0f;
+static Vector zoomOffset = Vector();
 
 bool RenderState::init() {
     glGenFramebuffers(1, &framebuffer.id);
@@ -109,7 +110,7 @@ void RenderState::updatePlayerViewMatrix(float lag) {
         .scale(Vector(factor / Window::getWidth(), -factor / Window::getHeight()) * 2.0f);
     viewMatrix.transform(getShake(shakeTicks + lag));
 
-    Vector c = Player::getCenter(lag);
+    Vector c = Player::getCenter(lag) + zoomOffset;
     viewMatrix.transform(c).scale(Vector(zoom, zoom)).transform(-c);
     float ft = std::min(zoom - 1.0f, 1.0f);
     Vector diff = (realSize / factor * 0.5f - c) / zoom * ft;
@@ -237,6 +238,7 @@ void RenderState::disableBlending() {
     glDisable(GL_BLEND);
 }
 
-void RenderState::setZoom(float z) {
+void RenderState::setZoom(float z, Vector offset) {
     zoom = z;
+    zoomOffset = offset;
 }

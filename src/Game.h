@@ -8,6 +8,8 @@ namespace Game {
     void renderImGui();
     void setNextLevelIndex(int index);
     void nextLevel();
+    void exitTitleScreen();
+    void loadLevelSelect();
     void switchWorld();
 
     void onWindowResize(int width, int height);

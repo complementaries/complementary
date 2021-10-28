@@ -37,6 +37,7 @@
 
 static constexpr int MAX_LEVEL_NAME_LENGTH = 100;
 
+static bool inTitleScreen = true;
 static int nextLevelIndex = -1;
 static int currentLevelIndex = 0;
 static std::vector<const char*> levelNames = {"map0", "map1", "wusi"};
@@ -54,11 +55,12 @@ static int fadeAdd = 0;
 static Clock tps;
 static Clock fps;
 
+static std::shared_ptr<ParticleSystem> titleEffectParticles;
 static std::shared_ptr<ParticleSystem> backgroundParticles;
 constexpr int BACKGROUND_PARTICLE_ALPHA_BLACK = 16;
 constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
 
-static void loadLevelSelect();
+static void loadTitleScreen();
 
 bool Game::init() {
     Tiles::init();
@@ -75,8 +77,11 @@ bool Game::init() {
     backgroundParticles->destroyOnLevelLoad = false;
     backgroundParticles->play();
 
-    loadLevelSelect();
-    Menu::showStartMenu();
+    titleEffectParticles = Objects::instantiateObject<ParticleSystem>(
+        "assets/particlesystems/titleeffect.cmob", Vector(24.f, 23.f));
+    titleEffectParticles->destroyOnLevelLoad = false;
+
+    loadTitleScreen();
 
     return false;
 }
@@ -113,8 +118,26 @@ static void loadLevel(const char* name) {
     Game::fadeIn(4);
 }
 
-static void loadLevelSelect() {
+static void loadTitleScreen() {
+    loadLevel("title");
+    inTitleScreen = true;
+    RenderState::setZoom(4.f, Vector(0.f, -2.f));
+    Menu::showStartMenu();
+    titleEffectParticles->play();
+}
+
+void Game::exitTitleScreen() {
+    inTitleScreen = false;
+    loadLevelSelect();
+    titleEffectParticles->stop();
+}
+
+void Game::loadLevelSelect() {
     loadLevel("level_select");
+    RenderState::setZoom(1.0f);
+
+    currentLevelIndex = -1;
+    nextLevelIndex = -1;
 
     for (auto& obj : Objects::getObjects()) {
         // Destroy doors of accessible levels
@@ -132,6 +155,7 @@ void Game::setNextLevelIndex(int next) {
 void Game::nextLevel() {
     if (nextLevelIndex >= 0 && nextLevelIndex < static_cast<int>(levelNames.size())) {
         loadLevel(levelNames[nextLevelIndex]);
+        RenderState::setZoom(1.f);
         currentLevelIndex = nextLevelIndex;
         nextLevelIndex = -1;
     } else {
@@ -142,8 +166,6 @@ void Game::nextLevel() {
         }
 
         loadLevelSelect();
-        currentLevelIndex = -1;
-        nextLevelIndex = -1;
     }
 }
 
@@ -197,12 +219,13 @@ void Game::tick() {
         tilemapEditor->setZoom(zoom);
     } else {
         Menu::tick();
-        if (Menu::isActive()) {
+        if (Menu::isActive() && Menu::getType() != MenuType::START) {
             return;
         }
         AbilityCutscene::tick();
         GoalCutscene::tick();
-        Player::setAllowedToMove(!AbilityCutscene::isActive() && !GoalCutscene::isActive());
+        Player::setAllowedToMove(!AbilityCutscene::isActive() && !GoalCutscene::isActive() &&
+                                 !Menu::isActive());
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
             switchWorld();
         }

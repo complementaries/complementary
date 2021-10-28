@@ -123,6 +123,7 @@ static void loadTitleScreen() {
     inTitleScreen = true;
     RenderState::setZoom(4.f, Vector(0.f, -2.f));
     Menu::showStartMenu();
+    Player::setAbilities(Ability::WALL_JUMP, Ability::DASH, true);
     titleEffectParticles->play();
     SoundManager::playContinuousSound(Sound::TITLE);
 }
@@ -133,6 +134,7 @@ void Game::exitTitleScreen() {
     titleEffectParticles->stop();
     SoundManager::playMusic();
     SoundManager::stopSound(Sound::TITLE);
+    Player::setAbilities(Ability::NONE, Ability::NONE, false);
 }
 
 void Game::loadLevelSelect() {
@@ -263,13 +265,25 @@ void Game::render(float lag) {
     ParticleRenderer::prepare();
     Objects::render(lag);
     ParticleRenderer::render();
-    RenderState::disableBlending();
-    RenderState::renderEffects(lag);
 
+    if (inTitleScreen) {
+        RenderState::updateViewMatrix(lag);
+
+        glDisable(GL_DEPTH_TEST);
+        Menu::render(lag);
+        RenderState::renderTitleScreenEffects(lag);
+    } else {
+        RenderState::renderEffects(lag);
+    }
+
+    RenderState::disableBlending();
     RenderState::updateViewMatrix(lag);
+
     glDisable(GL_DEPTH_TEST);
     RenderState::enableBlending();
-    TextureRenderer::render(lag);
+    if (!inTitleScreen) {
+        TextureRenderer::render(lag);
+    }
     ObjectRenderer::prepare(Matrix());
     ObjectRenderer::drawRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
                                   ColorUtils::setAlpha(ColorUtils::BLACK, fade));
@@ -278,7 +292,9 @@ void Game::render(float lag) {
     snprintf(buffer, 256, "FPS: %2.0f TPS: %3.0f", fps.getUpdatesPerSecond(),
              tps.getUpdatesPerSecond());
     Font::draw(Vector(0.0f, 0.0f), 2.0f, ColorUtils::RED, buffer);
-    Menu::render(lag);
+    if (!inTitleScreen) {
+        Menu::render(lag);
+    }
     AbilityCutscene::render(lag);
     GoalCutscene::render(lag);
     RenderState::disableBlending();

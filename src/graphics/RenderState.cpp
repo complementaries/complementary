@@ -30,6 +30,7 @@ struct Framebuffer {
 static Framebuffer framebuffer;
 
 static GL::Shader mixer;
+static GL::Shader lineMixer;
 static GL::Shader glow;
 static GL::VertexBuffer rectangle;
 static Vector mixCenter;
@@ -77,6 +78,7 @@ bool RenderState::init() {
     float data[] = {-1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f};
     rectangle.setData(data, sizeof(data));
     return mixer.compile({"assets/shaders/mixer.vs", "assets/shaders/mixer.fs"}) ||
+           lineMixer.compile({"assets/shaders/lineMixer.vs", "assets/shaders/lineMixer.fs"}) ||
            glow.compile({"assets/shaders/glow.vs", "assets/shaders/glow.fs"});
 }
 
@@ -226,6 +228,15 @@ void RenderState::renderEffects(float lag) {
     bindTextureTo(0);
     rectangle.drawTriangles(6);
     disableBlending();
+}
+
+void RenderState::renderTitleScreenEffects(float lag) {
+    bindAndClearDefaultFramebuffer();
+    lineMixer.use();
+    setViewMatrix(mixer);
+    mixer.setInt("samp", 0);
+    bindTextureTo(0);
+    rectangle.drawTriangles(6);
 }
 
 void RenderState::enableBlending() {

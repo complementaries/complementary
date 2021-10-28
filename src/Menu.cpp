@@ -101,8 +101,8 @@ void Menu::render(float lag) {
     unsigned int index = 0;
     for (auto& e : lines) {
         constexpr Color color[] = {ColorUtils::BLACK, ColorUtils::WHITE};
-        ObjectRenderer::prepare();
         if (index == menuIndex) {
+            ObjectRenderer::prepare();
             ObjectRenderer::drawRectangle(pos - Vector(e.width * 0.5f + 0.3f, 0.f),
                                           Vector(e.width + 0.6f, 3.5f), ColorUtils::BLACK);
         }

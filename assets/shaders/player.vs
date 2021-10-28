@@ -9,6 +9,6 @@ uniform mat4 model;
 out vec4 varColor;
 
 void main() {
-    gl_Position = view * model * vec4(pos, 0.0, 1.0);
+    gl_Position = view * model * vec4(pos, -0.15, 1.0);
     varColor = color;
 }

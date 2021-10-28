@@ -21,6 +21,7 @@ namespace RenderState {
     void startMixing();
     void startGlowing();
     void renderEffects(float lag);
+    void renderTitleScreenEffects(float lag);
 
     void enableBlending();
     void disableBlending();

@@ -79,11 +79,11 @@ dependencies = [
     stb_proj.get_variable('stb_dep')
 ]
 
-args = ['-Wall']
+args = []
 if host_machine.system() == 'windows'
     args += []
 elif host_machine.system() == 'darwin' or host_machine.system() == 'linux'
-    args += ['-Werror', '-Wextra', '-pedantic', '-Wno-comment', '-Wno-unused-parameter']
+    args += ['-Wall', '-Werror', '-Wextra', '-pedantic', '-Wno-comment', '-Wno-unused-parameter']
 endif
 
 if host_machine.system() == 'linux'

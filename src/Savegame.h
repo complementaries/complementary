@@ -15,6 +15,8 @@ namespace Savegame {
     void save();
     void unlockAbilities(Ability primary, Ability secondary);
     bool abilitiesUnlocked(Ability primary, Ability secondary);
+    int getCompletedLevels();
+    void setCompletedLevels(int amount);
 }
 
 #endif

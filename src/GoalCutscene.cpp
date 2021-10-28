@@ -91,7 +91,7 @@ void GoalCutscene::tick() {
         // Skip part of the animation if the player dashed into the goal
         currentTicks += 110;
         particles->position = goalPosition;
-        particles->data.attractSpeed = 0.003f;
+        particles->data.attractSpeed = 0.002f;
         particles->data.enableCollision = false;
         playerPosBeforeDissolve = Player::getPosition();
     }
@@ -110,7 +110,7 @@ void GoalCutscene::tick() {
     }
 
     if (currentTicks > 200) {
-        alpha += dashing ? 6 : 3;
+        alpha += 3;
         alpha = std::min(255, alpha);
         Game::setFade(alpha);
 
@@ -128,9 +128,6 @@ void GoalCutscene::tick() {
     }
 
     currentTicks++;
-    if (dashing && currentTicks >= 200) {
-        currentTicks++;
-    }
 }
 
 void GoalCutscene::render(float lag) {

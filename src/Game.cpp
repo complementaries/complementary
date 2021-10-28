@@ -36,7 +36,7 @@
 
 static constexpr int MAX_LEVEL_NAME_LENGTH = 100;
 
-static std::vector<const char*> levelNames = {"wusi", "map1"};
+static std::vector<const char*> levelNames = {"map0", "map1"};
 static int levelIndex = 0;
 // TODO: make the level list configurable in the UI and get rid of this
 static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "map0";

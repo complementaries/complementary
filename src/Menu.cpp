@@ -20,9 +20,10 @@ struct MenuEntry {
 };
 
 std::vector<MenuEntry> lines;
-static float fontSize = 4.0f;
+static float fontSize = 3.0f;
 static unsigned int menuIndex = 1;
 static MenuType type = MenuType::NONE;
+constexpr float yGapFactor = 1.25f;
 
 static void nothing() {
 }
@@ -88,7 +89,7 @@ void Menu::render(float lag) {
     for (auto& e : lines) {
         e.width = Font::getWidth(fontSize, e.text.c_str());
         size.x = std::max(size.x, e.width);
-        size.y += fontSize;
+        size.y += fontSize * yGapFactor;
     }
 
     Vector overSize = size * 1.1f;
@@ -100,17 +101,18 @@ void Menu::render(float lag) {
 
     pos = (Tilemap::getSize() - Vector(0.0f, size.y)) * 0.5f;
     unsigned int index = 0;
+    Font::prepare();
     for (auto& e : lines) {
         constexpr Color color[] = {ColorUtils::BLACK, ColorUtils::WHITE};
         if (index == menuIndex) {
             ObjectRenderer::prepare();
             ObjectRenderer::drawRectangle(pos - Vector(e.width * 0.5f + 0.3f, 0.f),
-                                          Vector(e.width + 0.6f, 3.5f), ColorUtils::BLACK);
+                                          Vector(e.width + 0.6f, fontSize), ColorUtils::BLACK);
+            Font::prepare();
         }
-        Font::prepare();
         Font::draw(pos - Vector(e.width * 0.5f, 0.0f), fontSize, color[index == menuIndex],
                    e.text.c_str());
-        pos.y += fontSize;
+        pos.y += fontSize * yGapFactor;
         index++;
     }
 }

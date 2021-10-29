@@ -4,6 +4,13 @@
 #include <array>
 #include <cstdio>
 #include <filesystem>
+#include <fstream>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
+#pragma GCC diagnostic pop
 
 #include "graphics/Buffer.h"
 #include "graphics/RenderState.h"
@@ -14,13 +21,73 @@
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
 static GL::Texture texture;
-static std::array<float, 128> fontWidth;
-static std::array<float, 128> realFontWidth;
-static std::array<float, 128> fontStart;
-constexpr int FONT_OFFSET = 32;
-constexpr int SYMBOLS_X = 16;
-constexpr int SYMBOLS_Y = 8;
-constexpr float gap = 0.03f;
+
+struct Character final {
+    int x = 0;
+    int y = 0;
+    int width = 0;
+    int height = 0;
+    int originX = 0;
+    int originY = 0;
+    int advance = 0;
+};
+static int fontSize = 0;
+static int fontWidth = 0;
+static int fontHeight = 0;
+static int fontMaxOriginY = 0;
+std::array<Character, 128> characters;
+
+static float scale(float f) {
+    return f / fontSize;
+}
+
+static bool hasMember(rapidjson::Document& document, const char* name) {
+    if (!document.HasMember(name)) {
+        fprintf(stderr, "font json has no field named '%s'\n", name);
+        return true;
+    }
+    return false;
+}
+
+static bool checkForField(rapidjson::Document& document, const char* name, rapidjson::Type type) {
+    if (hasMember(document, name)) {
+        return true;
+    } else if (document[name].GetType() != type) {
+        fprintf(stderr, "font json field '%s' is not an int\n", name);
+        return true;
+    }
+    return false;
+}
+
+static bool checkForField(rapidjson::Document& document, const char* name) {
+    if (hasMember(document, name)) {
+        return true;
+    } else if (!document[name].IsInt()) {
+        fprintf(stderr, "font json field '%s' is not an int\n", name);
+        return true;
+    }
+    return false;
+}
+
+static bool parseGlobalField(rapidjson::Document& document, const char* name, int& i) {
+    if (checkForField(document, name)) {
+        return true;
+    }
+    i = document[name].GetInt();
+    return false;
+}
+
+static bool readField(rapidjson::Value::ConstObject& o, const char* name, int& i) {
+    if (!o.HasMember(name)) {
+        fprintf(stderr, "font json character has no field named '%s'\n", name);
+        return true;
+    } else if (!o[name].IsInt()) {
+        fprintf(stderr, "font json character field '%s' is not an int\n", name);
+        return true;
+    }
+    i = o[name].GetInt();
+    return false;
+}
 
 bool Font::init() {
     if (shader.compile({"assets/shaders/font.vs", "assets/shaders/font.fs"})) {
@@ -34,33 +101,53 @@ bool Font::init() {
         fprintf(stderr, "cannot load font file '%s': %s\n", path, IMG_GetError());
         return true;
     }
-    Color* data = static_cast<Color*>(font->pixels);
     texture.setData(font->w, font->h, font->pixels);
-    fontWidth.fill(0.0f);
-    int symbolWidth = font->w / SYMBOLS_X;
-    int symbolHeight = font->h / SYMBOLS_Y;
-    for (int i = 32; i < 128; i++) {
-        int width = 0;
-        int start = font->w;
-        for (int x = 0; x < symbolWidth; x++) {
-            for (int y = 0; y < symbolHeight; y++) {
-                int o = i - FONT_OFFSET;
-                int base = (o % SYMBOLS_X) * symbolWidth + (o / SYMBOLS_X) * symbolWidth * font->w;
-                int index = base + x + y * font->w;
-                if ((data[index] & 0xFF) < 160) {
-                    width = x + 1;
-                    start = std::min(x, start);
-                }
-            }
-        }
-        fontWidth[i] = static_cast<float>(width - start) / symbolWidth;
-        fontStart[i] = static_cast<float>(start) / symbolWidth;
-    }
-    fontWidth[' '] = 0.25f;
-    realFontWidth = fontWidth;
-    realFontWidth['r'] *= 0.85f;
-    realFontWidth['t'] *= 0.8f;
     SDL_FreeSurface(font);
+
+    path = "assets/font.json";
+    std::ifstream json;
+    json.open(path);
+    if (!json.good()) {
+        fprintf(stderr, "cannot load font json '%s'\n", path);
+        return true;
+    }
+    rapidjson::BasicIStreamWrapper wrapped(json);
+    rapidjson::Document document;
+    document.ParseStream(wrapped);
+    if (document.HasParseError()) {
+        fprintf(stderr, "cannot parse font json: %d\n", document.GetParseError());
+        return true;
+    } else if (parseGlobalField(document, "size", fontSize) ||
+               parseGlobalField(document, "width", fontWidth) ||
+               parseGlobalField(document, "height", fontHeight)) {
+        return true;
+    } else if (checkForField(document, "characters", rapidjson::Type::kObjectType)) {
+        return true;
+    }
+    auto t = document["characters"].GetObject();
+    for (const auto& w : t) {
+        if (!w.name.IsString() || !w.value.IsObject()) {
+            fprintf(stderr, "font json characters has invalid member\n");
+            return true;
+        }
+        const char* name = w.name.GetString();
+        if (name == nullptr) {
+            fprintf(stderr, "font json character has invalid name\n");
+            return true;
+        }
+        int index = name[0];
+        rapidjson::Value::ConstObject intern = w.value.GetObject();
+        if (readField(intern, "x", characters[index].x) ||
+            readField(intern, "y", characters[index].y) ||
+            readField(intern, "width", characters[index].width) ||
+            readField(intern, "height", characters[index].height) ||
+            readField(intern, "originX", characters[index].originX) ||
+            readField(intern, "originY", characters[index].originY) ||
+            readField(intern, "advance", characters[index].advance)) {
+            return true;
+        }
+        fontMaxOriginY = std::max(fontMaxOriginY, characters[index].originY);
+    }
     return false;
 }
 
@@ -79,15 +166,15 @@ void Font::draw(const Vector& pos, float size, Color color, const char* s) {
     float y = pos.y;
 
     while (s[index] != '\0') {
-        int c = s[index] & 0x7F;
-        float minX = x;
-        float minY = y;
-        float maxX = minX + size * fontWidth[c];
-        float maxY = minY + size;
-        float minTexX = ((c % SYMBOLS_X) + fontStart[c]) / static_cast<float>(SYMBOLS_X);
-        float minTexY = ((c - FONT_OFFSET) / SYMBOLS_X) / static_cast<float>(SYMBOLS_Y);
-        float maxTexX = minTexX + 1.0f / SYMBOLS_X * fontWidth[c];
-        float maxTexY = minTexY + 1.0f / SYMBOLS_Y;
+        const Character& c = characters[s[index] & 0x7F];
+        float minX = x - size * scale(c.originX);
+        float minY = y - size * scale(c.originY - fontMaxOriginY + 1);
+        float maxX = minX + size * scale(c.width);
+        float maxY = minY + size * scale(c.height);
+        float minTexX = static_cast<float>(c.x) / fontWidth;
+        float minTexY = static_cast<float>(c.y) / fontHeight;
+        float maxTexX = static_cast<float>(c.x + c.width) / fontWidth;
+        float maxTexY = static_cast<float>(c.y + c.height) / fontHeight;
 
         data.add(minX).add(minY).add(minTexX).add(minTexY).add(color);
         data.add(maxX).add(minY).add(maxTexX).add(minTexY).add(color);
@@ -95,7 +182,7 @@ void Font::draw(const Vector& pos, float size, Color color, const char* s) {
         data.add(maxX).add(maxY).add(maxTexX).add(maxTexY).add(color);
         data.add(maxX).add(minY).add(maxTexX).add(minTexY).add(color);
         data.add(minX).add(maxY).add(minTexX).add(maxTexY).add(color);
-        x += size * (realFontWidth[c] + gap);
+        x += size * scale(c.advance);
         index++;
     }
 
@@ -107,7 +194,8 @@ float Font::getWidth(float size, const char* s) {
     float width = 0.0f;
     int index = 0;
     while (s[index] != '\0') {
-        width += realFontWidth[s[index] & 0x7F] + gap;
+        const Character& c = characters[s[index] & 0x7F];
+        width += scale(c.width - c.originX);
         index++;
     }
     width *= size;

@@ -64,8 +64,14 @@ constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
 static void loadTitleScreen();
 
 static void findLevels() {
-    for (const auto& entry : std::filesystem::directory_iterator("assets/maps")) {
+#ifdef _WIN32
+    auto mapsDir = "assets\\maps";
+#else
+    auto mapsDir = "assets/maps";
+#endif
+    for (const auto& entry : std::filesystem::directory_iterator(mapsDir)) {
         auto pathString = entry.path().string();
+        std::cout << pathString << std::endl;
 #ifdef _WIN32
         auto isMap = pathString.rfind("assets\\maps\\map", 0) == 0;
 #else

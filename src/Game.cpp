@@ -544,3 +544,7 @@ void Game::setFade(int amount) {
 bool Game::isFading() {
     return fade != 0 && fade != 255;
 }
+
+int Game::getCurrentLevel() {
+    return currentLevelIndex;
+}

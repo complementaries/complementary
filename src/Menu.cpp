@@ -138,6 +138,12 @@ void Menu::showPauseMenu() {
     type = MenuType::PAUSE;
     clear();
     menuIndex = 1;
+    if (Game::getCurrentLevel() == -1) {
+        add("[Pause]", nothing);
+        add("Continue", unpause);
+        add("Quit", quit);
+        return;
+    }
     add("[Pause]", nothing);
     add("Continue", unpause);
     add("Restart", restart);

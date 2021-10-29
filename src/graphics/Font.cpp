@@ -195,7 +195,7 @@ float Font::getWidth(float size, const char* s) {
     int index = 0;
     while (s[index] != '\0') {
         const Character& c = characters[s[index] & 0x7F];
-        width += scale(c.width - c.originX);
+        width += scale(c.advance);
         index++;
     }
     width *= size;

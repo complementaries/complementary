@@ -20,6 +20,8 @@ namespace Game {
     void fadeOut(int speed = 1);
     void setFade(int amount);
     bool isFading();
+
+    int getCurrentLevel();
 }
 
 #endif

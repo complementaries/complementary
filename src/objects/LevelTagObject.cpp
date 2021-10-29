@@ -40,8 +40,8 @@ std::shared_ptr<ObjectBase> LevelTagObject::clone() {
 #ifndef NDEBUG
 void LevelTagObject::initTileEditorData(std::vector<TileEditorProp>& props) {
     props.insert(props.end(),
-                 {TileEditorProp::Int("Size X", data.size.x, 0, 5),
-                  TileEditorProp::Int("Size Y", data.size.y, 0, 5),
+                 {TileEditorProp::Int("Size X", data.size.x, 0, 10),
+                  TileEditorProp::Int("Size Y", data.size.y, 0, 10),
                   TileEditorProp::Float("Level", static_cast<float>(data.level), 0, 20)});
 }
 

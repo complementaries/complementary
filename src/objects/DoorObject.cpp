@@ -82,7 +82,12 @@ void DoorObject::render(float lag) {
 void DoorObject::renderEditor(float lag, bool inPalette) {
     (void)inPalette;
     constexpr Color colors[] = {ColorUtils::RED, ColorUtils::GREEN, ColorUtils::BLUE};
-    render(lag, colors[(data.type & 0x3) % 3]);
+    if (data.type <= 2) {
+
+        render(lag, colors[(data.type & 0x3) % 3]);
+    } else {
+        render(lag, ColorUtils::MAGENTA);
+    }
 }
 
 std::shared_ptr<ObjectBase> DoorObject::clone() {
@@ -93,7 +98,7 @@ std::shared_ptr<ObjectBase> DoorObject::clone() {
 void DoorObject::initTileEditorData(std::vector<TileEditorProp>& props) {
     props.insert(props.end(), {TileEditorProp::Int("Size X", data.size.x, 1, 5),
                                TileEditorProp::Int("Size Y", data.size.y, 1, 5),
-                               TileEditorProp::Int("Type", data.type, 0, 2)});
+                               TileEditorProp::Int("Type", data.type, 0, 10)});
 }
 
 void DoorObject::applyTileEditorData(float* props) {

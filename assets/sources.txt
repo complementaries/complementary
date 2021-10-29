@@ -1,2 +1,2 @@
 font
-https://github.com/Vailias/signed-distance-field-font-generator
+https://evanw.github.io/font-texture-generator/

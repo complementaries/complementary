@@ -38,7 +38,6 @@ void MovingObject::tick() {
 
     auto goal = movingBack ? initialPosition : initialPosition + data.goal;
     velocity = goal - position;
-    // printf("velocity %f %f\n", velocity.x, velocity.y);
     float length = velocity.getLength();
     if (length < data.speed) {
         position = goal;

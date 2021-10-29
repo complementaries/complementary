@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Utils.h"
 #include "objects/ColorObject.h"
 #include "objects/DoorObject.h"
 #include "objects/KeyObject.h"
@@ -184,7 +185,7 @@ void Objects::load(const char* path) {
 
     int objectNum;
     stream.read((char*)&objectNum, 4);
-    printf("Reading %d objects\n", objectNum);
+    Utils::print("Reading %d objects\n", objectNum);
 
     for (int i = 0; i < objectNum; i++) {
         int prototypeId;
@@ -260,8 +261,8 @@ void Objects::save(const char* path) {
         stream.write((char*)&prototypeId, 4);
         stream.write((char*)&objectsToSave[i]->position, sizeof(Vector));
         stream.write((char*)&pointers[i], 4);
-        printf("Saving object %zu with prototypeId %d at position %d\n", i, prototypeId,
-               pointers[i]);
+        Utils::print("Saving object %zu with prototypeId %d at position %d\n", i, prototypeId,
+                     pointers[i]);
     }
 }
 
@@ -303,14 +304,6 @@ void Objects::saveObject(const char* path, ObjectBase& object) {
     stream.write((char*)&object.prototypeId, sizeof(int));
     stream.write((char*)&object.position, sizeof(Vector));
     object.write(stream);
-}
-
-void Objects::print() {
-    for (auto o : objects) {
-        Vector v = o->getSize();
-        std::cout << o->getTypeName() << " " << o->position.x << " " << o->position.y << " " << v.x
-                  << " " << v.y << " " << o->shouldDestroy << "\n";
-    }
 }
 
 void Objects::forceMoveParticles(const Vector& position, const Vector& size,

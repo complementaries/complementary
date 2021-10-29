@@ -63,7 +63,9 @@ class ParticleSystem : public Object<ParticleSystemData> {
     void stop();
     void lateTick() override;
     void render(float lag) override;
+#ifndef NDEBUG
     void renderImGui() override;
+#endif
     void forceMoveParticles(const Vector& position, const Vector& size,
                             const Vector& velocity) override;
     bool allowSaving() const override;

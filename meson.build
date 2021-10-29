@@ -1,4 +1,4 @@
-project('complementary', 'cpp', default_options : ['cpp_std=c++17'])
+project('complementary', 'cpp', default_options : ['cpp_std=c++17', 'b_ndebug=if-release'])
 
 src = [
   'src/graphics/gl/Shader.cpp',
@@ -46,6 +46,7 @@ src = [
   'src/AbilityCutscene.cpp',
   'src/GoalCutscene.cpp',
   'src/Savegame.cpp',
+  'src/Utils.cpp',
   'src/Main.cpp'
 ]
 

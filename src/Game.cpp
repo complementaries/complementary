@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -14,6 +15,7 @@
 #include "Input.h"
 #include "Menu.h"
 #include "Savegame.h"
+#include "Utils.h"
 #include "graphics/Buffer.h"
 #include "graphics/Font.h"
 #include "graphics/RenderState.h"
@@ -44,9 +46,12 @@ static int currentLevelIndex = 0;
 static std::vector<std::string> levelNames = {};
 // TODO: make the level list configurable in the UI and get rid of this
 static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "map0";
-static char objectLoadLocation[MAX_LEVEL_NAME_LENGTH] = "assets/particlesystems/object.cmob";
 
+#ifndef NDEBUG
+static char objectLoadLocation[MAX_LEVEL_NAME_LENGTH] = "assets/particlesystems/object.cmob";
 static TilemapEditor* tilemapEditor;
+#endif
+
 static bool paused;
 static bool singleStep;
 
@@ -60,6 +65,8 @@ static std::shared_ptr<ParticleSystem> titleEffectParticles;
 static std::shared_ptr<ParticleSystem> backgroundParticles;
 constexpr int BACKGROUND_PARTICLE_ALPHA_BLACK = 16;
 constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
+
+long totalTicks = 0;
 
 static void loadTitleScreen();
 
@@ -86,9 +93,17 @@ static void findLevels() {
 
 bool Game::init() {
     Tiles::init();
-    if (Tilemap::init(48, 27) || Objects::init() || TilemapEditor::init() || RenderState::init() ||
-        ParticleRenderer::init() || Font::init() || TextureRenderer::init() || Player::init() ||
-        Savegame::init() || AbilityCutscene::init() || GoalCutscene::init()) {
+    if (Tilemap::init(48, 27) || Objects::init()) {
+        return true;
+    }
+#ifndef NDEBUG
+    if (TilemapEditor::init()) {
+        return true;
+    }
+#endif
+    if (RenderState::init() || ParticleRenderer::init() || Font::init() ||
+        TextureRenderer::init() || Player::init() || Savegame::init() || AbilityCutscene::init() ||
+        GoalCutscene::init()) {
         return true;
     }
     GoalTile::init();
@@ -121,7 +136,7 @@ static void onTileLoad() {
 }
 
 static void loadLevel(const char* name) {
-    printf("Loading level %s\n", name);
+    Utils::print("Loading level %s\n", name);
 
     char formattedTilemapName[MAX_LEVEL_NAME_LENGTH];
     char formattedObjectmapName[MAX_LEVEL_NAME_LENGTH];
@@ -192,9 +207,9 @@ void Game::nextLevel() {
         currentLevelIndex = nextLevelIndex;
         nextLevelIndex = -1;
     } else {
-        printf("Completed level with index %d\n", currentLevelIndex);
+        Utils::print("Completed level with index %d\n", currentLevelIndex);
         if (currentLevelIndex >= Savegame::getCompletedLevels()) {
-            printf("Updated completion count to %d\n", currentLevelIndex + 1);
+            Utils::print("Updated completion count to %d\n", currentLevelIndex + 1);
             Savegame::setCompletedLevels(currentLevelIndex + 1);
         }
 
@@ -231,6 +246,11 @@ void Game::tick() {
     fade = std::clamp(fade + fadeAdd, 0, 255);
     RenderState::tick();
 
+    if (isInTitleScreen) {
+        RenderState::setZoom(4.f, Vector(0.f, -2.f + sinf(totalTicks * 0.01f) * 0.13f));
+    }
+
+#ifndef NDEBUG
     if (tilemapEditor) {
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove() &&
             !Player::isDead()) {
@@ -252,15 +272,19 @@ void Game::tick() {
             zoom--;
         }
         tilemapEditor->setZoom(zoom);
-    } else {
-        Menu::tick();
+    } else
+#endif
+    {
+        if (!ImGui::IsAnyItemActive()) {
+            Menu::tick();
+        }
         if (Menu::isActive() && Menu::getType() != MenuType::START) {
             return;
         }
         AbilityCutscene::tick();
         GoalCutscene::tick();
         Player::setAllowedToMove(!AbilityCutscene::isActive() && !GoalCutscene::isActive() &&
-                                 !Menu::isActive() && !Player::isDead());
+                                 !Menu::isActive() && !ImGui::IsAnyItemActive() && !Player::isDead());
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
             switchWorld();
         }
@@ -269,7 +293,19 @@ void Game::tick() {
         Player::tick();
         Objects::lateTick();
     }
+
+    totalTicks++;
 }
+
+#ifndef NDEBUG
+static void drawFpsDisplay() {
+    Font::prepare();
+    char buffer[256];
+    snprintf(buffer, 256, "FPS: %2.0f TPS: %3.0f", fps.getUpdatesPerSecond(),
+             tps.getUpdatesPerSecond());
+    Font::draw(Vector(0.0f, 0.0f), 1.0f, ColorUtils::RED, buffer);
+}
+#endif
 
 void Game::render(float lag) {
     if (Menu::isActive()) {
@@ -279,11 +315,13 @@ void Game::render(float lag) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     RenderState::bindAndClearDefaultFramebuffer();
+#ifndef NDEBUG
     if (tilemapEditor) {
         RenderState::updateEditorViewMatrix(lag);
         tilemapEditor->render();
         return;
     }
+#endif
     RenderState::updatePlayerViewMatrix(lag);
     RenderState::prepareEffectFramebuffer();
     Tilemap::renderBackground();
@@ -317,11 +355,9 @@ void Game::render(float lag) {
     ObjectRenderer::prepare(Matrix());
     ObjectRenderer::drawRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
                                   ColorUtils::setAlpha(ColorUtils::BLACK, fade));
-    Font::prepare();
-    char buffer[256];
-    snprintf(buffer, 256, "FPS: %2.0f TPS: %3.0f", fps.getUpdatesPerSecond(),
-             tps.getUpdatesPerSecond());
-    Font::draw(Vector(0.0f, 0.0f), 2.0f, ColorUtils::RED, buffer);
+#ifndef NDEBUG
+    drawFpsDisplay();
+#endif
     if (!isInTitleScreen) {
         Menu::render(lag);
     }
@@ -330,6 +366,7 @@ void Game::render(float lag) {
     RenderState::disableBlending();
 }
 
+#ifndef NDEBUG
 void Game::renderImGui() {
     if (tilemapEditor) {
         return;
@@ -515,19 +552,24 @@ void Game::renderImGui() {
 
     ImGui::End();
 }
+#endif
 
 void Game::onWindowResize(int width, int height) {
     glViewport(0, 0, width, height);
+#ifndef NDEBUG
     if (tilemapEditor) {
         tilemapEditor->onScreenResize(width, height);
     }
+#endif
     RenderState::resize(width, height);
 }
 
 void Game::onMouseEvent(void* eventPointer) {
+#ifndef NDEBUG
     if (tilemapEditor) {
         tilemapEditor->onMouseEvent(eventPointer);
     }
+#endif
 }
 
 void Game::fadeIn(int speed) {

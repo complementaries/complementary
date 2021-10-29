@@ -12,6 +12,7 @@
 #include <rapidjson/istreamwrapper.h>
 #pragma GCC diagnostic pop
 
+#include "Utils.h"
 #include "graphics/Buffer.h"
 #include "graphics/RenderState.h"
 #include "graphics/gl/Shader.h"
@@ -43,7 +44,7 @@ static float scale(float f) {
 
 static bool hasMember(rapidjson::Document& document, const char* name) {
     if (!document.HasMember(name)) {
-        fprintf(stderr, "font json has no field named '%s'\n", name);
+        Utils::printError("font json has no field named '%s'\n", name);
         return true;
     }
     return false;
@@ -53,7 +54,7 @@ static bool checkForField(rapidjson::Document& document, const char* name, rapid
     if (hasMember(document, name)) {
         return true;
     } else if (document[name].GetType() != type) {
-        fprintf(stderr, "font json field '%s' is not an int\n", name);
+        Utils::printError("font json field '%s' is not an int\n", name);
         return true;
     }
     return false;
@@ -63,7 +64,7 @@ static bool checkForField(rapidjson::Document& document, const char* name) {
     if (hasMember(document, name)) {
         return true;
     } else if (!document[name].IsInt()) {
-        fprintf(stderr, "font json field '%s' is not an int\n", name);
+        Utils::printError("font json field '%s' is not an int\n", name);
         return true;
     }
     return false;
@@ -79,10 +80,10 @@ static bool parseGlobalField(rapidjson::Document& document, const char* name, in
 
 static bool readField(rapidjson::Value::ConstObject& o, const char* name, int& i) {
     if (!o.HasMember(name)) {
-        fprintf(stderr, "font json character has no field named '%s'\n", name);
+        Utils::printError("font json character has no field named '%s'\n", name);
         return true;
     } else if (!o[name].IsInt()) {
-        fprintf(stderr, "font json character field '%s' is not an int\n", name);
+        Utils::printError("font json character field '%s' is not an int\n", name);
         return true;
     }
     i = o[name].GetInt();
@@ -98,7 +99,7 @@ bool Font::init() {
     const char* path = "assets/font.png";
     SDL_Surface* font = IMG_Load(path);
     if (font == nullptr) {
-        fprintf(stderr, "cannot load font file '%s': %s\n", path, IMG_GetError());
+        Utils::printError("cannot load font file '%s': %s\n", path, IMG_GetError());
         return true;
     }
     texture.setData(font->w, font->h, font->pixels);
@@ -108,14 +109,14 @@ bool Font::init() {
     std::ifstream json;
     json.open(path);
     if (!json.good()) {
-        fprintf(stderr, "cannot load font json '%s'\n", path);
+        Utils::printError("cannot load font json '%s'\n", path);
         return true;
     }
     rapidjson::BasicIStreamWrapper wrapped(json);
     rapidjson::Document document;
     document.ParseStream(wrapped);
     if (document.HasParseError()) {
-        fprintf(stderr, "cannot parse font json: %d\n", document.GetParseError());
+        Utils::printError("cannot parse font json: %d\n", document.GetParseError());
         return true;
     } else if (parseGlobalField(document, "size", fontSize) ||
                parseGlobalField(document, "width", fontWidth) ||
@@ -127,12 +128,12 @@ bool Font::init() {
     auto t = document["characters"].GetObject();
     for (const auto& w : t) {
         if (!w.name.IsString() || !w.value.IsObject()) {
-            fprintf(stderr, "font json characters has invalid member\n");
+            Utils::printError("font json characters has invalid member\n");
             return true;
         }
         const char* name = w.name.GetString();
         if (name == nullptr) {
-            fprintf(stderr, "font json character has invalid name\n");
+            Utils::printError("font json character has invalid name\n");
             return true;
         }
         int index = name[0];

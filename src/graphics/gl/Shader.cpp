@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "Utils.h"
 #include <fstream>
 
 GL::Shader::Shader() : vertex(0), fragment(0), program(0) {
@@ -20,7 +21,7 @@ bool GL::Shader::readFile(std::vector<GLchar>& code, const char* path) const {
     std::ifstream in;
     in.open(path);
     if (!in.good()) {
-        printf("cannot open shader file '%s'\n", path);
+        Utils::printError("cannot open shader file '%s'\n", path);
         return true;
     }
     while (in.good()) {
@@ -49,7 +50,7 @@ bool GL::Shader::compileShader(const char* path, GLenum shaderType, GLuint& shad
     if (error == GL_FALSE) {
         GLchar buffer[256];
         glGetShaderInfoLog(shader, 256, nullptr, buffer);
-        printf("cannot compile shader %s: %s\n", path, buffer);
+        Utils::printError("cannot compile shader %s: %s\n", path, buffer);
         return true;
     }
     return false;
@@ -71,7 +72,7 @@ bool GL::Shader::compile(const GL::Shader::Options& options) {
     if (error == GL_FALSE) {
         GLchar buffer[256];
         glGetProgramInfoLog(program, 256, nullptr, buffer);
-        printf("cannot link shader: %s\n", buffer);
+        Utils::printError("cannot link shader: %s\n", buffer);
         return true;
     }
     return false;

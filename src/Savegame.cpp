@@ -1,5 +1,6 @@
 #include "Savegame.h"
 
+#include "Utils.h"
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -24,7 +25,7 @@ void Savegame::load() {
 
         // File magic must be CSAV
         if (strcmp(magic, "CSAV") != 0) {
-            fprintf(stderr, "Corrupted save file: magic does not match\n");
+            Utils::printError("Corrupted save file: magic does not match\n");
             return;
         }
         stream.read((char*)&data, sizeof(Data));

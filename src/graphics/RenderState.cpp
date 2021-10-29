@@ -1,5 +1,6 @@
 #include "RenderState.h"
 
+#include "Utils.h"
 #include "graphics/Window.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
@@ -70,7 +71,7 @@ bool RenderState::init() {
 
     GLenum error = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (error != GL_FRAMEBUFFER_COMPLETE) {
-        fprintf(stderr, "framebuffer error: %u\n", error);
+        Utils::printError("framebuffer error: %u\n", error);
         return true;
     }
 

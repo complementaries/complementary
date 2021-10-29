@@ -5,7 +5,9 @@ namespace Game {
     bool init();
     void tick();
     void render(float lag);
+#ifndef NDEBUG
     void renderImGui();
+#endif
     void setNextLevelIndex(int index);
     void nextLevel();
     void exitTitleScreen();

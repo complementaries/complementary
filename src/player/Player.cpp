@@ -11,6 +11,7 @@
 #include "Game.h"
 #include "Input.h"
 #include "Savegame.h"
+#include "Utils.h"
 #include "graphics/Buffer.h"
 #include "graphics/RenderState.h"
 #include "graphics/gl/Shader.h"
@@ -126,7 +127,7 @@ bool Player::init() {
 
     load();
 
-    puts("player load");
+    Utils::print("player load\n");
 
     deathParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/death.cmob");

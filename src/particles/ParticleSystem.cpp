@@ -350,6 +350,7 @@ std::shared_ptr<ObjectBase> ParticleSystem::clone() {
     return std::make_shared<ParticleSystem>(data);
 }
 
+#ifndef NDEBUG
 void ParticleSystem::renderImGui() {
     ImGui::DragInt("Duration", &data.duration);
     const char* types[] = {"Triangle", "Square", "Diamond"};
@@ -393,6 +394,7 @@ void ParticleSystem::renderImGui() {
         stop();
     }
 }
+#endif
 
 void ParticleSystem::forceMoveParticles(const Vector& position, const Vector& size,
                                         const Vector& velocity) {

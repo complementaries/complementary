@@ -12,6 +12,7 @@
 #include "Arguments.h"
 #include "Game.h"
 #include "Input.h"
+#include "Utils.h"
 #include "graphics/gl/Glew.h"
 #include "sound/SoundManager.h"
 
@@ -29,18 +30,18 @@ static bool fullscreen = false;
 
 bool Window::init() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        fprintf(stderr, "SDL failed to initialise: %s\n", SDL_GetError());
+        Utils::printError("SDL failed to initialise: %s\n", SDL_GetError());
         return true;
     }
     if (!Arguments::muted) {
         if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-            fprintf(stderr, "SDL audio failed to initialise: %s\n", SDL_GetError());
+            Utils::printError("SDL audio failed to initialise: %s\n", SDL_GetError());
             Arguments::muted = true;
         }
     }
 
     if (SoundManager::init()) {
-        fprintf(stderr, "Disabled audio due to sound manager init failure\n");
+        Utils::printError("Disabled audio due to sound manager init failure\n");
     }
 
     if (SoundManager::loadSounds()) {
@@ -54,13 +55,13 @@ bool Window::init() {
     window = SDL_CreateWindow("Complementary", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                               width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (window == nullptr) {
-        fprintf(stderr, "SDL window failed to initialise: %s\n", SDL_GetError());
+        Utils::printError("SDL window failed to initialise: %s\n", SDL_GetError());
         return true;
     }
 
     SDL_GLContext gContext = SDL_GL_CreateContext(window);
     if (gContext == nullptr) {
-        fprintf(stderr, "OpenGL context could not be created! SDL Error: %s\n", SDL_GetError());
+        Utils::printError("OpenGL context could not be created! SDL Error: %s\n", SDL_GetError());
         return true;
     }
 
@@ -70,21 +71,21 @@ bool Window::init() {
 
     GLenum glewError = glewInit();
     if (glewError != GLEW_OK) {
-        fprintf(stderr, "Error initializing GLEW! %s\n", glewGetErrorString(glewError));
+        Utils::printError("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
         return true;
     }
 
     if (SDL_GL_SetSwapInterval(Arguments::vsync) < 0) {
-        fprintf(stderr, "unable to set swap interval to %d\n", Arguments::vsync);
+        Utils::printError("unable to set swap interval to %d\n", Arguments::vsync);
     }
 
     if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1) < 0 ||
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, MSAA_SAMPLES) < 0) {
-        fprintf(stderr, "Failed to enable multisampling.\n");
+        Utils::printError("Failed to enable multisampling.\n");
     }
 
     if (SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1) < 0) {
-        fprintf(stderr, "Failed to enable GPU acceleration.\n");
+        Utils::printError("Failed to enable GPU acceleration.\n");
     }
 
     // Imgui setup
@@ -103,11 +104,11 @@ bool Window::init() {
 
     // Setup Platform/Renderer backends
     if (!ImGui_ImplSDL2_InitForOpenGL(window, gContext)) {
-        fprintf(stderr, "Failed to initialize ImGui");
+        Utils::printError("Failed to initialize ImGui");
         return true;
     }
     if (!ImGui_ImplOpenGL3_Init("#version 410")) {
-        fprintf(stderr, "Failed to initialize ImGui");
+        Utils::printError("Failed to initialize ImGui");
         return true;
     }
 
@@ -128,21 +129,21 @@ static void toggleFullscreen() {
         SDL_DisplayMode mode = {};
         int displayIndex = SDL_GetWindowDisplayIndex(window);
         if (displayIndex < 0) {
-            fprintf(stderr, "%s\n", SDL_GetError());
+            Utils::printError("%s\n", SDL_GetError());
             return;
         }
         if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN) < 0) {
-            fprintf(stderr, "%s\n", SDL_GetError());
+            Utils::printError("%s\n", SDL_GetError());
             return;
         }
         if (SDL_GetDesktopDisplayMode(displayIndex, &mode) < 0) {
-            fprintf(stderr, "%s\n", SDL_GetError());
+            Utils::printError("%s\n", SDL_GetError());
             return;
         }
         SDL_SetWindowSize(window, mode.w, mode.h);
     } else {
         if (SDL_SetWindowFullscreen(window, 0) < 0) {
-            fprintf(stderr, "%s\n", SDL_GetError());
+            Utils::printError("%s\n", SDL_GetError());
             return;
         }
 

@@ -1,3 +1,4 @@
+#ifndef NDEBUG
 #include "TilemapEditor.h"
 
 #include "objects/ColorObject.h"
@@ -375,3 +376,4 @@ void TilemapEditor::flush() {
         }
     }
 }
+#endif

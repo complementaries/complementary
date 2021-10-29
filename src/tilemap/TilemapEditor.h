@@ -1,3 +1,4 @@
+#ifndef NDEBUG
 #ifndef TILEMAP_EDITOR_H
 #define TILEMAP_EDITOR_H
 
@@ -22,4 +23,5 @@ class TilemapEditor final : private NonCopyable {
     stbte_tilemap* stbTileMap;
 };
 
+#endif
 #endif

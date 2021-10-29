@@ -1,6 +1,7 @@
 #include "SoundManager.h"
 
 #include "Arguments.h"
+#include "Utils.h"
 
 #include <iostream>
 
@@ -28,7 +29,7 @@ static int getIdFromChannel(int channel) {
 static void channelDone(int channel) {
     // remove all effects from channel
     if (!Mix_UnregisterAllEffects(channel)) {
-        printf("Mix_UnregisterAllEffects: %s\n", Mix_GetError());
+        Utils::print("Mix_UnregisterAllEffects: %s\n", Mix_GetError());
     }
     int ID = getIdFromChannel(channel);
     soundArray[ID].playing = false;
@@ -40,7 +41,7 @@ bool SoundManager::init() {
         return false;
     }
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
-        fprintf(stderr, "SDL Mixer failed to initialise: %s\n", SDL_GetError());
+        Utils::printError("SDL Mixer failed to initialise: %s\n", SDL_GetError());
         Arguments::muted = true;
         return true;
     }
@@ -123,7 +124,7 @@ static void loadSound(Sound::Sound s, const char* path, int volume) {
     soundArray[s].sound = Mix_LoadWAV(path);
     soundArray[s].defaultVolume = volume;
     if (soundArray[s].sound == nullptr) {
-        fprintf(stderr, "could not load sound '%s'\n", path);
+        Utils::printError("could not load sound '%s'\n", path);
     }
 }
 
@@ -136,10 +137,9 @@ bool SoundManager::loadSounds() {
     loadSound(Sound::WORLD_SWITCH, "assets/sounds/switch.ogg", MIX_MAX_VOLUME / 4);
     loadSound(Sound::JUMP, "assets/sounds/jump.ogg", MIX_MAX_VOLUME / 2);
     loadSound(Sound::DASH, "assets/sounds/dash.ogg", MIX_MAX_VOLUME / 2);
-    loadSound(Sound::WIND, "assets/sounds/wind.ogg", MIX_MAX_VOLUME);
+    loadSound(Sound::WIND, "assets/sounds/wind.ogg", MIX_MAX_VOLUME / 2);
     loadSound(Sound::COLLECT, "assets/sounds/collect.ogg", MIX_MAX_VOLUME / 2);
     loadSound(Sound::DEATH, "assets/sounds/death.ogg", MIX_MAX_VOLUME / 2);
-    loadSound(Sound::TITLE, "assets/sounds/title.ogg", MIX_MAX_VOLUME / 2);
     return false;
 }
 
@@ -189,11 +189,11 @@ void SoundManager::setDistanceToPlayer(int soundId, float distance, float xDista
     xDist = (xDist + 255) / 2;
 
     if (!Mix_SetDistance(soundArray[soundId].channel, abs(dist))) {
-        printf("Mix_SetDistance: %s\n", Mix_GetError());
+        Utils::print("Mix_SetDistance: %s\n", Mix_GetError());
     }
 
     if (!Mix_SetPanning(soundArray[soundId].channel, xDist, 255 - xDist)) {
-        printf("Mix_SetPanning: %s\n", Mix_GetError());
+        Utils::print("Mix_SetPanning: %s\n", Mix_GetError());
     }
 }
 

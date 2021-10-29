@@ -4,6 +4,7 @@
 #include <array>
 #include <cstdio>
 
+#include "Utils.h"
 #include "graphics/Buffer.h"
 #include "graphics/RenderState.h"
 #include "graphics/Window.h"
@@ -26,7 +27,7 @@ bool TextureRenderer::init() {
     abilities.init();
     SDL_Surface* data = IMG_Load("assets/abilities.png");
     if (data == nullptr) {
-        printf("cannot load abilities: %s\n", IMG_GetError());
+        Utils::print("cannot load abilities: %s\n", IMG_GetError());
         return true;
     }
     abilities.setData(data->w, data->h, data->pixels);

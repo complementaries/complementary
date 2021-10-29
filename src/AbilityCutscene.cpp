@@ -105,7 +105,8 @@ void AbilityCutscene::render(float lag) {
     Vector size(8.0f, 8.0f);
     Ability ability = Player::getAbility();
     Vector iconPos(wSize.x / 2 - size.x / 2, wSize.y / 2 - size.x / 2 - 2.f);
-    TextureRenderer::renderIcon(iconPos, iconPos + size, ability, alpha);
+    float smooth = std::min(0.15f * 1500.0f / Window::getWidth(), 0.95f);
+    TextureRenderer::renderIcon(iconPos, iconPos + size, ability, alpha, smooth);
 
     Font::prepare();
     float width = Font::getWidth(2, AbilityUtils::getName(ability));

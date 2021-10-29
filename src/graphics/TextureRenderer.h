@@ -8,7 +8,7 @@
 namespace TextureRenderer {
     bool init();
     void render(float lag);
-    void renderIcon(const Vector& min, const Vector& max, Ability a, int alpha);
+    void renderIcon(const Vector& min, const Vector& max, Ability a, int alpha, float smooth);
 }
 
 #endif

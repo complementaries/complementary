@@ -6,6 +6,7 @@
 
 #include "graphics/Buffer.h"
 #include "graphics/RenderState.h"
+#include "graphics/Window.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/Texture.h"
 #include "graphics/gl/VertexBuffer.h"
@@ -47,11 +48,13 @@ static void renderBox(const Vector& min, const Vector& max, const Vector& tMin, 
     buffer.drawTriangles(6);
 }
 
-void TextureRenderer::renderIcon(const Vector& min, const Vector& max, Ability a, int alpha) {
+void TextureRenderer::renderIcon(const Vector& min, const Vector& max, Ability a, int alpha,
+                                 float smooth) {
     if (a == Ability::NONE) {
         return;
     }
     shader.use();
+    shader.setFloat("smoothing", smooth);
     RenderState::setViewMatrix(shader);
     abilities.bindTo();
     int id = static_cast<int>(a) - 1;
@@ -64,7 +67,8 @@ void TextureRenderer::render(float lag) {
     (void)lag;
     Vector wSize(Tilemap::getWidth(), Tilemap::getHeight());
     Vector size(4.0f, 4.0f);
-    renderIcon(wSize - size, wSize, Player::getAbility(), 255);
+    float smooth = std::min(0.3f * 1500.0f / Window::getWidth(), 0.95f);
+    renderIcon(wSize - size, wSize, Player::getAbility(), 255, smooth);
     renderIcon(wSize - Vector(size.x * 0.5f, size.y * 1.5f), wSize - Vector(0.0, size.y),
-               Player::getPassiveAbility(), 100);
+               Player::getPassiveAbility(), 100, smooth);
 }

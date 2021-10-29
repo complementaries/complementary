@@ -7,7 +7,7 @@ in vec4 varColor;
 
 out vec4 color;
 
-const float smoothing = 1.0 / 16.0;
+uniform float smoothing;
 
 void main() {
     float dist = 1.0 - texture(samp, varTex).r;

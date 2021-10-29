@@ -461,11 +461,10 @@ void Player::setAbilities(Ability dark, Ability light, bool animate) {
     Ability lastAbility = Player::getAbility();
 
     if (dark != Ability::NONE && light != Ability::NONE) {
-
         if (!hasAbility(dark) && !hasAbility(light)) {
             abilities[0] = dark;
             abilities[1] = light;
-            if (!Savegame::abilitiesUnlocked(dark, light)) {
+            if (!Savegame::abilitiesUnlocked(dark, light) && !Game::inTitleScreen()) {
                 Savegame::unlockAbilities(dark, light);
                 if (!Arguments::skipAnim) {
                     AbilityCutscene::show(lastAbility);

@@ -91,6 +91,7 @@ if host_machine.system() == 'linux'
 endif
 
 if host_machine.system() == 'darwin'
+    args += ['-Wno-unknown-warning-option']
     dependencies += dependency('appleframeworks', modules: 'OpenGL')
 endif
 

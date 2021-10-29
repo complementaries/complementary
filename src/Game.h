@@ -9,6 +9,7 @@ namespace Game {
     void setNextLevelIndex(int index);
     void nextLevel();
     void exitTitleScreen();
+    bool inTitleScreen();
     void loadLevelSelect();
     void switchWorld();
 

@@ -38,7 +38,7 @@
 
 static constexpr int MAX_LEVEL_NAME_LENGTH = 100;
 
-static bool inTitleScreen = true;
+static bool isInTitleScreen = true;
 static int nextLevelIndex = -1;
 static int currentLevelIndex = 0;
 static std::vector<std::string> levelNames = {};
@@ -66,8 +66,12 @@ static void loadTitleScreen();
 static void findLevels() {
     for (const auto& entry : std::filesystem::directory_iterator("assets/maps")) {
         auto pathString = entry.path().string();
-        if (pathString.rfind("assets/maps/map", 0) == 0 &&
-            pathString.compare(pathString.size() - 5, 5, ".cmtm") == 0) {
+#ifdef _WIN32
+        auto isMap = pathString.rfind("assets\\maps\\map", 0) == 0;
+#else
+        auto isMap = pathString.rfind("assets/maps/map", 0) == 0;
+#endif
+        if (isMap && pathString.compare(pathString.size() - 5, 5, ".cmtm") == 0) {
             auto mapName = pathString.substr(12, pathString.size() - 12 -
                                                      5); // Cut off path and file extension
             levelNames.push_back(mapName);
@@ -135,7 +139,7 @@ static void loadLevel(const char* name) {
 
 static void loadTitleScreen() {
     loadLevel("title");
-    inTitleScreen = true;
+    isInTitleScreen = true;
     RenderState::setZoom(4.f, Vector(0.f, -2.f));
     Menu::showStartMenu();
     Player::setAbilities(Ability::WALL_JUMP, Ability::DASH, true);
@@ -144,7 +148,7 @@ static void loadTitleScreen() {
 }
 
 void Game::exitTitleScreen() {
-    inTitleScreen = false;
+    isInTitleScreen = false;
     loadLevelSelect();
     titleEffectParticles->stop();
     SoundManager::playMusic();
@@ -170,6 +174,10 @@ void Game::loadLevelSelect() {
 
 void Game::setNextLevelIndex(int next) {
     nextLevelIndex = next;
+}
+
+bool Game::inTitleScreen() {
+    return isInTitleScreen;
 }
 
 void Game::nextLevel() {
@@ -281,7 +289,7 @@ void Game::render(float lag) {
     Objects::render(lag);
     ParticleRenderer::render();
 
-    if (inTitleScreen) {
+    if (isInTitleScreen) {
         RenderState::updateViewMatrix(lag);
 
         glDisable(GL_DEPTH_TEST);
@@ -296,7 +304,7 @@ void Game::render(float lag) {
 
     glDisable(GL_DEPTH_TEST);
     RenderState::enableBlending();
-    if (!inTitleScreen) {
+    if (!isInTitleScreen) {
         TextureRenderer::render(lag);
     }
     ObjectRenderer::prepare(Matrix());
@@ -307,7 +315,7 @@ void Game::render(float lag) {
     snprintf(buffer, 256, "FPS: %2.0f TPS: %3.0f", fps.getUpdatesPerSecond(),
              tps.getUpdatesPerSecond());
     Font::draw(Vector(0.0f, 0.0f), 2.0f, ColorUtils::RED, buffer);
-    if (!inTitleScreen) {
+    if (!isInTitleScreen) {
         Menu::render(lag);
     }
     AbilityCutscene::render(lag);

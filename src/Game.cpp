@@ -155,6 +155,7 @@ static void loadLevel(const char* name) {
 
     Game::setFade(254);
     Game::fadeIn(4);
+    Player::restart();
 }
 
 static void loadTitleScreen() {

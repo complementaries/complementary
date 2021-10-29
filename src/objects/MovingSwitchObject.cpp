@@ -18,6 +18,14 @@ void MovingSwitchObject::postInit() {
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/switchobjectOFF.cmob");
     seenParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/switchobjectON.cmob");
+    Vector size = this->getSize();
+    seenParticles->data.boxSize = size * 1.1f;
+    seenParticles->data.minStartVelocity = -size * 0.01f;
+    seenParticles->data.maxStartVelocity = size * 0.01f;
+    seenParticles->data.minEmissionRate = seenParticles->data.maxEmissionRate * size.x * size.y;
+
+    hiddenParticles->data.boxSize = size;
+    hiddenParticles->data.minEmissionRate = hiddenParticles->data.maxEmissionRate * size.x * size.y;
 }
 
 void MovingSwitchObject::tick() {
@@ -31,9 +39,7 @@ void MovingSwitchObject::tick() {
         hiddenParticles->stop();
         seenParticles->data.startColor = color[seen];
         seenParticles->data.endColor = ColorUtils::setAlpha(color[seen], 150);
-        seenParticles->data.boxSize = size * 1.1f;
-        seenParticles->data.minStartVelocity = -size * 0.01f;
-        seenParticles->data.maxStartVelocity = size * 0.01f;
+
         seenParticles->position = position + size / 2.0f;
     } else {
         lastPosition = position;
@@ -43,10 +49,7 @@ void MovingSwitchObject::tick() {
         }
         hiddenParticles->data.startColor = ColorUtils::setAlpha(color[!seen], 0);
         hiddenParticles->data.endColor = color[!seen];
-        hiddenParticles->data.boxSize = size;
         hiddenParticles->position = position + size / 2.0f;
-        seenParticles->data.minStartVelocity = -size * 0.05f;
-        seenParticles->data.maxStartVelocity = size * 0.05f;
     }
 }
 

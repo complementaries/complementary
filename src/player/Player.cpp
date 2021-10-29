@@ -379,7 +379,7 @@ void Player::restart() {
     rightWall = false;
     leftWallBuffer = 0;
     rightWallBuffer = 0;
-    // worldType = false;
+    worldType = false;
     wallJumpCooldown = 0;
     jumpTicks = 0;
     wallJumpTicks = 0;

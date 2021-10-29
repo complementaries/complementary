@@ -188,8 +188,8 @@ std::shared_ptr<ObjectBase> MovingObject::clone() {
 #ifndef NDEBUG
 void MovingObject::initTileEditorData(std::vector<TileEditorProp>& props) {
     props.insert(props.end(),
-                 {TileEditorProp::Int("Size X", data.size.x, 0, 5),
-                  TileEditorProp::Int("Size Y", data.size.y, 0, 5),
+                 {TileEditorProp::Int("Size X", data.size.x, 0, 18),
+                  TileEditorProp::Int("Size Y", data.size.y, 0, 18),
                   TileEditorProp::Float("Goal X", data.goal.x, -20.f, 20.f),
                   TileEditorProp::Float("Goal Y", data.goal.y, -20.f, 20.f),
                   TileEditorProp::Float("Speed", data.speed, 0.f, 0.5f),

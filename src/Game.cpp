@@ -71,7 +71,6 @@ static void findLevels() {
 #endif
     for (const auto& entry : std::filesystem::directory_iterator(mapsDir)) {
         auto pathString = entry.path().string();
-        std::cout << pathString << std::endl;
 #ifdef _WIN32
         auto isMap = pathString.rfind("assets\\maps\\map", 0) == 0;
 #else

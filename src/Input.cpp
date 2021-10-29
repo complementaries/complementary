@@ -81,6 +81,42 @@ void Input::setController(SDL_GameController* c) {
     }
 }
 
+void Input::playRumble(float strength, uint32_t length) {
+    SDL_HapticSetGain(controllerHaptic, 100);
+    if (SDL_HapticRumblePlay(controllerHaptic, strength, length) != 0) {
+        printf("Warning: Unable to play rumble! %s\n", SDL_GetError());
+    }
+    // SDL_HapticEffect effect;
+    // int effect_id;
+
+    // // See if it can do sine waves
+    // if ((SDL_HapticQuery(controllerHaptic) & SDL_HAPTIC_XINPUT) == 0) {
+    //     SDL_HapticClose(controllerHaptic); // No sine effect
+    //     printf("Warning: Unable to play sine! %s\n", SDL_GetError());
+    // }
+
+    // // Create the effect
+    // SDL_memset(&effect, 0, sizeof(SDL_HapticEffect)); // 0 is safe default
+    // effect.type = SDL_HAPTIC_XINPUT;
+    // effect.periodic.direction.type = SDL_HAPTIC_POLAR; // Polar coordinates
+    // effect.periodic.direction.dir[0] = 18000;          // Force comes from south
+    // effect.periodic.period = 1000;                     // 1000 ms
+    // effect.periodic.magnitude = 20000;                 // 20000/32767 strength
+    // effect.periodic.length = 5000;                     // 5 seconds long
+    // effect.periodic.attack_length = 1000;              // Takes 1 second to get max strength
+    // effect.periodic.fade_length = 1000;                // Takes 1 second to fade away
+
+    // // Upload the effect
+    // effect_id = SDL_HapticNewEffect(controllerHaptic, &effect);
+
+    // // Test the effect
+    // SDL_HapticRunEffect(controllerHaptic, effect_id, 1);
+    //  SDL_Delay( 5000); // Wait for the effect to finish
+
+    //  // We destroy the effect, although closing the device also does this
+    //  SDL_HapticDestroyEffect( haptic, effect_id );
+}
+
 void Input::closeController() {
     if (controllerHaptic != nullptr) {
         SDL_HapticClose(controllerHaptic);

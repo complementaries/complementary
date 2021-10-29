@@ -411,6 +411,7 @@ void Player::kill() {
     dead = deathParticles->data.duration + deathParticles->data.maxLifetime;
     RenderState::addRandomizedShake(1.0f);
     Game::fadeOut(4);
+    Input::playRumble(1.0f, 200);
 }
 
 bool Player::isDead() {

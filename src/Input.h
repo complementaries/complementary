@@ -48,6 +48,7 @@ namespace Input {
     const char* getButtonName(ButtonType button);
     void closeController();
     SDL_Haptic* getControllerHaptic();
+    void playRumble(float strength, uint32_t length);
 }
 
 #endif

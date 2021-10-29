@@ -112,7 +112,6 @@ bool Window::init() {
     }
 
     // Initialize game controller subsystem
-    SDL_SetHint("SDL_XINPUT_ENABLED", "0");
     if (SDL_WasInit(SDL_INIT_JOYSTICK) != 1) SDL_InitSubSystem(SDL_INIT_JOYSTICK);
     if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) != 1) SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
     if (SDL_WasInit(SDL_INIT_HAPTIC) != 1) SDL_InitSubSystem(SDL_INIT_HAPTIC);

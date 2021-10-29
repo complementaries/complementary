@@ -112,8 +112,10 @@ bool Window::init() {
     }
 
     // Initialize game controller subsystem
+    SDL_SetHint("SDL_XINPUT_ENABLED", "0");
+    if (SDL_WasInit(SDL_INIT_JOYSTICK) != 1) SDL_InitSubSystem(SDL_INIT_JOYSTICK);
     if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) != 1) SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
-
+    if (SDL_WasInit(SDL_INIT_HAPTIC) != 1) SDL_InitSubSystem(SDL_INIT_HAPTIC);
     SDL_GameControllerEventState(SDL_ENABLE);
 
     return false;
@@ -347,8 +349,7 @@ static void pollEvents() {
             case SDL_CONTROLLERDEVICEREMOVED: {
                 if (Input::getController() != NULL &&
                     SDL_GameControllerFromInstanceID(e.adevice.which) == Input::getController()) {
-                    SDL_GameControllerClose(Input::getController());
-                    Input::setController(nullptr);
+                    Input::closeController();
                 }
                 break;
             }
@@ -416,10 +417,7 @@ void Window::run() {
         SDL_GL_SwapWindow(window);
     }
 
-    if (Input::getController() != NULL) {
-        SDL_GameControllerClose(Input::getController());
-    }
-    Input::setController(nullptr);
+    Input::closeController();
     SDL_DestroyWindow(window);
     SDL_Quit();
     SoundManager::quit();

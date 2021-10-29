@@ -128,6 +128,7 @@ void Tilemap::load(const char* path) {
     stream.read((char*)&width, 4);
     stream.read((char*)&height, 4);
 
+    tiles.resize(width * height);
     stream.read(tiles.data(), width * height);
     stream.close();
 

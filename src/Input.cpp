@@ -9,7 +9,8 @@ static float axes[(size_t)AxisType::MAX];
 static float horizontal;
 static float joystickFactor = 1.0f;
 static bool joystickControlled = false;
-static SDL_GameController* controller;
+static SDL_GameController* controller = nullptr;
+static SDL_Haptic* controllerHaptic = nullptr;
 
 void Input::Internal::setButtonPressed(ButtonType type) {
     auto& button = buttons[(size_t)type];
@@ -62,9 +63,33 @@ float Input::getHorizontal() {
 SDL_GameController* Input::getController() {
     return controller;
 }
+SDL_Haptic* Input::getControllerHaptic() {
+    return controllerHaptic;
+}
 
 void Input::setController(SDL_GameController* c) {
     controller = c;
+    controllerHaptic = SDL_HapticOpenFromJoystick(SDL_GameControllerGetJoystick(c));
+    if (controllerHaptic == nullptr) {
+        printf("Warning: Controller does not support haptics! SDL Error: %s\n", SDL_GetError());
+    } else {
+        if (SDL_HapticRumbleInit(controllerHaptic) < 0) {
+            printf("Warning: Unable to initialize rumble! SDL Error: %s\n", SDL_GetError());
+        } else {
+            printf("Haptic Device Connected!");
+        }
+    }
+}
+
+void Input::closeController() {
+    if (controllerHaptic != nullptr) {
+        SDL_HapticClose(controllerHaptic);
+    }
+    if (controller != nullptr) {
+        SDL_GameControllerClose(controller);
+    }
+    controller = nullptr;
+    controllerHaptic = nullptr;
 }
 
 const char* Input::getButtonName(ButtonType type) {

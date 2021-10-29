@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include <SDL_gamecontroller.h>
+#include <SDL_haptic.h>
 #include <string>
 
 enum class ButtonType {
@@ -45,7 +46,8 @@ namespace Input {
     SDL_GameController* getController();
     void setController(SDL_GameController* controller);
     const char* getButtonName(ButtonType button);
-
+    void closeController();
+    SDL_Haptic* getControllerHaptic();
 }
 
 #endif

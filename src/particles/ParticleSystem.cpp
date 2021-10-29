@@ -397,7 +397,7 @@ void ParticleSystem::renderImGui() {
 void ParticleSystem::forceMoveParticles(const Vector& position, const Vector& size,
                                         const Vector& velocity) {
     for (Particle& p : squares) {
-        if (isColliding(data, p, position, size)) {
+        if (data.enableCollision && isColliding(data, p, position, size)) {
             p.position += velocity;
             p.lastPosition += velocity;
         }
@@ -406,4 +406,8 @@ void ParticleSystem::forceMoveParticles(const Vector& position, const Vector& si
 
 bool ParticleSystem::allowSaving() const {
     return false;
+}
+
+bool ParticleSystem::isPlaying() const {
+    return playing;
 }

@@ -25,7 +25,9 @@ void MovingSwitchObject::tick() {
     Vector size = this->getSize();
     if (isSolid()) {
         MovingObject::tick();
-        seenParticles->play();
+        if (!seenParticles->isPlaying()) {
+            seenParticles->play();
+        }
         hiddenParticles->stop();
         seenParticles->data.startColor = color[seen];
         seenParticles->data.endColor = ColorUtils::setAlpha(color[seen], 150);
@@ -36,7 +38,9 @@ void MovingSwitchObject::tick() {
     } else {
         lastPosition = position;
         seenParticles->stop();
-        hiddenParticles->play();
+        if (!hiddenParticles->isPlaying()) {
+            hiddenParticles->play();
+        }
         hiddenParticles->data.startColor = ColorUtils::setAlpha(color[!seen], 0);
         hiddenParticles->data.endColor = color[!seen];
         hiddenParticles->data.boxSize = size;

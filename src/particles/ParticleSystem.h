@@ -72,6 +72,8 @@ class ParticleSystem : public Object<ParticleSystemData> {
 
     float getColliderOffset();
 
+    bool isPlaying() const;
+
   private:
     std::vector<Particle> triangles;
     std::vector<Particle> squares;

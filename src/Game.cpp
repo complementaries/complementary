@@ -285,7 +285,8 @@ void Game::tick() {
         AbilityCutscene::tick();
         GoalCutscene::tick();
         Player::setAllowedToMove(!AbilityCutscene::isActive() && !GoalCutscene::isActive() &&
-                                 !Menu::isActive() && !ImGui::IsAnyItemActive() && !Player::isDead());
+                                 !Menu::isActive() && !ImGui::IsAnyItemActive() &&
+                                 !Player::isDead());
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
             switchWorld();
         }

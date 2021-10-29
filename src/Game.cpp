@@ -207,6 +207,7 @@ void Game::switchWorld() {
     RenderState::addRandomizedShake(1.0f);
     RenderState::startMixing();
     RenderState::startGlowing();
+    Input::playRumble(0.5f, 100);
 
     SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
     SoundManager::switchMusic();
@@ -231,7 +232,8 @@ void Game::tick() {
     RenderState::tick();
 
     if (tilemapEditor) {
-        if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
+        if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove() &&
+            !Player::isDead()) {
             switchWorld();
         }
         tilemapEditor->tick(Window::SECONDS_PER_TICK);
@@ -258,7 +260,7 @@ void Game::tick() {
         AbilityCutscene::tick();
         GoalCutscene::tick();
         Player::setAllowedToMove(!AbilityCutscene::isActive() && !GoalCutscene::isActive() &&
-                                 !Menu::isActive());
+                                 !Menu::isActive() && !Player::isDead());
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
             switchWorld();
         }

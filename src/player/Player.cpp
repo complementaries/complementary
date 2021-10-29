@@ -415,7 +415,7 @@ void Player::kill() {
 }
 
 bool Player::isDead() {
-    return dead <= 0;
+    return dead > 0;
 }
 
 bool Player::isAllowedToMove() {
@@ -462,6 +462,7 @@ void Player::setAbilities(Ability dark, Ability light, bool animate) {
     Ability lastAbility = Player::getAbility();
 
     if (dark != Ability::NONE && light != Ability::NONE) {
+        Input::playRumble(0.05f, 100);
         if (!hasAbility(dark) && !hasAbility(light)) {
             abilities[0] = dark;
             abilities[1] = light;
@@ -772,12 +773,14 @@ void Player::tick() {
     if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
         dashTicks == 0 && dashCoolDown == 0 && dashUseable && allowedToMove) {
         dashParticles->play();
+        Input::playRumble(0.2f, 100);
         dashTicks = data.maxDashTicks;
         dashUseable = false;
         dashCoolDown = data.maxDashCooldown + dashTicks;
         dashVelocity = Vector(data.dashStrength * dashDirection, 0.0f);
         addRenderForce(-0.5f, dashDirection < 0.0f ? Face::LEFT : Face::RIGHT);
         SoundManager::playSoundEffect(Sound::DASH);
+        RenderState::addRandomizedShake(0.1f);
     }
     if ((leftWall || rightWall) && Player::hasAbility(Ability::WALL_JUMP)) {
         resetDash();

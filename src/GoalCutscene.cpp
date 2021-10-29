@@ -73,6 +73,7 @@ void GoalCutscene::tick() {
     }
 
     if ((currentTicks == 90 && !dashing) || (currentTicks == 0 && dashing)) {
+        Input::playRumble(0.5f, 300);
         Player::setHidden(true);
         PlayerParticles::setParticlePosition(particles, 0, 0, 0, 0);
         RenderState::addRandomizedShake(4.f);
@@ -104,6 +105,7 @@ void GoalCutscene::tick() {
     }
 
     if (currentTicks == 200 && !dashing) {
+        Input::playRumble(0.75f, 600);
         particles->position = goalPosition;
         particles->data.attractSpeed = 0.002f;
         particles->data.enableCollision = false;

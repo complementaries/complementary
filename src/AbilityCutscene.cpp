@@ -34,6 +34,7 @@ void AbilityCutscene::show(Ability previous) {
     alpha = 0;
     Player::setGravityEnabled(false);
     Player::setOverrideColor(AbilityUtils::getColor(previous));
+    Input::playRumble(0.75f, 2500);
 }
 
 void AbilityCutscene::tick() {

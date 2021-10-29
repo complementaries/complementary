@@ -3,7 +3,7 @@
 
 #include "Tiles.h"
 
-static Tile defaultTile{ColorUtils::rgba(0xFF, 0x66, 0x00), false, nullptr};
+static BoxTile defaultTile{ColorUtils::rgba(0xFF, 0x66, 0x00), false};
 static std::vector<Tile*> tiles;
 
 Tile Tiles::AIR{ColorUtils::rgba(0xFF, 0xFF, 0xFF), false, nullptr};

@@ -354,7 +354,7 @@ void TilemapEditor::flush() {
         for (int x = 0; x < width; x++) {
             auto tiles = stbte_get_tile(stbTileMap, x, y);
             short tileId = tiles[0]; // Tile layer
-            Tilemap::setTile(x, y, Tiles::get(tileId));
+            Tilemap::setTile(x, y, tileId < 0 ? Tiles::AIR : Tiles::get(tileId));
 
             short objectId = tiles[1]; // Object layer
             if (objectId >= OBJECT_ID_OFFSET) {

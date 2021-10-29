@@ -49,19 +49,19 @@ src = [
   'src/Main.cpp'
 ]
 
-zlib_proj = subproject('zlib')
-libjpeg_proj = subproject('libjpeg')
-libpng_proj = subproject('libpng')
-libogg_proj = subproject('libogg')
-vorbis_proj = subproject('vorbis')
+zlib_proj = subproject('zlib', default_options: 'warning_level=0')
+libjpeg_proj = subproject('libjpeg', default_options: 'warning_level=0')
+libpng_proj = subproject('libpng', default_options: 'warning_level=0')
+libogg_proj = subproject('libogg', default_options: 'warning_level=0')
+vorbis_proj = subproject('vorbis', default_options: 'warning_level=0')
 
-sdl2_proj = subproject('sdl2')
-sdl2_image_proj = subproject('sdl2_image')
-sdl2_mixer_proj = subproject('sdl2_mixer')
-glew_proj = subproject('glew')
-imgui_proj = subproject('imgui')
-rapidjson_proj = subproject('rapidjson')
-stb_proj = subproject('stb')
+sdl2_proj = subproject('sdl2', default_options: 'warning_level=0')
+sdl2_image_proj = subproject('sdl2_image', default_options: 'warning_level=0')
+sdl2_mixer_proj = subproject('sdl2_mixer', default_options: 'warning_level=0')
+glew_proj = subproject('glew', default_options: 'warning_level=0')
+imgui_proj = subproject('imgui', default_options: 'warning_level=0')
+rapidjson_proj = subproject('rapidjson', default_options: 'warning_level=0')
+stb_proj = subproject('stb', default_options: 'warning_level=0')
 
 dependencies = [
     zlib_proj.get_variable('zlib_dep'),

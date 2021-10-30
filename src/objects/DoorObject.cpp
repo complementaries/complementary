@@ -96,8 +96,8 @@ std::shared_ptr<ObjectBase> DoorObject::clone() {
 
 #ifndef NDEBUG
 void DoorObject::initTileEditorData(std::vector<TileEditorProp>& props) {
-    props.insert(props.end(), {TileEditorProp::Int("Size X", data.size.x, 1, 5),
-                               TileEditorProp::Int("Size Y", data.size.y, 1, 5),
+    props.insert(props.end(), {TileEditorProp::Int("Size X", data.size.x, 1, 10),
+                               TileEditorProp::Int("Size Y", data.size.y, 1, 10),
                                TileEditorProp::Int("Type", data.type, 0, 10)});
 }
 

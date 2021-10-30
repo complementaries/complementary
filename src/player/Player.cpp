@@ -65,7 +65,7 @@ struct PlayerData {
     float wallJumpDrag = 0.2f;
     int wallJumpMoveCooldown = 15;
     float gravity = 0.0275f;
-    int coyoteTicks = 13;
+    int coyoteTicks = 8;
     Vector drag{0.7f, 0.9f};
     int maxJumpBufferTicks = 10;
     int maxDashTicks = 24;

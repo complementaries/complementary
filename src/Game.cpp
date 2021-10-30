@@ -88,6 +88,7 @@ static void findLevels() {
                                                      5); // Cut off path and file extension
             levelNames.push_back(mapName);
         }
+        std::sort(levelNames.begin(), levelNames.end());
     }
 }
 

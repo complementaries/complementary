@@ -1,10 +1,17 @@
 Disclaimer: Sound Effects are taken from free websites and not our original work.
 A list of the used sounds and their sources can be found below.
+Some effects where cut to be shorter and fit the games actions.
 
 jump - https://freesound.org/people/ryusa/sounds/531145/
 switch - https://freesound.org/people/pelicanicious/sounds/580062/
 wind - https://freesound.org/people/fedsmoker/sounds/208525/
-dash_old - https://freesound.org/people/Kastenfrosch/sounds/521999/
 collect - https://freesound.org/people/LittleRobotSoundFactory/sounds/270304/
-dash - https://freesound.org/people/erkanozan/sounds/51755/
+dash - https://freesound.org/people/florianreichelt/sounds/459999/
 death - https://freesound.org/people/tkky/sounds/524281/
+explode - https://freesound.org/people/ihitokage/sounds/413219/
+ability - https://freesound.org/people/Robinhood76/sounds/414293/
+teleport -https://freesound.org/people/martian/sounds/403973/
+
+dash_2 - https://freesound.org/people/WizardOZ/sounds/419341/
+
+

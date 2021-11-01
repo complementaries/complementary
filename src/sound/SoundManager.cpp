@@ -6,11 +6,9 @@
 #include <iostream>
 
 const static int maxMusicVolume = MIX_MAX_VOLUME / 4;
-const static int lightSoundID = 0;
-const static int darkSoundID = 1;
 const static int soundEffectsGroup = 1;
 const static int maxChannels = 16;
-static int curMusicChannel = lightSoundID;
+static int curMusicChannel = SoundManager::lightSoundID;
 static bool muted = false;
 static int musicVolume = maxMusicVolume;
 
@@ -24,6 +22,10 @@ static int getIdFromChannel(int channel) {
     }
     // should not happen
     return -1;
+}
+
+int SoundManager::getMusicChannel() {
+    return curMusicChannel;
 }
 
 static void channelDone(int channel) {
@@ -136,11 +138,15 @@ bool SoundManager::loadSounds() {
     loadSound(Sound::DARK_BG, "assets/sounds/dark.ogg", musicVolume);
     loadSound(Sound::WORLD_SWITCH, "assets/sounds/switch.ogg", MIX_MAX_VOLUME / 4);
     loadSound(Sound::JUMP, "assets/sounds/jump.ogg", MIX_MAX_VOLUME / 2);
-    loadSound(Sound::DASH, "assets/sounds/dash.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::DASH, "assets/sounds/dash.ogg", MIX_MAX_VOLUME);
     loadSound(Sound::WIND, "assets/sounds/wind.ogg", MIX_MAX_VOLUME);
     loadSound(Sound::COLLECT, "assets/sounds/collect.ogg", MIX_MAX_VOLUME / 2);
     loadSound(Sound::DEATH, "assets/sounds/death.ogg", MIX_MAX_VOLUME / 2);
     loadSound(Sound::TITLE, "assets/sounds/title.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::DOOR, "assets/sounds/door.ogg", MIX_MAX_VOLUME / 4);
+    loadSound(Sound::TELEPORT, "assets/sounds/teleport.ogg", MIX_MAX_VOLUME / 4);
+    loadSound(Sound::EXPLODE, "assets/sounds/explode.ogg", MIX_MAX_VOLUME / 3);
+    loadSound(Sound::NEW_ABILITY, "assets/sounds/ability.ogg", MIX_MAX_VOLUME / 2);
     return false;
 }
 

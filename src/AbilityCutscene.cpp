@@ -13,6 +13,7 @@
 #include "objects/Objects.h"
 #include "particles/ParticleSystem.h"
 #include "player/Player.h"
+#include "sound/SoundManager.h"
 #include "tilemap/Tilemap.h"
 
 static int currentTicks = -1;
@@ -35,6 +36,7 @@ void AbilityCutscene::show(Ability previous) {
     Player::setGravityEnabled(false);
     Player::setOverrideColor(AbilityUtils::getColor(previous));
     Input::playRumble(0.75f, 2500);
+    SoundManager::playSoundEffect(Sound::NEW_ABILITY);
 }
 
 void AbilityCutscene::tick() {

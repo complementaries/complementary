@@ -402,6 +402,9 @@ void Player::restart() {
     stickingToWall = false;
     dead = 0;
     Tilemap::forceReload();
+    if (SoundManager::getMusicChannel() == SoundManager::darkSoundID) {
+        SoundManager::switchMusic();
+    }
 }
 
 void Player::kill() {

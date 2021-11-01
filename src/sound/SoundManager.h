@@ -12,9 +12,13 @@ namespace Sound {
         WIND,
         COLLECT,
         DEATH,
+        DOOR,
         // GLIDE,
         DASH,
         TITLE,
+        TELEPORT,
+        EXPLODE,
+        NEW_ABILITY,
         MAX
     };
 }
@@ -40,4 +44,8 @@ namespace SoundManager {
     bool soundPlaying(int soundId);
     void quit();
     void mute();
+    int getMusicChannel();
+
+    const static int lightSoundID = 0;
+    const static int darkSoundID = 1;
 }

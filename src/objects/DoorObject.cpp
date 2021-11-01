@@ -3,6 +3,7 @@
 #include "ObjectRenderer.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
+#include "sound/SoundManager.h"
 
 #include <memory>
 
@@ -27,7 +28,6 @@ bool DoorObject::isSolid() const {
 
 void DoorObject::postInit() {
     particles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/door.cmob");
-    firstTick = true;
 }
 
 bool DoorObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {
@@ -40,13 +40,13 @@ void DoorObject::tick() {
     if (alpha < 0) {
         alpha = 0;
     }
-    if (firstTick && keys == maxKeys && maxKeys != 0) {
+    if (!particles->isPlaying() && keys == maxKeys && maxKeys != 0) {
         particles->play();
+        SoundManager::playSoundEffect(Sound::DOOR);
         constexpr Color colors[] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
         particles->data.startColor = colors[Player::invertColors()];
         particles->data.endColor = ColorUtils::setAlpha(colors[Player::invertColors()], 0);
         particles->position = position + this->getSize() / 2.0f;
-        firstTick = false;
     }
 }
 
@@ -125,5 +125,4 @@ void DoorObject::reset() {
     keys = 0;
     maxKeys = 0;
     alpha = START_ALPHA;
-    firstTick = true;
 }

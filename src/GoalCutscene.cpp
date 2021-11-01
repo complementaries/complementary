@@ -13,6 +13,7 @@
 #include "objects/Objects.h"
 #include "particles/ParticleSystem.h"
 #include "player/Player.h"
+#include "sound/SoundManager.h"
 #include "tilemap/Tilemap.h"
 
 static int currentTicks = -1;
@@ -73,6 +74,7 @@ void GoalCutscene::tick() {
     }
 
     if ((currentTicks == 90 && !dashing) || (currentTicks == 0 && dashing)) {
+        SoundManager::playSoundEffect(Sound::EXPLODE);
         Input::playRumble(0.5f, 300);
         Player::setHidden(true);
         PlayerParticles::setParticlePosition(particles, 0, 0, 0, 0);
@@ -105,6 +107,9 @@ void GoalCutscene::tick() {
     }
 
     if (currentTicks == 200 && !dashing) {
+        if (!SoundManager::soundPlaying(Sound::TELEPORT)) {
+            SoundManager::playSoundEffect(Sound::TELEPORT);
+        }
         Input::playRumble(0.75f, 600);
         particles->position = goalPosition;
         particles->data.attractSpeed = 0.002f;

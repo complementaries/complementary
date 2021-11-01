@@ -41,7 +41,6 @@ class DoorObject : public Object<DoorObjectData> {
     int keys;
     int alpha;
     std::shared_ptr<ParticleSystem> particles;
-    bool firstTick;
 };
 
 #endif

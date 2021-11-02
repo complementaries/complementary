@@ -92,6 +92,15 @@ static void findLevels() {
     }
 }
 
+#ifndef NDEBUG
+static void logGlError(const char* msg) {
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        fprintf(stderr, "GL-Error in %s: %u\n", msg, error);
+    }
+}
+#endif
+
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Objects::init()) {
@@ -122,6 +131,10 @@ bool Game::init() {
     titleEffectParticles->destroyOnLevelLoad = false;
 
     loadTitleScreen();
+
+#ifndef NDEBUG
+    logGlError("init");
+#endif
 
     return false;
 }
@@ -369,6 +382,10 @@ void Game::render(float lag) {
     AbilityCutscene::render(lag);
     GoalCutscene::render(lag);
     RenderState::disableBlending();
+
+#ifndef NDEBUG
+    logGlError("render end");
+#endif
 }
 
 #ifndef NDEBUG

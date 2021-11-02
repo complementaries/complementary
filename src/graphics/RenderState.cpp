@@ -235,7 +235,7 @@ void RenderState::renderTitleScreenEffects(float lag) {
     bindAndClearDefaultFramebuffer();
     lineMixer.use();
     setViewMatrix(mixer);
-    mixer.setInt("samp", 0);
+    lineMixer.setInt("samp", 0);
     bindTextureTo(0);
     rectangle.drawTriangles(6);
 }

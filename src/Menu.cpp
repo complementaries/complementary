@@ -9,7 +9,6 @@
 #include "graphics/Window.h"
 #include "objects/ObjectRenderer.h"
 #include "player/Player.h"
-#include "tilemap/Tilemap.h"
 
 typedef void (*MenuFunction)();
 
@@ -20,7 +19,7 @@ struct MenuEntry {
 };
 
 std::vector<MenuEntry> lines;
-static float fontSize = 3.0f;
+static float fontSize = 5.0f;
 static unsigned int menuIndex = 1;
 static MenuType type = MenuType::NONE;
 constexpr float yGapFactor = 1.25f;
@@ -85,6 +84,12 @@ void Menu::tick() {
 void Menu::render(float lag) {
     (void)lag;
 
+    float aspect = static_cast<float>(Window::getWidth()) / Window::getHeight();
+    Vector wSize(100.0f, 100.0f / aspect);
+    Matrix m;
+    m.transform(Vector(-1.0f, 1.0f));
+    m.scale(Vector(2.0f, -2.0) / wSize);
+
     Vector size;
     for (auto& e : lines) {
         e.width = Font::getWidth(fontSize, e.text.c_str());
@@ -93,22 +98,22 @@ void Menu::render(float lag) {
     }
 
     Vector overSize = size * 1.1f;
-    Vector pos = (Tilemap::getSize() - overSize) * 0.5f;
+    Vector pos = (wSize - overSize) * 0.5f;
     if (type != MenuType::START) {
-        ObjectRenderer::prepare();
+        ObjectRenderer::prepare(m);
         ObjectRenderer::drawRectangle(pos, overSize, ColorUtils::setAlpha(ColorUtils::GRAY, 200));
     }
 
-    pos = (Tilemap::getSize() - Vector(0.0f, size.y)) * 0.5f;
+    pos = (wSize - Vector(0.0f, size.y)) * 0.5f;
     unsigned int index = 0;
-    Font::prepare();
+    Font::prepare(m);
     for (auto& e : lines) {
         constexpr Color color[] = {ColorUtils::BLACK, ColorUtils::WHITE};
         if (index == menuIndex) {
-            ObjectRenderer::prepare();
+            ObjectRenderer::prepare(m);
             ObjectRenderer::drawRectangle(pos - Vector(e.width * 0.5f + 0.3f, 0.f),
                                           Vector(e.width + 0.6f, fontSize), ColorUtils::BLACK);
-            Font::prepare();
+            Font::prepare(m);
         }
         Font::draw(pos - Vector(e.width * 0.5f, 0.0f), fontSize, color[index == menuIndex],
                    e.text.c_str());

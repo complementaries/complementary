@@ -331,7 +331,11 @@ void Game::tick() {
 
 #ifndef NDEBUG
 static void drawFpsDisplay() {
-    Font::prepare();
+    Matrix m;
+    m.transform(Vector(-1.0f, 1.0f));
+    m.scale(Vector(0.1f * Window::getHeight() / Window::getWidth(), -0.1f));
+
+    Font::prepare(m);
     char buffer[256];
     snprintf(buffer, 256, "FPS: %2.0f", fps.getUpdatesPerSecond());
     Font::draw(Vector(0.0f, 0.0f), 1.0f, ColorUtils::RED, buffer);

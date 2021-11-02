@@ -157,6 +157,11 @@ void Font::prepare() {
     RenderState::setViewMatrix(shader);
 }
 
+void Font::prepare(const Matrix& view) {
+    shader.use();
+    shader.setMatrix("view", view);
+}
+
 void Font::draw(const Vector& pos, float size, Color color, const char* s) {
     texture.bindTo(0);
     static Buffer data;

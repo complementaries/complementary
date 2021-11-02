@@ -44,6 +44,7 @@ static constexpr int MAX_LEVEL_NAME_LENGTH = 100;
 static bool isInTitleScreen = true;
 static int nextLevelIndex = -1;
 static int currentLevelIndex = 0;
+static Vector levelSelectPosition;
 static std::vector<std::string> levelNames = {};
 // TODO: make the level list configurable in the UI and get rid of this
 static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "map0";
@@ -208,6 +209,9 @@ void Game::exitTitleScreen() {
 void Game::loadLevelSelect() {
     loadLevel("level_select");
     RenderState::setZoom(1.0f);
+    if (levelSelectPosition.x != 0.0f || levelSelectPosition.y != 0.0f) {
+        Player::setPosition(levelSelectPosition);
+    }
 
     currentLevelIndex = -1;
     nextLevelIndex = -1;
@@ -623,4 +627,8 @@ bool Game::isFading() {
 
 int Game::getCurrentLevel() {
     return currentLevelIndex;
+}
+
+void Game::setLevelScreenPosition(const Vector& v) {
+    levelSelectPosition = v;
 }

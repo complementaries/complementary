@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "math/Vector.h"
+
 namespace Game {
     bool init();
     void tick();
@@ -24,6 +26,7 @@ namespace Game {
     bool isFading();
 
     int getCurrentLevel();
+    void setLevelScreenPosition(const Vector& v);
 }
 
 #endif

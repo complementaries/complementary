@@ -18,6 +18,9 @@ GoalTile::GoalTile(Face face) : Tile(ColorUtils::BLACK, false, "default"), face(
 void GoalTile::onCollision(int x, int y) const {
     if (!GoalCutscene::isActive()) {
         GoalCutscene::show(Vector(x, y), face);
+        if (Game::getCurrentLevel() == -1) {
+            Game::setLevelScreenPosition(Player::getPosition() + FaceUtils::getDirection(face) * 2);
+        }
     }
 }
 

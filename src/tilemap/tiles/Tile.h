@@ -17,7 +17,7 @@ class Tile {
     virtual bool isSolid() const;
     virtual bool isWall() const;
     virtual const char* getEditorGroup() const;
-    virtual void render(Buffer& buffer, float x, float y) const;
+    virtual void render(Buffer& buffer, float x, float y, float z) const;
     virtual void renderEditor(Buffer& buffer, float x, float y, float z) const;
     virtual void onLoad(int x, int y) const;
 

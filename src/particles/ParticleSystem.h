@@ -61,6 +61,7 @@ class ParticleSystem : public Object<ParticleSystemData> {
     ParticleSystem(const ParticleSystemData& data);
     void play();
     void stop();
+    void clear();
     void lateTick() override;
     void render(float lag) override;
 #ifndef NDEBUG

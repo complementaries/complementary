@@ -61,6 +61,12 @@ void ParticleSystem::stop() {
     this->playing = false;
 }
 
+void ParticleSystem::clear() {
+    triangles.clear();
+    squares.clear();
+    diamonds.clear();
+}
+
 float ParticleSystem::getColliderOffset() {
     return this->data.startSize / 2.0f * collisionFactor;
 }

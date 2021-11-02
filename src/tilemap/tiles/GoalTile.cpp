@@ -25,18 +25,9 @@ bool GoalTile::isWall() const {
     return false;
 }
 
-void GoalTile::render(Buffer& buffer, float x, float y) const {
+void GoalTile::render(Buffer& buffer, float x, float y, float z) const {
+    z = -0.1f;
     const Color color[] = {getColor(), ColorUtils::setAlpha(ColorUtils::invert(getColor()), 0)};
-    buffer.add(x).add(y).add(color[face == Face::LEFT || face == Face::UP]);
-    buffer.add(x).add(y + 1.0f).add(color[face == Face::LEFT || face == Face::DOWN]);
-    buffer.add(x + 1.0f).add(y).add(color[face == Face::RIGHT || face == Face::UP]);
-    buffer.add(x + 1.0f).add(y + 1.0f).add(color[face == Face::RIGHT || face == Face::DOWN]);
-    buffer.add(x).add(y + 1.0f).add(color[face == Face::LEFT || face == Face::DOWN]);
-    buffer.add(x + 1.0f).add(y).add(color[face == Face::RIGHT || face == Face::UP]);
-}
-
-void GoalTile::renderEditor(Buffer& buffer, float x, float y, float z) const {
-    const Color color[] = {getColor(), ColorUtils::invert(getColor())};
     buffer.add(x).add(y).add(z).add(color[face == Face::LEFT || face == Face::UP]);
     buffer.add(x).add(y + 1.0f).add(z).add(color[face == Face::LEFT || face == Face::DOWN]);
     buffer.add(x + 1.0f).add(y).add(z).add(color[face == Face::RIGHT || face == Face::UP]);

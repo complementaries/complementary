@@ -64,7 +64,7 @@ static Clock fps;
 
 static std::shared_ptr<ParticleSystem> titleEffectParticles;
 static std::shared_ptr<ParticleSystem> backgroundParticles;
-constexpr int BACKGROUND_PARTICLE_ALPHA_BLACK = 16;
+constexpr int BACKGROUND_PARTICLE_ALPHA_BLACK = 60;
 constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
 
 long totalTicks = 0;
@@ -102,6 +102,14 @@ static void logGlError(const char* msg) {
 }
 #endif
 
+static void setBackgroundParticleColor() {
+    auto particleColor = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
+    backgroundParticles->data.startColor = ColorUtils::setAlpha(particleColor, 0);
+    backgroundParticles->data.endColor = ColorUtils::setAlpha(
+        particleColor,
+        Player::invertColors() ? BACKGROUND_PARTICLE_ALPHA_WHITE : BACKGROUND_PARTICLE_ALPHA_BLACK);
+}
+
 bool Game::init() {
     Tiles::init();
     if (Tilemap::init(48, 27) || Objects::init()) {
@@ -125,7 +133,11 @@ bool Game::init() {
     backgroundParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/background.cmob");
     backgroundParticles->destroyOnLevelLoad = false;
+    setBackgroundParticleColor();
     backgroundParticles->play();
+    for (int i = 0; i < 500; i++) {
+        backgroundParticles->lateTick();
+    }
 
     titleEffectParticles = Objects::instantiateObject<ParticleSystem>(
         "assets/particlesystems/titleeffect.cmob", Vector(24.f, 23.f));
@@ -187,6 +199,7 @@ void Game::exitTitleScreen() {
     isInTitleScreen = false;
     loadLevelSelect();
     titleEffectParticles->stop();
+    titleEffectParticles->clear();
     SoundManager::playMusic();
     SoundManager::stopSound(Sound::TITLE);
     Player::setAbilities(Ability::NONE, Ability::NONE, false);
@@ -243,11 +256,7 @@ void Game::switchWorld() {
     SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
     SoundManager::switchMusic();
 
-    auto particleColor = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
-    backgroundParticles->data.startColor = ColorUtils::setAlpha(particleColor, 0);
-    backgroundParticles->data.endColor = ColorUtils::setAlpha(
-        particleColor,
-        Player::invertColors() ? BACKGROUND_PARTICLE_ALPHA_WHITE : BACKGROUND_PARTICLE_ALPHA_BLACK);
+    setBackgroundParticleColor();
 }
 
 void Game::tick() {

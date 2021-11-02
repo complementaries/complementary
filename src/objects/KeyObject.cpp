@@ -90,7 +90,8 @@ void KeyObject::tick() {
 }
 
 void KeyObject::renderColor(float lag, Color color) {
-    color = ColorUtils::setAlpha(color, alpha);
+    int rAlpha = std::min(alpha, 255);
+    color = ColorUtils::setAlpha(color, rAlpha);
     Vector pos =
         lastRenderPosition + (renderPosition - lastRenderPosition) * lag +
         Vector(0.0f, sinf((counter + lag) * (6.283185307f / 150.0f)) * 0.125f * !collected);
@@ -98,9 +99,15 @@ void KeyObject::renderColor(float lag, Color color) {
     Vector a = pos + Vector(0.1f, 0.5f);
     Vector b = pos + Vector(0.5f, 0.1f);
     Vector c = pos + Vector(0.9f, 0.5f);
+    if (rAlpha < 255) {
+        ObjectRenderer::setZ(-0.1f);
+    }
     ObjectRenderer::drawTriangle(a, b, c, color);
     b = pos + Vector(0.5f, 0.9f);
     ObjectRenderer::drawTriangle(a, b, c, color);
+    if (rAlpha < 255) {
+        ObjectRenderer::setZ(-0.4f);
+    }
 }
 
 void KeyObject::lateRender(float lag) {

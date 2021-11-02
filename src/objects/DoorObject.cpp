@@ -52,11 +52,15 @@ void DoorObject::tick() {
 
 void DoorObject::render(float lag, Color color) {
     (void)lag;
-    color = ColorUtils::setAlpha(color, std::min(alpha, 255));
-    ObjectRenderer::drawRectangle(position, data.size, color);
-    if (alpha < 255) {
+    int rAlpha = std::min(alpha, 255);
+    color = ColorUtils::setAlpha(color, rAlpha);
+    if (rAlpha < 255) {
+        ObjectRenderer::setZ(-0.1f);
+        ObjectRenderer::drawRectangle(position, data.size, color);
+        ObjectRenderer::setZ(-0.4f);
         return;
     }
+    ObjectRenderer::drawRectangle(position, data.size, color);
 
     Color keyholeColor;
     Color background = Player::invertColors() ? ColorUtils::BLACK : ColorUtils::WHITE;

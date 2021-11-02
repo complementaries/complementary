@@ -37,17 +37,15 @@ const char* Tile::getEditorGroup() const {
     return editorGroup;
 }
 
-void Tile::render(Buffer& buffer, float x, float y) const {
-    (void)buffer;
-    (void)x;
-    (void)y;
-}
-
-void Tile::renderEditor(Buffer& buffer, float x, float y, float z) const {
+void Tile::render(Buffer& buffer, float x, float y, float z) const {
     (void)buffer;
     (void)x;
     (void)y;
     (void)z;
+}
+
+void Tile::renderEditor(Buffer& buffer, float x, float y, float z) const {
+    render(buffer, x, y, z);
 }
 
 bool Tile::operator==(const Tile& other) const {

@@ -28,13 +28,9 @@ bool Tilemap::init(int w, int h) {
     width = w;
     height = h;
     tiles.resize(width * height, 0);
-    buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
-    background.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
+    buffer.init(GL::VertexBuffer::Attributes().addVector3().addRGBA());
+    background.init(GL::VertexBuffer::Attributes().addVector3().addRGBA());
     return false;
-}
-
-static void setZ(float z) {
-    shader.setFloat("zLayer", z);
 }
 
 int Tilemap::getWidth() {
@@ -74,18 +70,18 @@ static void prepareRendering() {
     data.clear();
 
     Color c = Tiles::AIR.getColor();
-    data.add(0.0f).add(0.0f).add(c);
-    data.add(static_cast<float>(width)).add(0.0f).add(c);
-    data.add(0.0f).add(static_cast<float>(height)).add(c);
-    data.add(static_cast<float>(width)).add(static_cast<float>(height)).add(c);
-    data.add(static_cast<float>(width)).add(0.0f).add(c);
-    data.add(0.0f).add(static_cast<float>(height)).add(c);
+    data.add(0.0f).add(0.0f).add(0.0f).add(c);
+    data.add(static_cast<float>(width)).add(0.0f).add(0.0f).add(c);
+    data.add(0.0f).add(static_cast<float>(height)).add(0.0f).add(c);
+    data.add(static_cast<float>(width)).add(static_cast<float>(height)).add(0.0f).add(c);
+    data.add(static_cast<float>(width)).add(0.0f).add(0.0f).add(c);
+    data.add(0.0f).add(static_cast<float>(height)).add(0.0f).add(c);
     background.setData(data.getData(), data.getSize());
     data.clear();
 
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            Tilemap::getTile(x, y).render(data, x, y);
+            Tilemap::getTile(x, y).render(data, x, y, -0.2f);
         }
     }
     vertices = data.getSize() / (sizeof(float) * 2 + 4);
@@ -97,7 +93,6 @@ void Tilemap::renderBackground() {
     shader.use();
     RenderState::setViewMatrix(shader);
     prepareRendering();
-    setZ(0.0f);
     background.drawTriangles(6);
 }
 
@@ -105,7 +100,6 @@ void Tilemap::render() {
     shader.use();
     RenderState::setViewMatrix(shader);
     prepareRendering();
-    setZ(-0.2f);
     buffer.drawTriangles(vertices);
 }
 

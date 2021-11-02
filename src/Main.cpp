@@ -6,13 +6,22 @@
 #include "graphics/Window.h"
 
 int main(int argc, char** args) {
-    for (int i = 0; i < argc; i++) {
+    int parseIndex = 0;
+    for (int i = 1; i < argc; i++) {
         if (strcmp(args[i], "--muted") == 0) {
             Arguments::muted = true;
         } else if (strcmp(args[i], "--no-vsync") == 0) {
             Arguments::vsync = false;
         } else if (strcmp(args[i], "--skip-anim") == 0) {
             Arguments::skipAnim = true;
+        } else if (parseIndex == 0) {
+            int samples = atoi(args[i]);
+            if (samples <= 0) {
+                std::cout << "passed invalid number of samples, using default\n";
+            } else {
+                Arguments::samples = samples;
+            }
+            parseIndex++;
         }
     }
 

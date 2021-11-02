@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "AbilityCutscene.h"
+#include "Arguments.h"
 #include "Clock.h"
 #include "Game.h"
 #include "GoalCutscene.h"
@@ -319,8 +320,8 @@ void Game::tick() {
 static void drawFpsDisplay() {
     Font::prepare();
     char buffer[256];
-    snprintf(buffer, 256, "FPS: %2.0f TPS: %3.0f", fps.getUpdatesPerSecond(),
-             tps.getUpdatesPerSecond());
+    snprintf(buffer, 256, "FPS: %2.0f TPS: %3.0f Samples: %d", fps.getUpdatesPerSecond(),
+             tps.getUpdatesPerSecond(), Arguments::samples);
     Font::draw(Vector(0.0f, 0.0f), 1.0f, ColorUtils::RED, buffer);
 }
 #endif

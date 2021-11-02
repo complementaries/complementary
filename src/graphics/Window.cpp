@@ -18,7 +18,6 @@
 
 typedef long long int Nanos;
 static constexpr Nanos NANOS_PER_TICK = 1'000'000'000L * Window::SECONDS_PER_TICK;
-static constexpr int MSAA_SAMPLES = 8;
 
 static SDL_Window* window = nullptr;
 static bool running = false;
@@ -80,7 +79,7 @@ bool Window::init() {
     }
 
     if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1) < 0 ||
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, MSAA_SAMPLES) < 0) {
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, Arguments::samples) < 0) {
         Utils::printError("Failed to enable multisampling.\n");
     }
 

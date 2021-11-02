@@ -5,6 +5,7 @@ namespace Arguments {
     extern bool muted;
     extern bool vsync;
     extern bool skipAnim;
+    extern int samples;
 }
 
 #endif

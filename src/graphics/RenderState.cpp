@@ -1,5 +1,6 @@
 #include "RenderState.h"
 
+#include "Arguments.h"
 #include "Utils.h"
 #include "graphics/Window.h"
 #include "graphics/gl/Shader.h"
@@ -51,22 +52,19 @@ bool RenderState::init() {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.id);
 
     glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, Window::getWidth(), Window::getHeight(), 0, GL_RGBA,
-                 GL_FLOAT, nullptr);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_RGBA32F,
+                            Window::getWidth(), Window::getHeight(), false);
 
     glGenTextures(1, &textureDepth);
-    glBindTexture(GL_TEXTURE_2D, textureDepth);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, Window::getWidth(), Window::getHeight(), 0,
-                 GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureDepth);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_DEPTH_COMPONENT32,
+                            Window::getWidth(), Window::getHeight(), false);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureDepth, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE,
+                           textureDepth, 0);
     GLuint drawBuffer = GL_COLOR_ATTACHMENT0;
-    glFramebufferTexture2D(GL_FRAMEBUFFER, drawBuffer, GL_TEXTURE_2D, texture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, drawBuffer, GL_TEXTURE_2D_MULTISAMPLE, texture, 0);
     glDrawBuffers(1, &drawBuffer);
 
     GLenum error = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -156,11 +154,12 @@ void RenderState::tick() {
 }
 
 void RenderState::resize(int width, int height) {
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
-    glBindTexture(GL_TEXTURE_2D, textureDepth);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT,
-                 GL_FLOAT, nullptr);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_RGBA32F, width,
+                            height, false);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureDepth);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_DEPTH_COMPONENT32,
+                            width, height, false);
 }
 
 static void clear() {
@@ -184,7 +183,7 @@ void RenderState::bindAndClearDefaultFramebuffer() {
 
 static void bindTextureTo(int textureUnit) {
     glActiveTexture(GL_TEXTURE0 + textureUnit);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
 }
 
 void RenderState::startMixing() {
@@ -211,6 +210,7 @@ void RenderState::renderEffects(float lag) {
     mixer.setVector("center", mixCenter);
     mixer.setFloat("radius", lastMixRadius + (mixRadius - lastMixRadius) * lag);
     mixer.setInt("samp", 0);
+    mixer.setInt("texels", Arguments::samples);
     bindTextureTo(0);
     rectangle.drawTriangles(6);
 
@@ -226,6 +226,7 @@ void RenderState::renderEffects(float lag) {
     glow.setMatrix("modifier", modifier);
     glow.setFloat("alpha", lastGlowAlpha + (glowAlpha - lastGlowAlpha) * lag);
     glow.setInt("samp", 0);
+    glow.setInt("texels", Arguments::samples);
     bindTextureTo(0);
     rectangle.drawTriangles(6);
     disableBlending();
@@ -236,6 +237,7 @@ void RenderState::renderTitleScreenEffects(float lag) {
     lineMixer.use();
     setViewMatrix(mixer);
     lineMixer.setInt("samp", 0);
+    lineMixer.setInt("texels", Arguments::samples);
     bindTextureTo(0);
     rectangle.drawTriangles(6);
 }

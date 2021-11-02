@@ -208,6 +208,10 @@ static bool isColliding() {
             }
         }
     }
+    return Objects::collidesWithAnySolid(position, data.size);
+}
+
+bool Player::isCollidingWithAnyObject() {
     return Objects::collidesWithAny(position, data.size);
 }
 

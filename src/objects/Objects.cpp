@@ -100,9 +100,18 @@ std::shared_ptr<ObjectBase> Objects::instantiateObjectNoInit(int prototypeId, Ve
     return objects[objects.size() - 1];
 }
 
-bool Objects::collidesWithAny(const Vector& position, const Vector& size) {
+bool Objects::collidesWithAnySolid(const Vector& position, const Vector& size) {
     for (auto& o : objects) {
         if (o->isSolid() && o->collidesWith(position, size)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Objects::collidesWithAny(const Vector& position, const Vector& size) {
+    for (auto& o : objects) {
+        if (o->collidesWith(position, size)) {
             return true;
         }
     }

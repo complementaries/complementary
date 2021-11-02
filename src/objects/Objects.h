@@ -33,6 +33,7 @@ namespace Objects {
     std::shared_ptr<ObjectBase> instantiateObjectNoInit(int prototypeIndex,
                                                         Vector position = Vector());
 
+    bool collidesWithAnySolid(const Vector& position, const Vector& size);
     bool collidesWithAny(const Vector& position, const Vector& size);
     bool handleFaceCollision(const Vector& position, const Vector& size, Face face);
     bool hasWallCollision(const Vector& position, const Vector& size);

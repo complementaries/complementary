@@ -39,6 +39,10 @@ void MovingObject::tick() {
     auto goal = movingBack ? initialPosition : initialPosition + data.goal;
     velocity = goal - position;
     float length = velocity.getLength();
+    if (length < 0.0005f || data.speed < 0.0005f) {
+        velocity = Vector();
+        return;
+    }
     if (length < data.speed) {
         position = goal;
         movingBack = !movingBack;

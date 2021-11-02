@@ -289,7 +289,9 @@ void Game::tick() {
                                  !Menu::isActive() && !ImGui::IsAnyItemActive() &&
                                  !Player::isDead());
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
-            switchWorld();
+            if (!Player::isCollidingWithAnyObject()) {
+                switchWorld();
+            }
         }
         Objects::tick();
 

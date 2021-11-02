@@ -115,7 +115,7 @@ static bool isColliding(const ParticleSystemData& s, Particle& p) {
         }
     }
     Vector half(halfSize, halfSize);
-    return Objects::collidesWithAny(p.position - half, half * 2.0f);
+    return Objects::collidesWithAnySolid(p.position - half, half * 2.0f);
 }
 
 static void move(const ParticleSystemData& s, Particle& p) {

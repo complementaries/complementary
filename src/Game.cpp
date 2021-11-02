@@ -333,9 +333,12 @@ void Game::tick() {
 static void drawFpsDisplay() {
     Font::prepare();
     char buffer[256];
-    snprintf(buffer, 256, "FPS: %2.0f TPS: %3.0f Samples: %d", fps.getUpdatesPerSecond(),
-             tps.getUpdatesPerSecond(), Arguments::samples);
+    snprintf(buffer, 256, "FPS: %2.0f", fps.getUpdatesPerSecond());
     Font::draw(Vector(0.0f, 0.0f), 1.0f, ColorUtils::RED, buffer);
+    snprintf(buffer, 256, "TPS: %3.0f", tps.getUpdatesPerSecond());
+    Font::draw(Vector(0.0f, 1.0f), 1.0f, ColorUtils::RED, buffer);
+    snprintf(buffer, 256, "Samples: %d", Arguments::samples);
+    Font::draw(Vector(0.0f, 2.0f), 1.0f, ColorUtils::RED, buffer);
 }
 #endif
 
@@ -364,6 +367,7 @@ void Game::render(float lag) {
 
     ParticleRenderer::prepare();
     Objects::render(lag);
+    Objects::renderText(lag);
     ParticleRenderer::render();
 
     if (isInTitleScreen) {

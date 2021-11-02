@@ -42,6 +42,7 @@ namespace Objects {
     void tick();
     void lateTick();
     void render(float lag);
+    void renderText(float lag);
 
     void load(const char* path);
     void save(const char* path);

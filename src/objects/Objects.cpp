@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "Utils.h"
+#include "graphics/Font.h"
 #include "objects/ColorObject.h"
 #include "objects/DoorObject.h"
 #include "objects/KeyObject.h"
@@ -173,6 +174,13 @@ void Objects::render(float lag) {
     }
     for (auto& o : objects) {
         o->lateRender(lag);
+    }
+}
+
+void Objects::renderText(float lag) {
+    Font::prepare();
+    for (auto& o : objects) {
+        o->renderText(lag);
     }
 }
 

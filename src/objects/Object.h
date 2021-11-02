@@ -24,6 +24,7 @@ class ObjectBase {
     virtual void lateTick();
     virtual void render(float lag);
     virtual void lateRender(float lag);
+    virtual void renderText(float lag);
     virtual void renderEditor(float lag, bool inPalette);
     virtual void destroy();
     virtual void read(std::ifstream& in) = 0;

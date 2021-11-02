@@ -2,6 +2,8 @@
 
 #include "Game.h"
 #include "ObjectRenderer.h"
+#include "Savegame.h"
+#include "graphics/Font.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
 #include "sound/SoundManager.h"
@@ -31,6 +33,22 @@ void LevelTagObject::renderEditor(float lag, bool inPalette) {
     (void)lag;
     (void)inPalette;
     ObjectRenderer::drawRectangle(position, data.size, ColorUtils::rgba(0, 100, 0, 100));
+}
+
+void LevelTagObject::renderText(float lag) {
+    if (data.level > Savegame::getCompletedLevels()) {
+        return;
+    }
+    constexpr float SIZE = 2.0f;
+    char buffer[256];
+    snprintf(buffer, 256, "%d", data.level + 1);
+    float width = Font::getWidth(SIZE, buffer);
+    Vector pos = position + data.size * 0.5f;
+    pos.x -= width * 0.5f;
+    pos.y -= SIZE * 0.5f;
+    Color c =
+        ColorUtils::setAlpha(Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK, 100);
+    Font::draw(pos, SIZE, c, buffer);
 }
 
 std::shared_ptr<ObjectBase> LevelTagObject::clone() {

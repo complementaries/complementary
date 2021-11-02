@@ -40,6 +40,10 @@ void ObjectBase::lateRender(float lag) {
     (void)lag;
 }
 
+void ObjectBase::renderText(float lag) {
+    (void)lag;
+}
+
 void ObjectBase::renderEditor(float lag, bool inPalette) {
     (void)inPalette;
     render(lag);

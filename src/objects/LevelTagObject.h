@@ -22,6 +22,7 @@ class LevelTagObject : public Object<LevelTagObjectData> {
     Vector getSize() const override;
     std::shared_ptr<ObjectBase> clone() override;
     void renderEditor(float lag, bool inPalette) override;
+    void renderText(float lag) override;
 
   private:
 #ifndef NDEBUG

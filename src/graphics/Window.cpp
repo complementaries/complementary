@@ -120,6 +120,12 @@ bool Window::init() {
     return false;
 }
 
+static void resize(int w, int h) {
+    Game::onWindowResize(w, h);
+    width = w;
+    height = h;
+}
+
 static void toggleFullscreen() {
     if (!fullscreen) {
         previousHeight = height;
@@ -140,16 +146,14 @@ static void toggleFullscreen() {
             return;
         }
         SDL_SetWindowSize(window, mode.w, mode.h);
+        resize(mode.w, mode.h);
     } else {
         if (SDL_SetWindowFullscreen(window, 0) < 0) {
             Utils::printError("%s\n", SDL_GetError());
             return;
         }
-
-        width = previousWidth;
-        height = previousHeight;
-        SDL_SetWindowSize(window, width, height);
-        Game::onWindowResize(width, height); // No idea why we need to call it manually here
+        SDL_SetWindowSize(window, previousWidth, previousHeight);
+        resize(previousWidth, previousHeight);
     }
 
     fullscreen = !fullscreen;
@@ -354,9 +358,7 @@ static void pollEvents() {
             }
             case SDL_WINDOWEVENT: {
                 if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
-                    Game::onWindowResize(e.window.data1, e.window.data2);
-                    width = e.window.data1;
-                    height = e.window.data2;
+                    resize(e.window.data1, e.window.data2);
                 }
                 break;
             }

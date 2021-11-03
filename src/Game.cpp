@@ -358,6 +358,7 @@ static void drawFpsDisplay() {
 #endif
 
 void Game::render(float lag) {
+    onWindowResize(Window::getWidth(), Window::getHeight());
     if (Menu::isActive()) {
         lag = 0.0f;
     }

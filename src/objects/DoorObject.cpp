@@ -40,13 +40,14 @@ void DoorObject::tick() {
     if (alpha < 0) {
         alpha = 0;
     }
-    if (!particles->isPlaying() && keys == maxKeys && maxKeys != 0) {
+    if (!playedOpenEffect && keys == maxKeys && maxKeys != 0) {
         particles->play();
         SoundManager::playSoundEffect(Sound::DOOR);
         constexpr Color colors[] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
         particles->data.startColor = colors[Player::invertColors()];
         particles->data.endColor = ColorUtils::setAlpha(colors[Player::invertColors()], 0);
         particles->position = position + this->getSize() / 2.0f;
+        playedOpenEffect = true;
     }
 }
 
@@ -128,6 +129,7 @@ void DoorObject::addKey() {
 void DoorObject::reset() {
     keys = 0;
     maxKeys = 0;
+    playedOpenEffect = false;
     alpha = START_ALPHA;
     particles->stop();
 }

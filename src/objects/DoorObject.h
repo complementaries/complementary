@@ -40,6 +40,7 @@ class DoorObject : public Object<DoorObjectData> {
     int maxKeys;
     int keys;
     int alpha;
+    bool playedOpenEffect;
     std::shared_ptr<ParticleSystem> particles;
 };
 

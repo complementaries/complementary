@@ -82,91 +82,104 @@ bool MovingObject::collidesWith(const Vector& pPosition, const Vector& pSize) co
            position[1] < pPosition[1] + pSize[1] && position[1] + data.size[1] > pPosition[1];
 }
 
+bool MovingObject::isSpiky(Face f) const {
+    return data.spiky[static_cast<int>(f)];
+}
+
 void MovingObject::renderAt(float lag, Color color, Vector p) {
+    constexpr float oversize = 0.005f;
     Vector offset(0.33f, 0.33f);
     Vector size = data.size - offset * 2.0f;
     ObjectRenderer::drawRectangle(p + offset, size, color);
-    if (data.spiky[static_cast<int>(Face::UP)]) {
-        for (int i = data.size.x * 3 - 1; i > 1; i--) {
+    if (isSpiky(Face::UP)) {
+        int start = isSpiky(Face::LEFT);
+        int end = isSpiky(Face::RIGHT);
+        for (int i = data.size.x * 3 - end; i > start; i--) {
             Vector a = p + Vector(0.3333f * i, 0.33f);
             Vector b = p + Vector(0.3333f * (i - 1), 0.33f);
             Vector c = p + Vector(0.3333f * (i - 1) + 0.165f, 0.0f);
             ObjectRenderer::drawTriangle(a, b, c, color);
         }
     } else {
-        Vector a = p - Vector(0.0f, 0.0f);
-        Vector b = p + Vector(0.5f, 0.4f);
-        Vector c = p + Vector(data.size.x, 0.0f);
-        ObjectRenderer::drawTriangle(a, b, c, color);
-        a = p + Vector(data.size.x - 0.5f, 0.4f);
-        ObjectRenderer::drawTriangle(a, b, c, color);
-        ObjectRenderer::drawRectangle(p - Vector(0.0f, 0.05f), Vector(data.size.x, 0.05f), color);
+        ObjectRenderer::drawRectangle(p + Vector(0.33f, -oversize),
+                                      Vector(data.size.x - 0.66f, 0.33f + oversize), color);
     }
-    if (data.spiky[static_cast<int>(Face::DOWN)]) {
-        for (int i = data.size.x * 3 - 1; i > 1; i--) {
+    if (isSpiky(Face::DOWN)) {
+        int start = isSpiky(Face::LEFT);
+        int end = isSpiky(Face::RIGHT);
+        for (int i = data.size.x * 3 - end; i > start; i--) {
             Vector a = p + Vector(0.3333f * i, data.size.y - 0.33f);
             Vector b = p + Vector(0.3333f * (i - 1), data.size.y - 0.33f);
             Vector c = p + Vector(0.3333f * (i - 1) + 0.165f, data.size.y);
             ObjectRenderer::drawTriangle(a, b, c, color);
         }
     } else {
-        Vector a = p + Vector(0.0f, data.size.y);
-        Vector b = p + Vector(0.5f, data.size.y - 0.4f);
-        Vector c = p + data.size;
-        ObjectRenderer::drawTriangle(a, b, c, color);
-        a = p + data.size - Vector(0.5f, 0.4f);
-        ObjectRenderer::drawTriangle(a, b, c, color);
+        ObjectRenderer::drawRectangle(p + Vector(0.33f, data.size.y - 0.33f),
+                                      Vector(data.size.x - 0.66f, 0.33f), color);
     }
-    if (data.spiky[static_cast<int>(Face::LEFT)]) {
-        for (int i = data.size.y * 3 - 1; i > 1; i--) {
+    if (isSpiky(Face::LEFT)) {
+        int start = isSpiky(Face::UP);
+        int end = isSpiky(Face::DOWN);
+        for (int i = data.size.y * 3 - end; i > start; i--) {
             Vector a = p + Vector(0.3333f, 0.3333f * i);
             Vector b = p + Vector(0.3333f, 0.3333f * (i - 1));
             Vector c = p + Vector(0.0f, 0.3333f * (i - 1) + 0.165f);
             ObjectRenderer::drawTriangle(a, b, c, color);
         }
     } else {
-        Vector a = p;
-        Vector b = p + Vector(0.4f, 0.5f);
-        Vector c = p + Vector(0.0f, data.size.y);
-        ObjectRenderer::drawTriangle(a, b, c, color);
-        a = p + Vector(0.4f, data.size.y - 0.5f);
-        ObjectRenderer::drawTriangle(a, b, c, color);
+        ObjectRenderer::drawRectangle(p + Vector(0.0f, 0.33f), Vector(0.33f, data.size.y - 0.66f),
+                                      color);
     }
-    if (data.spiky[static_cast<int>(Face::RIGHT)]) {
-        for (int i = data.size.y * 3 - 1; i > 1; i--) {
+    if (isSpiky(Face::RIGHT)) {
+        int start = isSpiky(Face::UP);
+        int end = isSpiky(Face::DOWN);
+        for (int i = data.size.y * 3 - end; i > start; i--) {
             Vector a = p + Vector(data.size.x - 0.3333f, 0.3333f * i);
             Vector b = p + Vector(data.size.x - 0.3333f, 0.3333f * (i - 1));
             Vector c = p + Vector(data.size.x, 0.3333f * (i - 1) + 0.165f);
             ObjectRenderer::drawTriangle(a, b, c, color);
         }
     } else {
-        Vector a = p + Vector(data.size.x, 0.0f);
-        Vector b = p + Vector(data.size.x - 0.4f, 0.5f);
-        Vector c = p + Vector(data.size.x, data.size.y);
-        ObjectRenderer::drawTriangle(a, b, c, color);
-        a = p + Vector(data.size.x - 0.4f, data.size.y - 0.5f);
-        ObjectRenderer::drawTriangle(a, b, c, color);
+        ObjectRenderer::drawRectangle(p + Vector(data.size.x - 0.33f, 0.33f),
+                                      Vector(0.33f, data.size.y - 0.66f), color);
     }
 
-    Vector a = p;
-    Vector b = p + Vector(0.5f, 0.3f);
-    Vector c = p + Vector(0.3f, 0.5f);
-    ObjectRenderer::drawTriangle(a, b, c, color);
-
-    a = p + Vector(data.size.x, 0.0f);
-    b = p + Vector(data.size.x - 0.5f, 0.3f);
-    c = p + Vector(data.size.x - 0.3f, 0.5f);
-    ObjectRenderer::drawTriangle(a, b, c, color);
-
-    a = p + Vector(0.0f, data.size.y);
-    b = p + Vector(0.5f, data.size.y - 0.3f);
-    c = p + Vector(0.3f, data.size.y - 0.5f);
-    ObjectRenderer::drawTriangle(a, b, c, color);
-
-    a = p + data.size;
-    b = p + Vector(data.size.x - 0.5f, data.size.y - 0.3f);
-    c = p + Vector(data.size.x - 0.3f, data.size.y - 0.5f);
-    ObjectRenderer::drawTriangle(a, b, c, color);
+    if (isSpiky(Face::UP) && isSpiky(Face::LEFT)) {
+        Vector a = p;
+        Vector b = p + Vector(0.5f, 0.3f);
+        Vector c = p + Vector(0.3f, 0.5f);
+        ObjectRenderer::drawTriangle(a, b, c, color);
+    } else if (!isSpiky(Face::UP) && !isSpiky(Face::LEFT)) {
+        ObjectRenderer::drawRectangle(p - Vector(0.0f, oversize), Vector(0.33f, 0.33f + oversize),
+                                      color);
+    }
+    if (isSpiky(Face::UP) && isSpiky(Face::RIGHT)) {
+        Vector a = p + Vector(data.size.x, 0.0f);
+        Vector b = p + Vector(data.size.x - 0.5f, 0.3f);
+        Vector c = p + Vector(data.size.x - 0.3f, 0.5f);
+        ObjectRenderer::drawTriangle(a, b, c, color);
+    } else if (!isSpiky(Face::UP) && !isSpiky(Face::RIGHT)) {
+        ObjectRenderer::drawRectangle(p + Vector(data.size.x - 0.33f, -oversize),
+                                      Vector(0.33f, 0.33f + oversize), color);
+    }
+    if (isSpiky(Face::DOWN) && isSpiky(Face::LEFT)) {
+        Vector a = p + Vector(0.0f, data.size.y);
+        Vector b = p + Vector(0.5f, data.size.y - 0.3f);
+        Vector c = p + Vector(0.3f, data.size.y - 0.5f);
+        ObjectRenderer::drawTriangle(a, b, c, color);
+    } else if (!isSpiky(Face::DOWN) && !isSpiky(Face::LEFT)) {
+        ObjectRenderer::drawRectangle(p + Vector(0.0f, data.size.y - 0.33f), Vector(0.33f, 0.33f),
+                                      color);
+    }
+    if (isSpiky(Face::DOWN) && isSpiky(Face::RIGHT)) {
+        Vector a = p + data.size;
+        Vector b = p + Vector(data.size.x - 0.5f, data.size.y - 0.3f);
+        Vector c = p + Vector(data.size.x - 0.3f, data.size.y - 0.5f);
+        ObjectRenderer::drawTriangle(a, b, c, color);
+    } else if (!isSpiky(Face::DOWN) && !isSpiky(Face::RIGHT)) {
+        ObjectRenderer::drawRectangle(p + Vector(data.size.x - 0.33f, data.size.y - 0.33f),
+                                      Vector(0.33f, 0.33f), color);
+    }
 }
 
 void MovingObject::render(float lag, Color color) {

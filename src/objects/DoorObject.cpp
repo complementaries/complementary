@@ -102,7 +102,7 @@ std::shared_ptr<ObjectBase> DoorObject::clone() {
 void DoorObject::initTileEditorData(std::vector<TileEditorProp>& props) {
     props.insert(props.end(), {TileEditorProp::Int("Size X", data.size.x, 1, 10),
                                TileEditorProp::Int("Size Y", data.size.y, 1, 10),
-                               TileEditorProp::Int("Type", data.type, 0, 10)});
+                               TileEditorProp::Float("Type", data.type, 0, 100)});
 }
 
 void DoorObject::applyTileEditorData(float* props) {
@@ -129,4 +129,5 @@ void DoorObject::reset() {
     keys = 0;
     maxKeys = 0;
     alpha = START_ALPHA;
+    particles->stop();
 }

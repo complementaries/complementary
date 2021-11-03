@@ -47,6 +47,7 @@ src = [
   'src/GoalCutscene.cpp',
   'src/Savegame.cpp',
   'src/Utils.cpp',
+  'src/TextUtils.cpp',
   'src/Main.cpp'
 ]
 

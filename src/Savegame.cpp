@@ -1,6 +1,7 @@
 #include "Savegame.h"
 
 #include "Utils.h"
+#include <cassert>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -38,7 +39,7 @@ void Savegame::save() {
     stream.open(SAVE_FILE_TEMP_NAME, std::ios::binary);
     if (!stream.bad()) {
         stream.write("CSAV", 4);
-        stream.write((char*)&data, sizeof(Data));
+        stream.write(reinterpret_cast<char*>(&data), sizeof(Data));
         stream.close();
     }
 
@@ -52,7 +53,6 @@ void Savegame::reset() {
 void Savegame::unlockAbilities(Ability primary, Ability secondary) {
     data.unlockedAbilities |= 1 << static_cast<int>(primary);
     data.unlockedAbilities |= 1 << static_cast<int>(secondary);
-    save();
 }
 
 bool Savegame::abilitiesUnlocked(Ability primary, Ability secondary) {
@@ -66,5 +66,13 @@ int Savegame::getCompletedLevels() {
 
 void Savegame::setCompletedLevels(int amount) {
     data.completedLevels = amount;
-    save();
+}
+
+uint32_t Savegame::getCompletionTime(size_t levelIndex) {
+    return data.completionTime[levelIndex];
+}
+
+void Savegame::setCompletionTime(size_t levelIndex, uint32_t ticks) {
+    assert(levelIndex < MAX_LEVEL_COUNT);
+    data.completionTime[levelIndex] = ticks;
 }

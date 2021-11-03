@@ -410,6 +410,7 @@ void Player::restart() {
     stickingToWall = false;
     dead = 0;
     Tilemap::forceReload();
+    Game::resetTickCounter();
     if (SoundManager::getMusicChannel() == SoundManager::darkSoundID) {
         SoundManager::switchMusic();
     }
@@ -480,6 +481,7 @@ void Player::setAbilities(Ability dark, Ability light, bool animate) {
             abilities[1] = light;
             if (!Savegame::abilitiesUnlocked(dark, light) && !Game::inTitleScreen()) {
                 Savegame::unlockAbilities(dark, light);
+                Savegame::save();
                 if (!Arguments::skipAnim) {
                     AbilityCutscene::show(lastAbility);
                 }

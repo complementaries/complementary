@@ -5,9 +5,12 @@
 #include <cstdint>
 
 namespace Savegame {
+    constexpr int MAX_LEVEL_COUNT = 128;
+
     struct Data {
         uint32_t completedLevels;
         uint32_t unlockedAbilities; // bit mask
+        uint32_t completionTime[MAX_LEVEL_COUNT];
     };
 
     bool init();
@@ -18,6 +21,8 @@ namespace Savegame {
     bool abilitiesUnlocked(Ability primary, Ability secondary);
     int getCompletedLevels();
     void setCompletedLevels(int amount);
+    uint32_t getCompletionTime(size_t levelIndex);
+    void setCompletionTime(size_t levelIndex, uint32_t ticks);
 }
 
 #endif

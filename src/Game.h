@@ -27,6 +27,9 @@ namespace Game {
 
     int getCurrentLevel();
     void setLevelScreenPosition(const Vector& v);
+
+    void resetTickCounter();
+    void setTickCounterPaused(bool paused);
 }
 
 #endif

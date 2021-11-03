@@ -17,6 +17,7 @@ class LevelTagObject : public Object<LevelTagObjectData> {
     LevelTagObject(Vector position, Vector size);
     LevelTagObject(LevelTagObjectData data);
 
+    void tick() override;
     void onCollision() override;
     bool collidesWith(const Vector& position, const Vector& size) const override;
     Vector getSize() const override;
@@ -29,6 +30,7 @@ class LevelTagObject : public Object<LevelTagObjectData> {
     void initTileEditorData(std::vector<TileEditorProp>& props) override;
     void applyTileEditorData(float* props) override;
 #endif
+    int bestTimeAlpha;
 };
 
 #endif

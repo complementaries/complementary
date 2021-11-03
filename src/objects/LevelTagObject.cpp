@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "ObjectRenderer.h"
 #include "Savegame.h"
+#include "TextUtils.h"
 #include "graphics/Font.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
@@ -11,13 +12,18 @@
 #include <cmath>
 #include <memory>
 
-LevelTagObject::LevelTagObject(Vector position, Vector size) {
+LevelTagObject::LevelTagObject(Vector position, Vector size) : bestTimeAlpha(0.f) {
     this->position = position;
     data = {};
     data.size = size;
 }
 
-LevelTagObject::LevelTagObject(LevelTagObjectData data) {
+LevelTagObject::LevelTagObject(LevelTagObjectData data) : bestTimeAlpha(0.f) {
+}
+
+void LevelTagObject::tick() {
+    bestTimeAlpha += Player::isAllowedToMove() && Player::isColliding(*this) ? 10.f : -10.f;
+    bestTimeAlpha = std::max(std::min(bestTimeAlpha, 255), 0);
 }
 
 void LevelTagObject::onCollision() {
@@ -49,6 +55,14 @@ void LevelTagObject::renderText(float lag) {
     Color c =
         ColorUtils::setAlpha(Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK, 100);
     Font::draw(pos, SIZE, c, buffer);
+
+    if (bestTimeAlpha > 0) {
+        uint32_t completionTime = Savegame::getCompletionTime(data.level);
+        if (completionTime > 0) {
+            TextUtils::drawBestTimeObjectSpace(pos + Vector(1.0f, 1.0f), completionTime,
+                                               bestTimeAlpha);
+        }
+    }
 }
 
 std::shared_ptr<ObjectBase> LevelTagObject::clone() {

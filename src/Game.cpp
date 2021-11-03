@@ -16,6 +16,7 @@
 #include "Input.h"
 #include "Menu.h"
 #include "Savegame.h"
+#include "TextUtils.h"
 #include "Utils.h"
 #include "graphics/Buffer.h"
 #include "graphics/Font.h"
@@ -69,6 +70,7 @@ constexpr int BACKGROUND_PARTICLE_ALPHA_BLACK = 60;
 constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
 
 long totalTicks = 0;
+long ticksInCurrentLevel = 0;
 
 static void loadTitleScreen();
 
@@ -241,9 +243,23 @@ void Game::nextLevel() {
         nextLevelIndex = -1;
     } else {
         Utils::print("Completed level with index %d\n", currentLevelIndex);
+
+        bool shouldSave = false;
+        uint32_t bestCompletionTime = Savegame::getCompletionTime(currentLevelIndex);
+        Utils::print("Completed level %d in %d ticks. Best time: %d \n", currentLevelIndex,
+                     ticksInCurrentLevel, bestCompletionTime);
+        if (ticksInCurrentLevel < bestCompletionTime || bestCompletionTime == 0) {
+            Savegame::setCompletionTime(currentLevelIndex, ticksInCurrentLevel);
+            Utils::print("Saving record time\n");
+            shouldSave = true;
+        }
         if (currentLevelIndex >= Savegame::getCompletedLevels()) {
-            Utils::print("Updated completion count to %d\n", currentLevelIndex + 1);
             Savegame::setCompletedLevels(currentLevelIndex + 1);
+            Utils::print("Updated completion count to %d.\n", currentLevelIndex + 1);
+            shouldSave = true;
+        }
+        if (shouldSave) {
+            Savegame::save();
         }
 
         loadLevelSelect();
@@ -338,6 +354,13 @@ void Game::tick() {
     }
 
     totalTicks++;
+    if (Player::isAllowedToMove()) {
+        ticksInCurrentLevel++;
+        if (ticksInCurrentLevel > UINT32_MAX) {
+            // Sanitize high counter values
+            ticksInCurrentLevel = UINT32_MAX;
+        }
+    }
 }
 
 #ifndef NDEBUG
@@ -349,11 +372,11 @@ static void drawFpsDisplay() {
     Font::prepare(m);
     char buffer[256];
     snprintf(buffer, 256, "FPS: %2.0f", fps.getUpdatesPerSecond());
-    Font::draw(Vector(0.0f, 0.0f), 1.0f, ColorUtils::RED, buffer);
+    Font::draw(Vector(00.0f, 2.0f), 0.6f, ColorUtils::RED, buffer);
     snprintf(buffer, 256, "TPS: %3.0f", tps.getUpdatesPerSecond());
-    Font::draw(Vector(0.0f, 1.0f), 1.0f, ColorUtils::RED, buffer);
+    Font::draw(Vector(00.0f, 2.6f), 0.6f, ColorUtils::RED, buffer);
     snprintf(buffer, 256, "Samples: %d", Arguments::samples);
-    Font::draw(Vector(0.0f, 2.0f), 1.0f, ColorUtils::RED, buffer);
+    Font::draw(Vector(00.0f, 3.2f), 0.6f, ColorUtils::RED, buffer);
 }
 #endif
 
@@ -404,12 +427,18 @@ void Game::render(float lag) {
     if (!isInTitleScreen) {
         TextureRenderer::render(lag);
     }
+    if (!isInTitleScreen && currentLevelIndex > -1) {
+        TextUtils::drawTimer(Vector(0.2f, 0.2f), ticksInCurrentLevel);
+    }
     ObjectRenderer::prepare(Matrix());
     ObjectRenderer::drawRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
                                   ColorUtils::setAlpha(ColorUtils::BLACK, fade));
 #ifndef NDEBUG
     drawFpsDisplay();
 #endif
+
+    Font::prepare();
+
     if (!isInTitleScreen) {
         Menu::render(lag);
     }
@@ -460,10 +489,12 @@ void Game::renderImGui() {
         ImGui::InputInt("Completed levels", &levels);
         if (levels != Savegame::getCompletedLevels()) {
             Savegame::setCompletedLevels(levels);
+            Savegame::save();
         }
 
         if (ImGui::Button("Reset save")) {
             Savegame::reset();
+            Savegame::save();
         }
     }
 
@@ -651,4 +682,8 @@ int Game::getCurrentLevel() {
 
 void Game::setLevelScreenPosition(const Vector& v) {
     levelSelectPosition = v;
+}
+
+void Game::resetTickCounter() {
+    ticksInCurrentLevel = 0;
 }

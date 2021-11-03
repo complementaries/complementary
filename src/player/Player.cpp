@@ -761,7 +761,8 @@ void Player::tick() {
                 wallStickParticles->play();
                 stickingToWall = true;
             }
-            if (Tilemap::getTile(xLeft, y).getId() <= 0) {
+            if (Tilemap::getTile(xLeft, y).getId() <= 0 &&
+                !Objects::collidesWithAnySolid(Vector(xLeft, y), Vector(0.1f, 0.1f))) {
                 wallStickParticles->stop();
             }
         } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed && allowedToMove) {
@@ -777,7 +778,8 @@ void Player::tick() {
                 wallStickParticles->play();
                 stickingToWall = true;
             }
-            if (Tilemap::getTile(xRight, y).getId() <= 0) {
+            if (Tilemap::getTile(xRight, y).getId() <= 0 &&
+                !Objects::collidesWithAnySolid(Vector(xRight, y), Vector(0.1f, 0.1f))) {
                 wallStickParticles->stop();
             }
         } else {

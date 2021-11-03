@@ -56,4 +56,5 @@ void TextUtils::drawBestTimeObjectSpace(Vector position, long ticks, int alpha) 
     col = ColorUtils::setAlpha(col, alpha);
     Font::draw(position + Vector((width - topWidth) * 0.5f, 0.0f), 1.0f, col, "Best time");
     Font::draw(position + Vector((width - bottomWidth) * 0.5f, 1.0f), 1.0f, col, buffer);
+    Font::setZ(0.0f);
 }

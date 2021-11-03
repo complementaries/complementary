@@ -59,6 +59,10 @@ bool MovingSwitchObject::isSolid() const {
     return seen == Player::invertColors();
 }
 
+bool MovingSwitchObject::isSolidInAnyWorld() const {
+    return true;
+}
+
 void MovingSwitchObject::render(float lag) {
     if (!isSolid()) {
         return;

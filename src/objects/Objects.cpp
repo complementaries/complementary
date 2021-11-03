@@ -110,6 +110,15 @@ bool Objects::collidesWithAnySolid(const Vector& position, const Vector& size) {
     return false;
 }
 
+bool Objects::collidesWithSolidInAnyWorld(const Vector& position, const Vector& size) {
+    for (auto& o : objects) {
+        if (o->isSolidInAnyWorld() && o->collidesWith(position, size)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool Objects::collidesWithAny(const Vector& position, const Vector& size) {
     for (auto& o : objects) {
         if (o->collidesWith(position, size)) {

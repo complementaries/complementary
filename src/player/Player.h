@@ -13,6 +13,7 @@ namespace Player {
     bool isColliding(Face face);
     bool isColliding(const ObjectBase& o);
     bool isCollidingWithAnyObject();
+    bool isCollidingInAnyWorld();
     void addForce(const Vector& force);
     void addForce(Face face, float force);
     void addBaseVelocity(const Vector& v);

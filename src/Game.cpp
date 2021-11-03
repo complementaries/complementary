@@ -325,7 +325,7 @@ void Game::tick() {
                                  !Menu::isActive() && !ImGui::IsAnyItemActive() &&
                                  !Player::isDead());
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
-            if (!Player::isCollidingWithAnyObject()) {
+            if (!Player::isCollidingInAnyWorld()) {
                 switchWorld();
             } else {
                 playFakeSwitchAnimation();

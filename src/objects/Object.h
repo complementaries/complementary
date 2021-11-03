@@ -19,6 +19,7 @@ class ObjectBase {
     virtual void onFaceCollision(Face playerFace);
     virtual void onCollision();
     virtual bool isSolid() const;
+    virtual bool isSolidInAnyWorld() const;
     virtual bool collidesWith(const Vector& position, const Vector& size) const;
     virtual void tick();
     virtual void lateTick();

@@ -215,6 +215,10 @@ bool Player::isCollidingWithAnyObject() {
     return Objects::collidesWithAny(position, data.size);
 }
 
+bool Player::isCollidingInAnyWorld() {
+    return Objects::collidesWithSolidInAnyWorld(position, data.size);
+}
+
 void Player::addForce(const Vector& force) {
     data.acceleration += force;
 }

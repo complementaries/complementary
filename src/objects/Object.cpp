@@ -20,6 +20,10 @@ bool ObjectBase::isSolid() const {
     return false;
 }
 
+bool ObjectBase::isSolidInAnyWorld() const {
+    return isSolid();
+}
+
 bool ObjectBase::collidesWith(const Vector& position, const Vector& size) const {
     (void)position;
     (void)size;

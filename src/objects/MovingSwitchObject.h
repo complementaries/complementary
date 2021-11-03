@@ -12,6 +12,7 @@ class MovingSwitchObject : public MovingObject {
     void tick() override;
     void postInit() override;
     bool isSolid() const override;
+    bool isSolidInAnyWorld() const override;
     void render(float lag) override;
     void renderEditor(float lag, bool inPalette) override;
     std::shared_ptr<ObjectBase> clone() override;

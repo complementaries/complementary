@@ -152,14 +152,16 @@ bool Font::init() {
     return false;
 }
 
-void Font::prepare() {
+void Font::prepare(float zLayer) {
     shader.use();
     RenderState::setViewMatrix(shader);
+    shader.setFloat("zLayer", zLayer);
 }
 
-void Font::prepare(const Matrix& view) {
+void Font::prepare(const Matrix& view, float zLayer) {
     shader.use();
     shader.setMatrix("view", view);
+    shader.setFloat("zLayer", zLayer);
 }
 
 void Font::draw(const Vector& pos, float size, Color color, const char* s) {

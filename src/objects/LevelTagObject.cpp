@@ -59,7 +59,7 @@ void LevelTagObject::renderText(float lag) {
     if (bestTimeAlpha > 0) {
         uint32_t completionTime = Savegame::getCompletionTime(data.level);
         if (completionTime > 0) {
-            TextUtils::drawBestTimeObjectSpace(pos + Vector(1.0f, 1.0f), completionTime,
+            TextUtils::drawBestTimeObjectSpace(Player::getPosition(), completionTime,
                                                bestTimeAlpha);
         }
     }

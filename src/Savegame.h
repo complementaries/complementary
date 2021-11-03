@@ -2,6 +2,7 @@
 #define SAVEGAME_H
 
 #include "player/Ability.h"
+#include <cstddef>
 #include <cstdint>
 
 namespace Savegame {

@@ -244,6 +244,10 @@ void Player::moveForced(const Vector& v) {
     position += v;
 }
 
+Vector Player::getSize() {
+    return data.size;
+}
+
 Vector Player::getPosition() {
     return position;
 }

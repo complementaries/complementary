@@ -32,6 +32,7 @@ namespace Player {
     void setHidden(bool hidden);
     bool invertColors();
     void toggleWorld();
+    Vector getSize();
     Vector getPosition();
     void setPosition(const Vector& pos);
     Vector getCenter(float lag = 0.0f);

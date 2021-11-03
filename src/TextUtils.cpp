@@ -23,8 +23,9 @@ void TextUtils::drawTimer(Vector position, long ticks) {
     createTextBuffer(buffer, 256, ticks);
 
     Vector size(Font::getWidth(1.0f, buffer), 1.0f);
+    Vector oversize = size * 0.1f;
     ObjectRenderer::prepare(m);
-    ObjectRenderer::drawRectangle(position, size,
+    ObjectRenderer::drawRectangle(position - oversize * 0.5f, size + oversize,
                                   Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK);
 
     Font::prepare(m);
@@ -40,16 +41,19 @@ void TextUtils::drawBestTimeObjectSpace(Vector position, long ticks, int alpha) 
     float bottomWidth = Font::getWidth(1.f, buffer);
     float width = std::max(topWidth, bottomWidth);
     Vector size(width, 2.0f);
+    Vector oversize = size * 0.1f;
+    position += Vector(width * -0.5f, Player::getSize().y + oversize.y);
     ObjectRenderer::prepare();
-    ObjectRenderer::setZ(0.0f);
+    ObjectRenderer::setZ(-1.0f);
 
     Color col = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
     col = ColorUtils::setAlpha(col, alpha);
-    ObjectRenderer::drawRectangle(position - size / 2, size, col);
 
-    Font::prepare();
+    ObjectRenderer::drawRectangle(position - oversize * 0.5f, size + oversize, col);
+
+    Font::prepare(-1.0f);
     col = Player::invertColors() ? ColorUtils::BLACK : ColorUtils::WHITE;
     col = ColorUtils::setAlpha(col, alpha);
-    Font::draw(position - size / 2, 1.0f, col, "Best time");
-    Font::draw(position - size / 2 + Vector(0.f, 1.f), 1.0f, col, buffer);
+    Font::draw(position + Vector((width - topWidth) * 0.5f, 0.0f), 1.0f, col, "Best time");
+    Font::draw(position + Vector((width - bottomWidth) * 0.5f, 1.0f), 1.0f, col, buffer);
 }

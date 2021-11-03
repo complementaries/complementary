@@ -38,6 +38,8 @@ static GL::VertexBuffer rectangle;
 static Vector mixCenter;
 static float lastMixRadius = 0.0f;
 static float mixRadius = 1000.0f;
+static float mixDirection = 1.f;
+static bool fakeMixing = false;
 
 static float lastGlowAlpha = 0.0f;
 static float glowAlpha = 0.0f;
@@ -143,14 +145,35 @@ void RenderState::addRandomizedShake(float strength) {
 void RenderState::tick() {
     shakeTicks++;
     lastMixRadius = mixRadius;
-    mixRadius += 1.5f + mixRadius * 0.02f;
+    mixRadius += (1.5f + mixRadius * 0.02f) * mixDirection;
+    if (mixRadius < 0.f) {
+        mixRadius = 0.f;
+    }
     if (mixRadius > 1000.0f) {
         mixRadius = 1000.0f;
     }
+
     lastGlowAlpha = glowAlpha;
     lastGlowScale = glowScale;
-    glowScale *= 1.01f;
-    glowAlpha *= 0.90f;
+
+    if (mixDirection == 1.f) {
+        glowScale *= 1.01f;
+        glowAlpha *= 0.90f;
+    } else {
+        glowScale *= 0.99f;
+        if (glowScale < 1.f) {
+            glowScale = 1.f;
+        }
+
+        glowAlpha *= 1.10f;
+        if (glowAlpha > 1.f) {
+            glowAlpha = 1.f;
+        }
+    }
+
+    if (mixRadius > 15.f && fakeMixing) {
+        mixDirection = -1;
+    }
 }
 
 void RenderState::resize(int width, int height) {
@@ -187,9 +210,16 @@ static void bindTextureTo(int textureUnit) {
 }
 
 void RenderState::startMixing() {
+    fakeMixing = false;
     mixCenter = Player::getPosition();
     mixRadius = 0.0f;
     lastMixRadius = 0.0f;
+    mixDirection = 1.0f;
+}
+
+void RenderState::startFakeMixing() {
+    startMixing();
+    fakeMixing = true;
 }
 
 void RenderState::startGlowing() {

@@ -263,6 +263,15 @@ void Game::switchWorld() {
     setBackgroundParticleColor();
 }
 
+static void playFakeSwitchAnimation() {
+    RenderState::addRandomizedShake(1.0f);
+    RenderState::startFakeMixing();
+    RenderState::startGlowing();
+    Input::playRumble(0.5f, 100);
+
+    SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
+}
+
 void Game::tick() {
     tps.update();
     if (paused) {
@@ -318,6 +327,8 @@ void Game::tick() {
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
             if (!Player::isCollidingWithAnyObject()) {
                 switchWorld();
+            } else {
+                playFakeSwitchAnimation();
             }
         }
         Objects::tick();

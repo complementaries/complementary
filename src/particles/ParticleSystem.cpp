@@ -193,7 +193,7 @@ void ParticleSystem::lateTick() {
 
     Vector particlePosition = position;
 
-    if (playing && (data.duration <= 0.f || currentLifetime < data.duration)) {
+    if (isPlaying()) {
         int emissionInterval = random.next(data.minEmissionInterval, data.maxEmissionInterval + 1);
         if (emissionInterval <= 0 || currentLifetime % emissionInterval == 0) {
             int emissionRate = random.next(data.minEmissionRate, data.maxEmissionRate + 1);
@@ -417,5 +417,5 @@ bool ParticleSystem::allowSaving() const {
 }
 
 bool ParticleSystem::isPlaying() const {
-    return playing;
+    return playing && (data.duration <= 0.f || currentLifetime < data.duration);
 }

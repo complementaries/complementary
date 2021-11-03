@@ -19,6 +19,7 @@ namespace RenderState {
 
     void prepareEffectFramebuffer();
     void startMixing();
+    void startFakeMixing();
     void startGlowing();
     void renderEffects(float lag);
     void renderTitleScreenEffects(float lag);

@@ -5,6 +5,7 @@
 #include "Savegame.h"
 #include "TextUtils.h"
 #include "graphics/Font.h"
+#include "graphics/gl/Glew.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
 #include "sound/SoundManager.h"
@@ -59,8 +60,15 @@ void LevelTagObject::renderText(float lag) {
     if (bestTimeAlpha > 0) {
         uint32_t completionTime = Savegame::getCompletionTime(data.level);
         if (completionTime > 0) {
-            TextUtils::drawBestTimeObjectSpace(Player::getPosition(), completionTime,
-                                               bestTimeAlpha);
+            if (bestTimeAlpha < 150) {
+                glDepthMask(false);
+                TextUtils::drawBestTimeObjectSpace(Player::getPosition(), completionTime,
+                                                   bestTimeAlpha);
+                glDepthMask(true);
+            } else {
+                TextUtils::drawBestTimeObjectSpace(Player::getPosition(), completionTime,
+                                                   bestTimeAlpha);
+            }
         }
     }
 }

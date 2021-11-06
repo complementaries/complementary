@@ -52,7 +52,7 @@ void Input::Internal::update() {
     horizontal += buttons[(size_t)ButtonType::RIGHT].pressed * joystickFactor;
 }
 
-Button Input::getButton(ButtonType type) {
+Button& Input::getButton(ButtonType type) {
     return buttons[(size_t)type];
 }
 

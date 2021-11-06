@@ -76,7 +76,11 @@ void Menu::tick() {
     if (Input::getButton(ButtonType::DOWN).pressedFirstFrame && menuIndex < lines.size() - 1) {
         menuIndex++;
     }
-    if (Input::getButton(ButtonType::JUMP).pressedFirstFrame && menuIndex < lines.size()) {
+    if ((Input::getButton(ButtonType::JUMP).pressedFirstFrame ||
+         Input::getButton(ButtonType::SWITCH).pressedFirstFrame) &&
+        menuIndex < lines.size()) {
+        Input::getButton(ButtonType::JUMP).reset();
+        Input::getButton(ButtonType::SWITCH).reset();
         lines[menuIndex].function();
     }
 }

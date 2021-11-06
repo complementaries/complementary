@@ -28,6 +28,11 @@ struct Button {
     int pressedTicks;
     bool pressed;
     bool pressedFirstFrame;
+    void reset() {
+        pressedTicks = 0;
+        pressed = false;
+        pressedFirstFrame = false;
+    }
 };
 
 namespace Input {
@@ -41,7 +46,7 @@ namespace Input {
         void update();
     }
 
-    Button getButton(ButtonType type);
+    Button& getButton(ButtonType type);
     float getHorizontal();
     SDL_GameController* getController();
     void setController(SDL_GameController* controller);

@@ -56,7 +56,7 @@ static void add(const char* s, MenuFunction mf) {
 }
 
 static void openMenu() {
-    if (Menu::isActive()) {
+    if (Menu::isActive() || Player::isDead()) {
         return;
     }
     if (Input::getButton(ButtonType::PAUSE).pressedFirstFrame) {

@@ -23,6 +23,7 @@ static float fontSize = 5.0f;
 static unsigned int menuIndex = 1;
 static MenuType type = MenuType::NONE;
 constexpr float yGapFactor = 1.25f;
+static bool showControls = false;
 
 static void nothing() {
 }
@@ -51,6 +52,10 @@ static void quitLevel() {
     Game::loadLevelSelect();
 }
 
+static void controls() {
+    showControls = !showControls;
+}
+
 static void add(const char* s, MenuFunction mf) {
     lines.push_back({s, 0.0f, mf});
 }
@@ -72,9 +77,11 @@ void Menu::tick() {
     }
     if (Input::getButton(ButtonType::UP).pressedFirstFrame && menuIndex > 1) {
         menuIndex--;
+        showControls = false;
     }
     if (Input::getButton(ButtonType::DOWN).pressedFirstFrame && menuIndex < lines.size() - 1) {
         menuIndex++;
+        showControls = false;
     }
     if ((Input::getButton(ButtonType::JUMP).pressedFirstFrame ||
          Input::getButton(ButtonType::SWITCH).pressedFirstFrame) &&
@@ -82,6 +89,37 @@ void Menu::tick() {
         Input::getButton(ButtonType::JUMP).reset();
         Input::getButton(ButtonType::SWITCH).reset();
         lines[menuIndex].function();
+    }
+}
+
+static void renderControls(const Matrix& m, Vector pos, Vector baseSize) {
+    // Links/Rechts gehen:
+    // Jump: [A] / [B]
+    // Fähigkeit: [X]
+    // Weltwechsel: [L1] / [R1] bzw. [L] / [R]
+    // Weltwechsel + Fähigkeit: [Y]
+
+    constexpr const char* help[] = {
+        "Left/Right:", "[LEFT JOYSTICK]",   "[LEFT D-PAD]", "[RIGHT D-PAD]", "Jump:",
+        "[A] / [B]",   "Ability:",          "[X]",          "[L]",           "Switch:",
+        "[R]",         "Switch + Ability:", "[Y]"};
+    constexpr int length = sizeof(help) / sizeof(const char*);
+    float smallFontSize = fontSize * 0.5f;
+    Vector size;
+    for (int i = 0; i < length; i++) {
+        size.x = std::max(size.x, Font::getWidth(smallFontSize, help[i]));
+        size.y += smallFontSize * yGapFactor;
+    }
+    Vector oversize = size * 1.1f;
+    pos.y += baseSize.y * 0.5f - oversize.y * 0.5f;
+    ObjectRenderer::prepare(m);
+    ObjectRenderer::drawRectangle(pos, oversize, ColorUtils::setAlpha(ColorUtils::GRAY, 200));
+    pos += (oversize - size) * 0.5f;
+    Font::prepare(m);
+    constexpr Color colors[] = {ColorUtils::BLACK, ColorUtils::WHITE};
+    for (int i = 0; i < length; i++) {
+        Font::draw(pos, smallFontSize, colors[help[i][0] == '['], help[i]);
+        pos.y += smallFontSize * yGapFactor;
     }
 }
 
@@ -124,6 +162,9 @@ void Menu::render(float lag) {
         pos.y += fontSize * yGapFactor;
         index++;
     }
+    if (showControls) {
+        renderControls(m, (wSize - overSize) * 0.5f + Vector(overSize.x, 0.0f), overSize);
+    }
 }
 
 bool Menu::isActive() {
@@ -150,12 +191,14 @@ void Menu::showPauseMenu() {
     if (Game::getCurrentLevel() == -1) {
         add("[Pause]", nothing);
         add("Continue", unpause);
+        add("Controls", controls);
         add("Quit", quit);
         return;
     }
     add("[Pause]", nothing);
     add("Continue", unpause);
     add("Restart", restart);
+    add("Controls", controls);
     add("Quit Level", quitLevel);
 }
 

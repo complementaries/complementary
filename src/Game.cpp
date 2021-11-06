@@ -69,6 +69,8 @@ static std::shared_ptr<ParticleSystem> backgroundParticles;
 constexpr int BACKGROUND_PARTICLE_ALPHA_BLACK = 60;
 constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
 
+static int worldSwitchBuffer = 0;
+
 long totalTicks = 0;
 long ticksInCurrentLevel = 0;
 
@@ -341,10 +343,16 @@ void Game::tick() {
         Player::setAllowedToMove(!AbilityCutscene::isActive() && !GoalCutscene::isActive() &&
                                  !Menu::isActive() && !ImGui::IsAnyItemActive() &&
                                  !Player::isDead());
-        if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame && Player::isAllowedToMove()) {
-            if (!Player::isCollidingInAnyWorld()) {
+        if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
+            worldSwitchBuffer = 20;
+        }
+        if (Player::isAllowedToMove()) {
+            worldSwitchBuffer -= worldSwitchBuffer > 0;
+            if (!Player::isCollidingInAnyWorld() && worldSwitchBuffer > 0) {
+                worldSwitchBuffer = 0;
                 switchWorld();
-            } else {
+            } else if (worldSwitchBuffer == 1) {
+                worldSwitchBuffer = 0;
                 playFakeSwitchAnimation();
             }
         }

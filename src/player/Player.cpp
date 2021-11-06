@@ -565,6 +565,7 @@ static void tickIdleAndRunAnimation() {
 
 static void addTopShear(float shear) {
     topShear += shear;
+    topShear = std::clamp(topShear, -0.3f, 0.3f);
 }
 
 static void tickShear() {
@@ -572,7 +573,7 @@ static void tickShear() {
     if (Player::isColliding(Face::DOWN)) {
         addTopShear(data.velocity.x * 0.2f);
     }
-    topShear *= 0.9;
+    topShear *= 0.9f;
 }
 
 void Player::tick() {
@@ -981,6 +982,8 @@ void Player::renderImGui() {
         ImGui::DragFloat2("Size", data.size);
         ImGui::DragFloat2("Velocity", data.velocity);
         ImGui::DragFloat2("Acceleration", data.acceleration);
+        ImGui::DragFloat("last top", &lastTopShear);
+        ImGui::DragFloat("top", &topShear);
 
         ImGui::Spacing();
 

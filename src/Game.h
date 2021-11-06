@@ -30,6 +30,9 @@ namespace Game {
 
     void resetTickCounter();
     void setTickCounterPaused(bool paused);
+
+    void pause();
+    bool isPaused();
 }
 
 #endif

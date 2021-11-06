@@ -688,3 +688,11 @@ void Game::setLevelScreenPosition(const Vector& v) {
 void Game::resetTickCounter() {
     ticksInCurrentLevel = 0;
 }
+
+void Game::pause() {
+    paused = true;
+}
+
+bool Game::isPaused() {
+    return paused;
+}

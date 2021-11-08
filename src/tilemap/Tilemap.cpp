@@ -84,7 +84,7 @@ static void prepareRendering() {
             Tilemap::getTile(x, y).render(data, x, y, -0.2f);
         }
     }
-    vertices = data.getSize() / (sizeof(float) * 2 + 4);
+    vertices = data.getSize() / (sizeof(float) * 3 + 4);
     buffer.setData(data.getData(), data.getSize());
     dirty = false;
 }

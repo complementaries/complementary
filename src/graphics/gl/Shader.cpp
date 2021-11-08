@@ -2,6 +2,10 @@
 #include "Utils.h"
 #include <fstream>
 
+#ifndef NDEBUG
+GLuint GL::Shader::boundProgram = 0;
+#endif
+
 GL::Shader::Shader() : vertex(0), fragment(0), program(0) {
 }
 
@@ -75,25 +79,57 @@ bool GL::Shader::compile(const GL::Shader::Options& options) {
         Utils::printError("cannot link shader: %s\n", buffer);
         return true;
     }
+#ifndef NDEBUG
+    printf("(%s, %s) has program id %d\n", options.vertexPath, options.fragmentPath, program);
+#endif
     return false;
 }
 
 void GL::Shader::use() {
+#ifndef NDEBUG
+    boundProgram = program;
+#endif
     glUseProgram(program);
 }
 
 void GL::Shader::setFloat(const char* name, float f) {
+#ifndef NDEBUG
+    if (program != boundProgram) {
+        fprintf(stderr, "setFloat on invalid shader: %d instead of %d\n", boundProgram, program);
+    }
+#endif
     glUniform1f(glGetUniformLocation(program, name), f);
 }
 
 void GL::Shader::setInt(const char* name, int i) {
+#ifndef NDEBUG
+    if (program != boundProgram) {
+        fprintf(stderr, "setInt on invalid shader: %d instead of %d\n", boundProgram, program);
+    }
+#endif
     glUniform1i(glGetUniformLocation(program, name), i);
 }
 
 void GL::Shader::setVector(const char* name, Vector vec) {
+#ifndef NDEBUG
+    if (program != boundProgram) {
+        fprintf(stderr, "setVector on invalid shader: %d instead of %d\n", boundProgram, program);
+    }
+#endif
     glUniform2f(glGetUniformLocation(program, name), vec.x, vec.y);
 }
 
 void GL::Shader::setMatrix(const char* name, const Matrix& matrix) {
+#ifndef NDEBUG
+    if (program != boundProgram) {
+        fprintf(stderr, "setMatrix on invalid shader: %d instead of %d\n", boundProgram, program);
+    }
+#endif
     glUniformMatrix4fv(glGetUniformLocation(program, name), 1, false, matrix.getData());
 }
+
+#ifndef NDEBUG
+bool GL::Shader::isBound() const {
+    return program == boundProgram;
+}
+#endif

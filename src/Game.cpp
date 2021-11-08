@@ -442,6 +442,7 @@ void Game::render(float lag) {
     ObjectRenderer::prepare(Matrix());
     ObjectRenderer::drawRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
                                   ColorUtils::setAlpha(ColorUtils::BLACK, fade));
+
 #ifndef NDEBUG
     drawFpsDisplay();
 #endif

@@ -27,7 +27,13 @@ GL::VertexBuffer::Attributes& GL::VertexBuffer::Attributes::addRGBA() {
     return *this;
 }
 
-GL::VertexBuffer::VertexBuffer() : vertexArray(0), vertexBuffer(0) {
+GL::VertexBuffer::VertexBuffer()
+    : vertexArray(0), vertexBuffer(0)
+#ifndef NDEBUG
+      ,
+      vertexSize(0), dataSize(0)
+#endif
+{
 }
 
 GL::VertexBuffer::~VertexBuffer() {
@@ -58,6 +64,9 @@ void GL::VertexBuffer::init(const Attributes& a) {
         glEnableVertexAttribArray(i);
         offset += d.size;
     }
+#ifndef NDEBUG
+    vertexSize = offset;
+#endif
 }
 
 void GL::VertexBuffer::bindBuffer() const {
@@ -71,9 +80,26 @@ void GL::VertexBuffer::bindArray() const {
 void GL::VertexBuffer::setData(const void* data, int length) {
     bindBuffer();
     glBufferData(GL_ARRAY_BUFFER, length, data, GL_STATIC_DRAW);
+#ifndef NDEBUG
+    if (vertexSize == 0) {
+        fprintf(stderr, "GL::VertexBuffer::setData before GL::VertexBuffer::init\n");
+        return;
+    }
+    dataSize = length;
+    if (dataSize % vertexSize != 0) {
+        fprintf(stderr, "data length is not a multiple of vertex size: %d %d\n", dataSize,
+                vertexSize);
+    }
+#endif
 }
 
 void GL::VertexBuffer::drawTriangles(int vertices) const {
     bindArray();
     glDrawArrays(GL_TRIANGLES, 0, vertices);
+#ifndef NDEBUG
+    if (vertexSize * vertices != dataSize) {
+        fprintf(stderr, "invalid vertices on drawTriangles: %d %d %d\n", vertexSize, vertices,
+                dataSize);
+    }
+#endif
 }

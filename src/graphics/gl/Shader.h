@@ -25,6 +25,9 @@ namespace GL {
         void setInt(const char* name, int i);
         void setVector(const char* name, Vector v);
         void setMatrix(const char* name, const Matrix& matrix);
+#ifndef NDEBUG
+        bool isBound() const;
+#endif
 
       private:
         bool readFile(std::vector<GLchar>& code, const char* path) const;
@@ -33,6 +36,10 @@ namespace GL {
         GLuint vertex;
         GLuint fragment;
         GLuint program;
+
+#ifndef NDEBUG
+        static GLuint boundProgram;
+#endif
     };
 }
 

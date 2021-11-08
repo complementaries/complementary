@@ -35,6 +35,11 @@ void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector
 
 void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color xc,
                                   Color yc, Color zc) {
+#ifndef NDEBUG
+    if (!shader.isBound()) {
+        fprintf(stderr, "ObjectRenderer::drawTriangle on invalid shader\n");
+    }
+#endif
     data.clear();
     data.add(x).add(xc);
     data.add(y).add(yc);
@@ -44,6 +49,11 @@ void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector
 }
 
 void ObjectRenderer::drawRectangle(const Vector& position, const Vector& size, Color c) {
+#ifndef NDEBUG
+    if (!shader.isBound()) {
+        fprintf(stderr, "ObjectRenderer::drawRectangle on invalid shader\n");
+    }
+#endif
     data.clear();
     float minX = position[0];
     float minY = position[1];

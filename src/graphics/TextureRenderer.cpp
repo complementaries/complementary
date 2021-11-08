@@ -37,6 +37,11 @@ bool TextureRenderer::init() {
 
 static void renderBox(const Vector& min, const Vector& max, const Vector& tMin, const Vector& tMax,
                       Color c) {
+#ifndef NDEBUG
+    if (!shader.isBound()) {
+        fprintf(stderr, "renderBox on invalid shader\n");
+    }
+#endif
     static Buffer data;
     data.clear();
     data.add(min.x).add(min.y).add(tMin.x).add(tMin.y).add(c);

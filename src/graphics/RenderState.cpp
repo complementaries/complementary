@@ -265,7 +265,7 @@ void RenderState::renderEffects(float lag) {
 void RenderState::renderTitleScreenEffects(float lag) {
     bindAndClearDefaultFramebuffer();
     lineMixer.use();
-    setViewMatrix(mixer);
+    setViewMatrix(lineMixer);
     lineMixer.setInt("samp", 0);
     lineMixer.setInt("texels", Arguments::samples);
     bindTextureTo(0);

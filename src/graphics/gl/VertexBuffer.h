@@ -45,6 +45,11 @@ namespace GL {
 
         GLuint vertexArray;
         GLuint vertexBuffer;
+
+#ifndef NDEBUG
+        int vertexSize;
+        int dataSize;
+#endif
     };
 }
 

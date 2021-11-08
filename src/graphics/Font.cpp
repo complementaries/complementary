@@ -169,6 +169,11 @@ void Font::prepare(const Matrix& view, float zLayer) {
 }
 
 void Font::draw(const Vector& pos, float size, Color color, const char* s) {
+#ifndef NDEBUG
+    if (!shader.isBound()) {
+        fprintf(stderr, "Font::draw on invalid shader\n");
+    }
+#endif
     texture.bindTo(0);
     static Buffer data;
     data.clear();

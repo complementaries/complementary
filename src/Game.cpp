@@ -10,11 +10,11 @@
 
 #include "AbilityCutscene.h"
 #include "Arguments.h"
-#include "Clock.h"
 #include "Game.h"
 #include "GoalCutscene.h"
 #include "Input.h"
 #include "Menu.h"
+#include "Profiler.h"
 #include "Savegame.h"
 #include "TextUtils.h"
 #include "Utils.h"
@@ -60,9 +60,6 @@ static bool singleStep;
 
 static int fade = 0;
 static int fadeAdd = 0;
-
-static Clock tps;
-static Clock fps;
 
 static std::shared_ptr<ParticleSystem> titleEffectParticles;
 static std::shared_ptr<ParticleSystem> backgroundParticles;
@@ -292,7 +289,10 @@ static void playFakeSwitchAnimation() {
 }
 
 void Game::tick() {
-    tps.update();
+#ifndef NDEBUG
+    Profiler::tick();
+    Profiler::Timer tickTimer(Profiler::tickNanos);
+#endif
     if (paused) {
         if (singleStep) {
             singleStep = false;
@@ -356,10 +356,24 @@ void Game::tick() {
                 playFakeSwitchAnimation();
             }
         }
+#ifndef NDEBUG
+        {
+            Profiler::Timer timer(Profiler::objectTickNanos);
+            Objects::tick();
+        }
+        {
+            Profiler::Timer timer(Profiler::playerTickNanos);
+            Player::tick();
+        }
+        {
+            Profiler::Timer timer(Profiler::objectLateTickNanos);
+            Objects::lateTick();
+        }
+#else
         Objects::tick();
-
         Player::tick();
         Objects::lateTick();
+#endif
     }
 
     totalTicks++;
@@ -380,9 +394,9 @@ static void drawFpsDisplay() {
 
     Font::prepare(m);
     char buffer[256];
-    snprintf(buffer, 256, "FPS: %2.0f", fps.getUpdatesPerSecond());
+    snprintf(buffer, 256, "FPS: %2.0f", Profiler::getFPS());
     Font::draw(Vector(00.0f, 2.0f), 0.6f, ColorUtils::RED, buffer);
-    snprintf(buffer, 256, "TPS: %3.0f", tps.getUpdatesPerSecond());
+    snprintf(buffer, 256, "TPS: %3.0f", Profiler::getTPS());
     Font::draw(Vector(00.0f, 2.6f), 0.6f, ColorUtils::RED, buffer);
     snprintf(buffer, 256, "Samples: %d", Arguments::samples);
     Font::draw(Vector(00.0f, 3.2f), 0.6f, ColorUtils::RED, buffer);
@@ -390,11 +404,15 @@ static void drawFpsDisplay() {
 #endif
 
 void Game::render(float lag) {
+#ifndef NDEBUG
+    Profiler::render();
+    Profiler::Timer renderTimer(Profiler::renderNanos);
+#endif
+
     onWindowResize(Window::getWidth(), Window::getHeight());
     if (Menu::isActive()) {
         lag = 0.0f;
     }
-    fps.update();
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     RenderState::bindAndClearDefaultFramebuffer();
@@ -414,9 +432,24 @@ void Game::render(float lag) {
     Tilemap::render();
 
     ParticleRenderer::prepare();
+#ifndef NDEBUG
+    {
+        Profiler::Timer timer(Profiler::objectRenderNanos);
+        Objects::render(lag);
+    }
+    {
+        Profiler::Timer timer(Profiler::objectTextRenderNanos);
+        Objects::renderText(lag);
+    }
+    {
+        Profiler::Timer timer(Profiler::particleRenderNanos);
+        ParticleRenderer::render();
+    }
+#else
     Objects::render(lag);
     Objects::renderText(lag);
     ParticleRenderer::render();
+#endif
 
     if (isInTitleScreen) {
         RenderState::updateViewMatrix(lag);

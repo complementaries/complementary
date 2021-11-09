@@ -12,6 +12,7 @@
 #include "Arguments.h"
 #include "Game.h"
 #include "Input.h"
+#include "Profiler.h"
 #include "Utils.h"
 #include "graphics/gl/Glew.h"
 #include "sound/SoundManager.h"
@@ -390,7 +391,12 @@ void Window::run() {
     Nanos lag = 0;
     Nanos lastTime = getNanos();
     while (running) {
-        pollEvents();
+        {
+#ifndef NDEBUG
+            Profiler::Timer timer(Profiler::eventPollNanos);
+#endif
+            pollEvents();
+        }
 
         Nanos time = getNanos();
         lag += time - lastTime;
@@ -402,20 +408,26 @@ void Window::run() {
         }
 
         Game::render(static_cast<float>(lag) / NANOS_PER_TICK);
-
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame(window);
-        ImGui::NewFrame();
-
+        {
 #ifndef NDEBUG
-        Game::renderImGui();
+            Profiler::Timer timer(Profiler::postGameRenderNanos);
 #endif
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        SDL_GL_SwapWindow(window);
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplSDL2_NewFrame(window);
+            ImGui::NewFrame();
+#ifndef NDEBUG
+            Game::renderImGui();
+#endif
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
+        {
+#ifndef NDEBUG
+            Profiler::Timer timer(Profiler::bufferSwapNanos);
+#endif
+            SDL_GL_SwapWindow(window);
+        }
     }
 
     Input::closeController();

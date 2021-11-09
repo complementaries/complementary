@@ -48,6 +48,7 @@ src = [
   'src/Savegame.cpp',
   'src/Utils.cpp',
   'src/TextUtils.cpp',
+  'src/Profiler.cpp',
   'src/Main.cpp'
 ]
 

@@ -62,7 +62,7 @@ struct PlayerData {
     Vector wallJumpInit{0.5f, 0.4f};
     float wallJumpBoost = 0.1f;
     int maxWallJumpTicks = 40;
-    float wallJumpDrag = 0.2f;
+    float wallJumpDrag = 0.3f;
     int wallJumpMoveCooldown = 15;
     float gravity = 0.0275f;
     int coyoteTicks = 8;

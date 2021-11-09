@@ -107,7 +107,7 @@ static void logGlError(const char* msg) {
 }
 #endif
 
-static void setBackgroundParticleColor() {
+void Game::setBackgroundParticleColor() {
     auto particleColor = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
     backgroundParticles->data.startColor = ColorUtils::setAlpha(particleColor, 0);
     backgroundParticles->data.endColor = ColorUtils::setAlpha(
@@ -188,7 +188,7 @@ static void loadLevel(const char* name) {
     Game::setFade(254);
     Game::fadeIn(4);
     Player::restart();
-    setBackgroundParticleColor();
+    Game::setBackgroundParticleColor();
 }
 
 static void loadTitleScreen() {

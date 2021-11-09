@@ -33,6 +33,7 @@ namespace Game {
 
     void pause();
     bool isPaused();
+    void setBackgroundParticleColor();
 }
 
 #endif

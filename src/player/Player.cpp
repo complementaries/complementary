@@ -418,6 +418,7 @@ void Player::restart() {
     if (SoundManager::getMusicChannel() == SoundManager::darkSoundID) {
         SoundManager::switchMusic();
     }
+    Game::setBackgroundParticleColor();
 }
 
 void Player::kill() {

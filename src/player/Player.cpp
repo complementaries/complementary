@@ -621,6 +621,19 @@ void Player::tick() {
         dashDirection = -1.0f;
     }
 
+    if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
+        dashTicks == 0 && dashCoolDown == 0 && dashUseable && allowedToMove) {
+        dashParticles->play();
+        Input::playRumble(0.2f, 100);
+        dashTicks = data.maxDashTicks;
+        dashUseable = false;
+        dashCoolDown = data.maxDashCooldown + dashTicks;
+        dashVelocity = Vector(data.dashStrength * dashDirection, 0.0f);
+        addRenderForce(-0.5f, dashDirection < 0.0f ? Face::LEFT : Face::RIGHT);
+        SoundManager::playSoundEffect(Sound::DASH);
+        RenderState::addRandomizedShake(0.1f);
+    }
+
     if (Input::getButton(ButtonType::JUMP).pressedFirstFrame && allowedToMove) {
         jumpBufferTicks = data.maxJumpBufferTicks;
     }
@@ -633,8 +646,9 @@ void Player::tick() {
         rightWallJumpBuffer = 15;
     }
     if (jumpBufferTicks > 0) {
-        if (fakeGrounded > 0 ||
-            (hasAbility(Ability::DOUBLE_JUMP) && jumpCount < data.maxJumpCount)) {
+        if ((fakeGrounded > 0 ||
+             (hasAbility(Ability::DOUBLE_JUMP) && jumpCount < data.maxJumpCount)) &&
+            dashTicks == 0) {
             addForce(Face::UP, data.jumpInit);
             jumpTicks = data.maxJumpTicks;
             wallJumpCooldown = 10;
@@ -791,18 +805,6 @@ void Player::tick() {
     } else {
         wallStickParticles->stop();
         stickingToWall = false;
-    }
-    if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
-        dashTicks == 0 && dashCoolDown == 0 && dashUseable && allowedToMove) {
-        dashParticles->play();
-        Input::playRumble(0.2f, 100);
-        dashTicks = data.maxDashTicks;
-        dashUseable = false;
-        dashCoolDown = data.maxDashCooldown + dashTicks;
-        dashVelocity = Vector(data.dashStrength * dashDirection, 0.0f);
-        addRenderForce(-0.5f, dashDirection < 0.0f ? Face::LEFT : Face::RIGHT);
-        SoundManager::playSoundEffect(Sound::DASH);
-        RenderState::addRandomizedShake(0.1f);
     }
     if ((leftWall || rightWall) && Player::hasAbility(Ability::WALL_JUMP)) {
         resetDash();

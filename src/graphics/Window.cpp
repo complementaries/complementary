@@ -401,10 +401,17 @@ void Window::run() {
         Nanos time = getNanos();
         lag += time - lastTime;
         lastTime = time;
+        int i = 0;
         while (lag >= NANOS_PER_TICK) {
             lag -= NANOS_PER_TICK;
             Input::Internal::update();
             Game::tick();
+            i++;
+            if (i > 5) {
+                int skip = lag / NANOS_PER_TICK;
+                lag -= skip * NANOS_PER_TICK;
+                fprintf(stderr, "Lagging, skipped %d ticks\n", skip);
+            }
         }
 
         Game::render(static_cast<float>(lag) / NANOS_PER_TICK);

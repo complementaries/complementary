@@ -408,8 +408,6 @@ void Game::render(float lag) {
     Profiler::render();
     Profiler::Timer renderTimer(Profiler::renderNanos);
 #endif
-
-    onWindowResize(Window::getWidth(), Window::getHeight());
     if (Menu::isActive()) {
         lag = 0.0f;
     }

@@ -20,8 +20,8 @@ void MovingSwitchObject::postInit() {
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/switchobjectON.cmob");
     Vector size = this->getSize();
     seenParticles->data.boxSize = size * 1.1f;
-    seenParticles->data.minStartVelocity = -size * 0.01f;
-    seenParticles->data.maxStartVelocity = size * 0.01f;
+    seenParticles->data.minStartVelocity = Vector(-1.0f, -1.0f) * 0.035f;
+    seenParticles->data.maxStartVelocity = Vector(1.0f, 1.0f) * 0.035f;
     auto emissionRate = std::min(50.f, seenParticles->data.maxEmissionRate * size.x * size.y);
 
     seenParticles->data.minEmissionRate = emissionRate;

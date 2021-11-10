@@ -308,7 +308,7 @@ void TilemapEditor::render() {
 
     shader.use();
     RenderState::setViewMatrix(shader);
-    int vertices = renderBuffer.getSize() / (sizeof(float) * 2 + 4);
+    int vertices = renderBuffer.getSize() / (sizeof(float) * 3 + 4);
     buffer.setData(renderBuffer.getData(), renderBuffer.getSize());
     buffer.drawTriangles(vertices);
 

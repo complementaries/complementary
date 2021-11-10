@@ -568,6 +568,14 @@ void Game::renderImGui() {
         }
     }
 
+    if (ImGui::CollapsingHeader("Levels")) {
+        for (auto& levelName : levelNames) {
+            if (ImGui::Button(levelName.c_str())) {
+                loadLevel(levelName.c_str());
+            }
+        }
+    }
+
     if (ImGui::CollapsingHeader("Prototypes")) {
         if (ImGui::Button("Load from file")) {
             auto obj = Objects::loadObject(objectLoadLocation);

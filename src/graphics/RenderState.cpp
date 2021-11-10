@@ -48,25 +48,42 @@ static float glowScale = 1.0f;
 
 static float zoom = 1.0f;
 static Vector zoomOffset = Vector();
+static GLenum textureTarget = GL_TEXTURE_2D;
 
 bool RenderState::init() {
+    if (Arguments::samples > 1) {
+        textureTarget = GL_TEXTURE_2D_MULTISAMPLE;
+    }
     glGenFramebuffers(1, &framebuffer.id);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.id);
 
     glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_RGBA32F,
-                            Window::getWidth(), Window::getHeight(), false);
+    glBindTexture(textureTarget, texture);
+    if (Arguments::samples > 1) {
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_RGBA32F,
+                                Window::getWidth(), Window::getHeight(), false);
+    } else {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Window::getWidth(), Window::getHeight(), 0, GL_RGBA,
+                     GL_UNSIGNED_BYTE, nullptr);
+    }
 
     glGenTextures(1, &textureDepth);
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureDepth);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_DEPTH_COMPONENT32,
-                            Window::getWidth(), Window::getHeight(), false);
+    glBindTexture(textureTarget, textureDepth);
+    if (Arguments::samples > 1) {
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_DEPTH_COMPONENT32,
+                                Window::getWidth(), Window::getHeight(), false);
+    } else {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Window::getWidth(), Window::getHeight(),
+                     0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    }
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE,
-                           textureDepth, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureTarget, textureDepth, 0);
     GLuint drawBuffer = GL_COLOR_ATTACHMENT0;
-    glFramebufferTexture2D(GL_FRAMEBUFFER, drawBuffer, GL_TEXTURE_2D_MULTISAMPLE, texture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, drawBuffer, textureTarget, texture, 0);
     glDrawBuffers(1, &drawBuffer);
 
     GLenum error = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -78,6 +95,12 @@ bool RenderState::init() {
     rectangle.init(GL::VertexBuffer::Attributes().addVector2());
     float data[] = {-1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f};
     rectangle.setData(data, sizeof(data));
+    if (Arguments::samples > 1) {
+        return mixer.compile({"assets/shaders/mixer.vs", "assets/shaders/mixerSampled.fs"}) ||
+               lineMixer.compile(
+                   {"assets/shaders/lineMixer.vs", "assets/shaders/lineMixerSampled.fs"}) ||
+               glow.compile({"assets/shaders/glow.vs", "assets/shaders/glowSampled.fs"});
+    }
     return mixer.compile({"assets/shaders/mixer.vs", "assets/shaders/mixer.fs"}) ||
            lineMixer.compile({"assets/shaders/lineMixer.vs", "assets/shaders/lineMixer.fs"}) ||
            glow.compile({"assets/shaders/glow.vs", "assets/shaders/glow.fs"});
@@ -177,12 +200,21 @@ void RenderState::tick() {
 }
 
 void RenderState::resize(int width, int height) {
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_RGBA32F, width,
-                            height, false);
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureDepth);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_DEPTH_COMPONENT32,
-                            width, height, false);
+    glBindTexture(textureTarget, texture);
+    if (Arguments::samples > 1) {
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_RGBA32F, width,
+                                height, false);
+    } else {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+    }
+    glBindTexture(textureTarget, textureDepth);
+    if (Arguments::samples > 1) {
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_DEPTH_COMPONENT32,
+                                width, height, false);
+    } else {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT,
+                     GL_FLOAT, nullptr);
+    }
 }
 
 static void clear() {
@@ -206,7 +238,7 @@ void RenderState::bindAndClearDefaultFramebuffer() {
 
 static void bindTextureTo(int textureUnit) {
     glActiveTexture(GL_TEXTURE0 + textureUnit);
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+    glBindTexture(textureTarget, texture);
 }
 
 void RenderState::startMixing() {

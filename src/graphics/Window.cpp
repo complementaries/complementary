@@ -79,9 +79,11 @@ bool Window::init() {
         Utils::printError("unable to set swap interval to %d\n", Arguments::vsync);
     }
 
-    if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1) < 0 ||
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, Arguments::samples) < 0) {
-        Utils::printError("Failed to enable multisampling.\n");
+    if (Arguments::samples > 1) {
+        if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1) < 0 ||
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, Arguments::samples) < 0) {
+            Utils::printError("Failed to enable multisampling.\n");
+        }
     }
 
     if (SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1) < 0) {

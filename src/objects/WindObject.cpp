@@ -39,7 +39,8 @@ void WindObject::postInit() {
     particles->data.maxStartVelocity = data.force * 2.0f;
     particles->data.boxSize = data.size;
     particles->data.maxLifetime = std::max(data.size.x, data.size.y) * 10;
-    particles->position = this->position;
+    particles->position = this->position + data.size / 2;
+    particles->data.boxLifetimeLoss = 4;
     particles->play();
 }
 
@@ -106,8 +107,8 @@ std::shared_ptr<ObjectBase> WindObject::clone() {
 void WindObject::initTileEditorData(std::vector<TileEditorProp>& props) {
     props.insert(props.end(),
                  {
-                     TileEditorProp::Int("Size X", data.size.x, 0, 5),
-                     TileEditorProp::Int("Size Y", data.size.y, 0, 5),
+                     TileEditorProp::Int("Size X", data.size.x, 0, 80),
+                     TileEditorProp::Int("Size Y", data.size.y, 0, 40),
                      TileEditorProp::Float("Force X", data.force.x, -0.5f, 0.5f, 0.01f),
                      TileEditorProp::Float("Force Y", data.force.y, -0.5f, 0.5f, 0.01f),
                  });

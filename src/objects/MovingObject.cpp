@@ -187,7 +187,7 @@ void MovingObject::render(float lag, Color color) {
 }
 
 void MovingObject::render(float lag) {
-    render(lag, ColorUtils::GRAY);
+    render(lag, Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK);
 }
 
 void MovingObject::renderEditor(float lag, bool inPalette) {

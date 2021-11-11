@@ -301,11 +301,11 @@ static void pollEvents() {
                 break;
             }
             case SDL_CONTROLLERAXISMOTION: {
+                float value = e.caxis.value / 32768.0f;
+                int sign = value < 0 ? -1 : 1;
                 switch (e.jaxis.axis) {
-                    case SDL_CONTROLLER_AXIS_LEFTX:
+                    case SDL_CONTROLLER_AXIS_LEFTX: {
                         Input::Internal::setJoystickFactor(1.0f);
-                        float value = e.caxis.value / 32768.0f;
-                        int sign = value < 0 ? -1 : 1;
                         value = (std::abs(value) - 0.2f) / (0.9f - 0.2f);
                         value = (float)sign * std::clamp(value, 0.0f, 1.0f);
                         if (value < 0) {
@@ -324,6 +324,23 @@ static void pollEvents() {
                             Input::Internal::setButtonReleased(ButtonType::RIGHT);
                         }
                         break;
+                    }
+                    case SDL_CONTROLLER_AXIS_TRIGGERLEFT: {
+                        if (value > 0.5f && !Input::getButton(ButtonType::ABILITY).pressed) {
+                            Input::Internal::setButtonPressed(ButtonType::ABILITY);
+                        } else if (value <= 0.5f) {
+                            Input::Internal::setButtonReleased(ButtonType::ABILITY);
+                        }
+                        break;
+                    }
+                    case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: {
+                        if (value > 0.5f && !Input::getButton(ButtonType::SWITCH).pressed) {
+                            Input::Internal::setButtonPressed(ButtonType::SWITCH);
+                        } else if(value <= 0.5f) {
+                            Input::Internal::setButtonReleased(ButtonType::SWITCH);
+                        }
+                        break;
+                    }
                 }
                 break;
             }

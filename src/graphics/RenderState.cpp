@@ -60,7 +60,7 @@ bool RenderState::init() {
     glGenTextures(1, &texture);
     glBindTexture(textureTarget, texture);
     if (Arguments::samples > 1) {
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_RGBA32F,
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_RGBA,
                                 Window::getWidth(), Window::getHeight(), false);
     } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -72,7 +72,7 @@ bool RenderState::init() {
     glGenTextures(1, &textureDepth);
     glBindTexture(textureTarget, textureDepth);
     if (Arguments::samples > 1) {
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_DEPTH_COMPONENT32,
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_DEPTH_COMPONENT,
                                 Window::getWidth(), Window::getHeight(), false);
     } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -202,17 +202,18 @@ void RenderState::tick() {
 void RenderState::resize(int width, int height) {
     glBindTexture(textureTarget, texture);
     if (Arguments::samples > 1) {
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_RGBA32F, width,
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_RGBA, width,
                                 height, false);
     } else {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                     nullptr);
     }
     glBindTexture(textureTarget, textureDepth);
     if (Arguments::samples > 1) {
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_DEPTH_COMPONENT32,
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, Arguments::samples, GL_DEPTH_COMPONENT,
                                 width, height, false);
     } else {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT,
                      GL_FLOAT, nullptr);
     }
 }

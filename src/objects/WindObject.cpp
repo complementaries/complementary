@@ -7,11 +7,25 @@
 #include <iostream>
 #include <memory>
 
+static std::vector<float> windObjects;
+
 WindObject::WindObject() {
+}
+WindObject::~WindObject() {
+    if (this->index) {
+        windObjects.clear();
+    }
 }
 
 WindObject::WindObject(const WindObjectData& data) {
     this->data = data;
+    if (windObjects.empty()) {
+        this->index = 0;
+    } else {
+        this->index = windObjects.size();
+    }
+    std::cout << this->index << std::endl;
+    windObjects.push_back(biggestFloat);
 }
 
 WindObject::WindObject(const Vector& position, const Vector& size, const Vector& force) {
@@ -48,15 +62,30 @@ void WindObject::handleSound(int soundId) {
     float distance = calculatePlayerDistance();
     float xDistance = calculatePlayerDistanceAxis(0);
     if (abs(distance) < soundThreshold) {
+        windObjects[this->index] = distance;
         if (!SoundManager::soundPlaying(soundId)) {
             SoundManager::playContinuousSound(soundId);
         }
-        SoundManager::setDistanceToPlayer(soundId, distance, xDistance, soundThreshold);
+        if (nearestWind() == abs(distance)) {
+            SoundManager::setDistanceToPlayer(soundId, distance, xDistance, soundThreshold);
+        }
     } else {
-        if (SoundManager::soundPlaying(soundId)) {
+        windObjects[this->index] = biggestFloat;
+        if (SoundManager::soundPlaying(soundId) && nearestWind() == biggestFloat) {
             SoundManager::stopSound(soundId);
         }
     }
+}
+
+float WindObject::nearestWind() {
+    float smallestDistance = biggestFloat;
+    for (int i = 0; i < windObjects.size(); i++) {
+        float currDistance = abs(windObjects[i]);
+        if (smallestDistance > currDistance) {
+            smallestDistance = currDistance;
+        }
+    }
+    return smallestDistance;
 }
 
 float WindObject::calculatePlayerDistance() {

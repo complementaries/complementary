@@ -5,6 +5,8 @@
 #include "math/Vector.h"
 #include "particles/ParticleSystem.h"
 #include "player/Ability.h"
+#include <limits>
+#include <vector>
 
 struct WindObjectData {
     Vector size;
@@ -16,6 +18,7 @@ class WindObject : public Object<WindObjectData> {
     WindObject();
     WindObject(const WindObjectData& data);
     WindObject(const Vector& position, const Vector& size, const Vector& force);
+    ~WindObject();
 
     void postInit() override;
     void onCollision() override;
@@ -31,6 +34,9 @@ class WindObject : public Object<WindObjectData> {
 
   private:
     std::shared_ptr<ParticleSystem> particles;
+    int index;
+    const float biggestFloat = std::numeric_limits<float>::max();
+    float nearestWind();
 
 #ifndef NDEBUG
     void initTileEditorData(std::vector<TileEditorProp>& props) override;

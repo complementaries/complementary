@@ -56,12 +56,10 @@ void DoorObject::render(float lag, Color color) {
     int rAlpha = std::min(alpha, 255);
     color = ColorUtils::setAlpha(color, rAlpha);
     if (rAlpha < 255) {
-        ObjectRenderer::setZ(-0.1f);
-        ObjectRenderer::drawRectangle(position, data.size, color);
-        ObjectRenderer::setZ(-0.4f);
+        ObjectRenderer::addRectangle(position, data.size, color, -0.1f);
         return;
     }
-    ObjectRenderer::drawRectangle(position, data.size, color);
+    ObjectRenderer::addRectangle(position, data.size, color);
 
     Color keyholeColor;
     Color background = Player::invertColors() ? ColorUtils::BLACK : ColorUtils::WHITE;
@@ -74,9 +72,9 @@ void DoorObject::render(float lag, Color color) {
     Vector a = mid + Vector(-0.4f, 0.0f);
     Vector b = mid + Vector(0.4f, 0.0f);
     Vector c = mid + Vector(0.0f, -0.4f);
-    ObjectRenderer::drawTriangle(a, b, c, keyholeColor);
+    ObjectRenderer::addTriangle(a, b, c, keyholeColor);
     c = mid + Vector(0.0f, 0.4f);
-    ObjectRenderer::drawTriangle(a, b, c, keyholeColor);
+    ObjectRenderer::addTriangle(a, b, c, keyholeColor);
 }
 
 void DoorObject::render(float lag) {

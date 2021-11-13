@@ -117,15 +117,15 @@ bool WindObject::collidesWith(const Vector& pPosition, const Vector& pSize) cons
 void WindObject::renderEditor(float lag, bool inPalette) {
     (void)lag;
     (void)inPalette;
-    ObjectRenderer::drawRectangle(position, data.size, ColorUtils::rgba(255, 0, 0, 100));
+    ObjectRenderer::addRectangle(position, data.size, ColorUtils::rgba(255, 0, 0, 100));
 
     // TEMP: indicator for the wind direction
     auto normForce = data.force;
     normForce.normalize();
-    ObjectRenderer::drawRectangle(position + data.size * 0.5f, Vector(1.f, 1.f),
-                                  ColorUtils::rgba(255, 0, 0, 200));
-    ObjectRenderer::drawRectangle(position + data.size * 0.5f + normForce + Vector(0.2f, 0.2f),
-                                  Vector(0.4f, 0.4f), ColorUtils::rgba(255, 0, 0));
+    ObjectRenderer::addRectangle(position + data.size * 0.5f, Vector(1.f, 1.f),
+                                 ColorUtils::rgba(255, 0, 0, 200));
+    ObjectRenderer::addRectangle(position + data.size * 0.5f + normForce + Vector(0.2f, 0.2f),
+                                 Vector(0.4f, 0.4f), ColorUtils::rgba(255, 0, 0));
 }
 
 std::shared_ptr<ObjectBase> WindObject::clone() {

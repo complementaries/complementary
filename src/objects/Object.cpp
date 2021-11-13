@@ -3,7 +3,8 @@
 #include "imgui/ImGuiUtils.h"
 #include <imgui.h>
 
-ObjectBase::ObjectBase() : hasWall(true), shouldDestroy(false), destroyOnLevelLoad(true) {
+ObjectBase::ObjectBase()
+    : hasWall(true), isStatic(true), shouldDestroy(false), destroyOnLevelLoad(true) {
 }
 
 void ObjectBase::postInit() {
@@ -137,4 +138,8 @@ bool ObjectBase::isDoorOfType(int type) const {
 }
 
 void ObjectBase::addKey() {
+}
+
+bool ObjectBase::hasMoved() const {
+    return true;
 }

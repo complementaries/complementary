@@ -156,9 +156,19 @@ void Objects::handleCollision(const Vector& position, const Vector& size) {
     }
 }
 
-void Objects::tick() {
+void Objects::tick(bool test) {
+    int staticO = 0;
     for (auto& o : objects) {
         o->tick();
+
+        if (o->hasMoved() && o->isStatic) {
+            ObjectRenderer::clearStaticBuffer();
+            o->isStatic = false;
+        }
+        staticO += o->isStatic;
+    }
+    if (!test) {
+        std::cout << staticO << " static objects\n";
     }
 
     for (size_t i = objects.size(); i > 0;) {
@@ -177,13 +187,23 @@ void Objects::lateTick() {
 }
 
 void Objects::render(float lag) {
-    ObjectRenderer::prepare();
     for (auto& o : objects) {
+        if (o->isStatic && !ObjectRenderer::dirtyStaticBuffer()) {
+            continue;
+        }
+        ObjectRenderer::bindBuffer(o->isStatic);
         o->render(lag);
     }
     for (auto& o : objects) {
+        if (o->isStatic && !ObjectRenderer::dirtyStaticBuffer()) {
+            continue;
+        }
+        ObjectRenderer::bindBuffer(o->isStatic);
         o->lateRender(lag);
     }
+    ObjectRenderer::bindBuffer(false);
+    ObjectRenderer::render();
+    ObjectRenderer::renderStatic();
 }
 
 void Objects::renderText(float lag) {

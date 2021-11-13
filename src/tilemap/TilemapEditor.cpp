@@ -312,12 +312,12 @@ void TilemapEditor::render() {
     buffer.setData(renderBuffer.getData(), renderBuffer.getSize());
     buffer.drawTriangles(vertices);
 
-    ObjectRenderer::prepare();
     RenderState::enableBlending();
     for (unsigned int i = 0; i < objectQueue.size(); i++) {
-        ObjectRenderer::setZ(objectQueue[i].zLayer);
+        ObjectRenderer::setDefaultZ(objectQueue[i].zLayer);
         objectQueue[i].object->renderEditor(1.0f, objectQueue[i].inPalette);
     }
+    ObjectRenderer::render();
     objectQueue.clear();
     RenderState::disableBlending();
 }

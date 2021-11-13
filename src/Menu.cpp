@@ -112,8 +112,8 @@ static void renderControls(const Matrix& m, Vector pos, Vector baseSize) {
     }
     Vector oversize = size * 1.1f;
     pos.y += baseSize.y * 0.5f - oversize.y * 0.5f;
-    ObjectRenderer::prepare(m);
-    ObjectRenderer::drawRectangle(pos, oversize, ColorUtils::setAlpha(ColorUtils::GRAY, 200));
+    ObjectRenderer::addRectangle(pos, oversize, ColorUtils::setAlpha(ColorUtils::GRAY, 200));
+    ObjectRenderer::render(m);
     pos += (oversize - size) * 0.5f;
     Font::prepare(m);
     constexpr Color colors[] = {ColorUtils::BLACK, ColorUtils::WHITE};
@@ -142,8 +142,8 @@ void Menu::render(float lag) {
     Vector overSize = size * 1.1f;
     Vector pos = (wSize - overSize) * 0.5f;
     if (type != MenuType::START) {
-        ObjectRenderer::prepare(m);
-        ObjectRenderer::drawRectangle(pos, overSize, ColorUtils::setAlpha(ColorUtils::GRAY, 200));
+        ObjectRenderer::addRectangle(pos, overSize, ColorUtils::setAlpha(ColorUtils::GRAY, 200));
+        ObjectRenderer::render(m);
     }
 
     pos = (wSize - Vector(0.0f, size.y)) * 0.5f;
@@ -152,9 +152,9 @@ void Menu::render(float lag) {
     for (auto& e : lines) {
         constexpr Color color[] = {ColorUtils::BLACK, ColorUtils::WHITE};
         if (index == menuIndex) {
-            ObjectRenderer::prepare(m);
-            ObjectRenderer::drawRectangle(pos - Vector(e.width * 0.5f + 0.3f, 0.f),
-                                          Vector(e.width + 0.6f, fontSize), ColorUtils::BLACK);
+            ObjectRenderer::addRectangle(pos - Vector(e.width * 0.5f + 0.3f, 0.f),
+                                         Vector(e.width + 0.6f, fontSize), ColorUtils::BLACK);
+            ObjectRenderer::render(m);
             Font::prepare(m);
         }
         Font::draw(pos - Vector(e.width * 0.5f, 0.0f), fontSize, color[index == menuIndex],

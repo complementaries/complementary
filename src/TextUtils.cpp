@@ -24,9 +24,10 @@ void TextUtils::drawTimer(Vector position, long ticks) {
 
     Vector size(Font::getWidth(1.0f, buffer), 1.0f);
     Vector oversize = size * 0.1f;
-    ObjectRenderer::prepare(m);
-    ObjectRenderer::drawRectangle(position - oversize * 0.5f, size + oversize,
-                                  Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK);
+
+    ObjectRenderer::addRectangle(position - oversize * 0.5f, size + oversize,
+                                 Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK);
+    ObjectRenderer::render(m);
 
     Font::prepare(m);
     Font::draw(position, 1.0f, Player::invertColors() ? ColorUtils::BLACK : ColorUtils::WHITE,
@@ -43,13 +44,12 @@ void TextUtils::drawBestTimeObjectSpace(Vector position, long ticks, int alpha) 
     Vector size(width, 2.0f);
     Vector oversize = size * 0.1f;
     position += Vector(width * -0.5f, Player::getSize().y + oversize.y);
-    ObjectRenderer::prepare();
-    ObjectRenderer::setZ(-1.0f);
 
     Color col = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
     col = ColorUtils::setAlpha(col, alpha);
 
-    ObjectRenderer::drawRectangle(position - oversize * 0.5f, size + oversize, col);
+    ObjectRenderer::addRectangle(position - oversize * 0.5f, size + oversize, col, -1.0f);
+    ObjectRenderer::render();
 
     Font::prepare(-1.0f);
     col = Player::invertColors() ? ColorUtils::BLACK : ColorUtils::WHITE;

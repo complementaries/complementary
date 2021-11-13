@@ -33,6 +33,7 @@ class MovingObject : public Object<MovingObjectData> {
     std::shared_ptr<ObjectBase> clone() override;
     Vector getSize() const override;
     bool isSpiky(Face f) const;
+    bool hasMoved() const override;
 
 #ifndef NDEBUG
     void initTileEditorData(std::vector<TileEditorProp>& props) override;

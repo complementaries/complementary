@@ -17,6 +17,7 @@
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
 #include "math/Vector.h"
+#include "objects/ObjectRenderer.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
 #include "sound/SoundManager.h"
@@ -419,6 +420,7 @@ void Player::restart() {
         SoundManager::switchMusic();
     }
     Game::setBackgroundParticleColor();
+    ObjectRenderer::clearStaticBuffer();
 }
 
 void Player::kill() {

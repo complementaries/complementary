@@ -186,6 +186,9 @@ static void loadLevel(const char* name) {
     Game::fadeIn(4);
     Player::restart();
     Game::setBackgroundParticleColor();
+
+    Objects::tick(false);
+    Objects::lateTick();
 }
 
 static void loadTitleScreen() {
@@ -277,6 +280,7 @@ void Game::switchWorld() {
     SoundManager::switchMusic();
 
     setBackgroundParticleColor();
+    ObjectRenderer::clearStaticBuffer();
 }
 
 static void playFakeSwitchAnimation() {
@@ -470,9 +474,9 @@ void Game::render(float lag) {
     if (!isInTitleScreen && currentLevelIndex > -1) {
         TextUtils::drawTimer(Vector(0.2f, 0.2f), ticksInCurrentLevel);
     }
-    ObjectRenderer::prepare(Matrix());
-    ObjectRenderer::drawRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
-                                  ColorUtils::setAlpha(ColorUtils::BLACK, fade));
+    ObjectRenderer::addRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
+                                 ColorUtils::setAlpha(ColorUtils::BLACK, fade));
+    ObjectRenderer::render(Matrix());
 
 #ifndef NDEBUG
     drawFpsDisplay();

@@ -25,6 +25,7 @@ class ColorObject : public Object<ColorObjectData> {
     void render(float lag) override;
     std::shared_ptr<ObjectBase> clone() override;
     Vector getSize() const override;
+    bool hasMoved() const override;
 
   private:
     std::shared_ptr<ParticleSystem> particles;

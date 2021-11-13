@@ -7,70 +7,101 @@
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
-static Buffer data;
+static GL::VertexBuffer staticBuffer;
+static Buffer data[2];
+static int dataIndex = 0;
+static int staticVertices = 0;
+static bool dirty = true;
+static float zLayer = -0.4f;
 
 bool ObjectRenderer::init() {
     if (shader.compile({"assets/shaders/object.vs", "assets/shaders/object.fs"})) {
         return true;
     }
-    buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
+    buffer.init(GL::VertexBuffer::Attributes().addVector3().addRGBA());
+    staticBuffer.init(GL::VertexBuffer::Attributes().addVector3().addRGBA());
     return false;
 }
 
-void ObjectRenderer::prepare() {
+void ObjectRenderer::render() {
     shader.use();
-    setZ(-0.4f);
     RenderState::setViewMatrix(shader);
+    buffer.setData(data[0].getData(), data[0].getSize());
+    buffer.drawTriangles(data[0].getSize() / (sizeof(float) * 3 + 4));
+    data[0].clear();
 }
 
-void ObjectRenderer::prepare(const Matrix& view) {
+void ObjectRenderer::render(const Matrix& view) {
     shader.use();
-    setZ(-1.0f);
     shader.setMatrix("view", view);
+    buffer.setData(data[0].getData(), data[0].getSize());
+    buffer.drawTriangles(data[0].getSize() / (sizeof(float) * 3 + 4));
+    data[0].clear();
 }
 
-void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color c) {
-    drawTriangle(x, y, z, c, c, c);
+void ObjectRenderer::clearStaticBuffer() {
+    dirty = true;
 }
 
-void ObjectRenderer::drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color xc,
-                                  Color yc, Color zc) {
-#ifndef NDEBUG
-    if (!shader.isBound()) {
-        fprintf(stderr, "ObjectRenderer::drawTriangle on invalid shader\n");
+bool ObjectRenderer::dirtyStaticBuffer() {
+    return dirty;
+}
+
+void ObjectRenderer::renderStatic() {
+    shader.use();
+    RenderState::setViewMatrix(shader);
+    if (dirty) {
+        staticVertices = data[1].getSize() / (sizeof(float) * 3 + 4);
+        staticBuffer.setData(data[1].getData(), data[1].getSize());
+        dirty = false;
     }
-#endif
-    data.clear();
-    data.add(x).add(xc);
-    data.add(y).add(yc);
-    data.add(z).add(zc);
-    buffer.setData(data.getData(), data.getSize());
-    buffer.drawTriangles(3);
+    staticBuffer.drawTriangles(staticVertices);
+    data[1].clear();
 }
 
-void ObjectRenderer::drawRectangle(const Vector& position, const Vector& size, Color c) {
-#ifndef NDEBUG
-    if (!shader.isBound()) {
-        fprintf(stderr, "ObjectRenderer::drawRectangle on invalid shader\n");
-    }
-#endif
-    data.clear();
+void ObjectRenderer::addTriangle(const Vector& x, const Vector& y, const Vector& z, Color c,
+                                 float zLayer) {
+    addTriangle(x, y, z, zLayer, c, c, c);
+}
+
+void ObjectRenderer::addTriangle(const Vector& x, const Vector& y, const Vector& z, Color c) {
+    addTriangle(x, y, z, zLayer, c, c, c);
+}
+
+void ObjectRenderer::addTriangle(const Vector& x, const Vector& y, const Vector& z, float zLayer,
+                                 Color xc, Color yc, Color zc) {
+    data[dataIndex].add(x).add(zLayer).add(xc);
+    data[dataIndex].add(y).add(zLayer).add(yc);
+    data[dataIndex].add(z).add(zLayer).add(zc);
+}
+
+void ObjectRenderer::addRectangle(const Vector& position, const Vector& size, Color c,
+                                  float zLayer) {
     float minX = position[0];
     float minY = position[1];
     float maxX = minX + size[0];
     float maxY = minY + size[1];
 
-    data.add(minX).add(minY).add(c);
-    data.add(maxX).add(minY).add(c);
-    data.add(minX).add(maxY).add(c);
-    data.add(maxX).add(maxY).add(c);
-    data.add(maxX).add(minY).add(c);
-    data.add(minX).add(maxY).add(c);
-
-    buffer.setData(data.getData(), data.getSize());
-    buffer.drawTriangles(6);
+    data[dataIndex].add(minX).add(minY).add(zLayer).add(c);
+    data[dataIndex].add(maxX).add(minY).add(zLayer).add(c);
+    data[dataIndex].add(minX).add(maxY).add(zLayer).add(c);
+    data[dataIndex].add(maxX).add(maxY).add(zLayer).add(c);
+    data[dataIndex].add(maxX).add(minY).add(zLayer).add(c);
+    data[dataIndex].add(minX).add(maxY).add(zLayer).add(c);
 }
 
-void ObjectRenderer::setZ(float z) {
-    shader.setFloat("zLayer", z);
+void ObjectRenderer::addRectangle(const Vector& position, const Vector& size, Color c) {
+    addRectangle(position, size, c, zLayer);
+}
+
+void ObjectRenderer::bindBuffer(bool isStatic) {
+    dataIndex = isStatic;
+}
+
+void ObjectRenderer::setDefaultZ(float z) {
+    zLayer = z;
+}
+
+void ObjectRenderer::resetDefaultZ() {
+    zLayer = -0.4f;
 }

@@ -39,7 +39,7 @@ bool LevelTagObject::collidesWith(const Vector& pPosition, const Vector& pSize) 
 void LevelTagObject::renderEditor(float lag, bool inPalette) {
     (void)lag;
     (void)inPalette;
-    ObjectRenderer::drawRectangle(position, data.size, ColorUtils::rgba(0, 100, 0, 100));
+    ObjectRenderer::addRectangle(position, data.size, ColorUtils::rgba(0, 100, 0, 100));
 }
 
 void LevelTagObject::renderText(float lag) {

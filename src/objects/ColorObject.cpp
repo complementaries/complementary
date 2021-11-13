@@ -53,8 +53,8 @@ void ColorObject::tick() {
 
 void ColorObject::render(float lag) {
     (void)lag;
-    ObjectRenderer::drawRectangle(position, data.size,
-                                  AbilityUtils::getColor(data.abilities[Player::invertColors()]));
+    ObjectRenderer::addRectangle(position, data.size,
+                                 AbilityUtils::getColor(data.abilities[Player::invertColors()]));
 }
 
 std::shared_ptr<ObjectBase> ColorObject::clone() {
@@ -84,4 +84,8 @@ void ColorObject::applyTileEditorData(float* props) {
 
 Vector ColorObject::getSize() const {
     return data.size;
+}
+
+bool ColorObject::hasMoved() const {
+    return false;
 }

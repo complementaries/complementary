@@ -7,13 +7,21 @@
 
 namespace ObjectRenderer {
     bool init();
-    void prepare();
-    void prepare(const Matrix& view);
-    void drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color c);
-    void drawTriangle(const Vector& x, const Vector& y, const Vector& z, Color xc, Color yc,
-                      Color zc);
-    void drawRectangle(const Vector& position, const Vector& size, Color c);
-    void setZ(float z);
+    void render();
+    void clearStaticBuffer();
+    bool dirtyStaticBuffer();
+    void renderStatic();
+    void render(const Matrix& view);
+    void addTriangle(const Vector& x, const Vector& y, const Vector& z, Color c);
+    void addTriangle(const Vector& x, const Vector& y, const Vector& z, Color c, float zLayer);
+    void addTriangle(const Vector& x, const Vector& y, const Vector& z, float zLayer, Color xc,
+                     Color yc, Color zc);
+    void addRectangle(const Vector& position, const Vector& size, Color c);
+    void addRectangle(const Vector& position, const Vector& size, Color c, float zLayer);
+
+    void bindBuffer(bool isStatic);
+    void setDefaultZ(float z);
+    void resetDefaultZ();
 }
 
 #endif

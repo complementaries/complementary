@@ -39,6 +39,7 @@ class ObjectBase {
     virtual bool isKeyOfType(int type) const;
     virtual bool isDoorOfType(int type) const;
     virtual void addKey();
+    virtual bool hasMoved() const;
 
 #ifndef NDEBUG
     virtual const char* getTypeName();
@@ -62,6 +63,7 @@ class ObjectBase {
     bool hasWall;
     int prototypeId = -1;
     Vector position;
+    bool isStatic;
     bool shouldDestroy;
     bool destroyOnLevelLoad;
 };

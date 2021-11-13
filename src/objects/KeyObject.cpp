@@ -100,13 +100,13 @@ void KeyObject::renderColor(float lag, Color color) {
     Vector b = pos + Vector(0.5f, 0.1f);
     Vector c = pos + Vector(0.9f, 0.5f);
     if (rAlpha < 255) {
-        ObjectRenderer::setZ(-0.1f);
-    }
-    ObjectRenderer::drawTriangle(a, b, c, color);
-    b = pos + Vector(0.5f, 0.9f);
-    ObjectRenderer::drawTriangle(a, b, c, color);
-    if (rAlpha < 255) {
-        ObjectRenderer::setZ(-0.4f);
+        ObjectRenderer::addTriangle(a, b, c, color, -0.1f);
+        b = pos + Vector(0.5f, 0.9f);
+        ObjectRenderer::addTriangle(a, b, c, color, -0.1f);
+    } else {
+        ObjectRenderer::addTriangle(a, b, c, color);
+        b = pos + Vector(0.5f, 0.9f);
+        ObjectRenderer::addTriangle(a, b, c, color);
     }
 }
 

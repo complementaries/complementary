@@ -94,7 +94,7 @@ bool RenderState::init() {
 
     rectangle.init(GL::VertexBuffer::Attributes().addVector2());
     float data[] = {-1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f};
-    rectangle.setData(data, sizeof(data));
+    rectangle.setStaticData(data, sizeof(data));
     if (Arguments::samples > 1) {
         return mixer.compile({"assets/shaders/mixer.vs", "assets/shaders/mixerSampled.fs"}) ||
                lineMixer.compile(

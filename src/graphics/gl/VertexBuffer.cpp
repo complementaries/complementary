@@ -77,9 +77,9 @@ void GL::VertexBuffer::bindArray() const {
     glBindVertexArray(vertexArray);
 }
 
-void GL::VertexBuffer::setData(const void* data, int length) {
+void GL::VertexBuffer::setData(const void* data, int length, int dataType) {
     bindBuffer();
-    glBufferData(GL_ARRAY_BUFFER, length, data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, length, data, dataType);
 #ifndef NDEBUG
     if (vertexSize == 0) {
         fprintf(stderr, "GL::VertexBuffer::setData before GL::VertexBuffer::init\n");
@@ -92,6 +92,16 @@ void GL::VertexBuffer::setData(const void* data, int length) {
     }
 #endif
 }
+
+void GL::VertexBuffer::setStaticData(const void* data, int length) {
+    setData(data, length, GL_STATIC_DRAW);
+}
+
+void GL::VertexBuffer::setStreamData(const void* data, int length) {
+    setData(data, length, GL_STREAM_DRAW);
+}
+
+void setData(const void* data, int length, int dataType);
 
 void GL::VertexBuffer::drawTriangles(int vertices) const {
     bindArray();

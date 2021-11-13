@@ -26,7 +26,7 @@ bool ObjectRenderer::init() {
 void ObjectRenderer::render() {
     shader.use();
     RenderState::setViewMatrix(shader);
-    buffer.setData(data[0].getData(), data[0].getSize());
+    buffer.setStreamData(data[0].getData(), data[0].getSize());
     buffer.drawTriangles(data[0].getSize() / (sizeof(float) * 3 + 4));
     data[0].clear();
 }
@@ -34,7 +34,7 @@ void ObjectRenderer::render() {
 void ObjectRenderer::render(const Matrix& view) {
     shader.use();
     shader.setMatrix("view", view);
-    buffer.setData(data[0].getData(), data[0].getSize());
+    buffer.setStreamData(data[0].getData(), data[0].getSize());
     buffer.drawTriangles(data[0].getSize() / (sizeof(float) * 3 + 4));
     data[0].clear();
 }
@@ -52,7 +52,7 @@ void ObjectRenderer::renderStatic() {
     RenderState::setViewMatrix(shader);
     if (dirty) {
         staticVertices = data[1].getSize() / (sizeof(float) * 3 + 4);
-        staticBuffer.setData(data[1].getData(), data[1].getSize());
+        staticBuffer.setStaticData(data[1].getData(), data[1].getSize());
         dirty = false;
     }
     staticBuffer.drawTriangles(staticVertices);

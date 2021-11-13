@@ -36,10 +36,13 @@ namespace GL {
 
         void init(const Attributes& a);
 
-        void setData(const void* data, int length);
+        void setStaticData(const void* data, int length);
+        void setStreamData(const void* data, int length);
         void drawTriangles(int vertices) const;
 
       private:
+        void setData(const void* data, int length, int dataType);
+
         void bindBuffer() const;
         void bindArray() const;
 

@@ -40,7 +40,7 @@ namespace Objects {
     bool hasWallCollision(const Vector& position, const Vector& size);
     void handleCollision(const Vector& position, const Vector& size);
 
-    void tick(bool test = true);
+    void tick();
     void lateTick();
     void render(float lag);
     void renderText(float lag);

@@ -966,7 +966,7 @@ void Player::render(float lag) {
     buf.add(shear + 0.0f).add(1.0f).add(color);
     addGlider(buf, color);
 
-    buffer.setData(buf.getData(), buf.getSize());
+    buffer.setStreamData(buf.getData(), buf.getSize());
     buffer.drawTriangles(buf.getSize() / (sizeof(float) * 2 + sizeof(Color)));
 }
 

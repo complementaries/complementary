@@ -203,7 +203,7 @@ void Font::draw(const Vector& pos, float size, Color color, const char* s) {
         index++;
     }
 
-    buffer.setData(data.getData(), data.getSize());
+    buffer.setStreamData(data.getData(), data.getSize());
     buffer.drawTriangles(6 * index);
 }
 

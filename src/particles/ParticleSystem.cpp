@@ -34,7 +34,7 @@ void ParticleRenderer::prepare() {
 void ParticleRenderer::render() {
     shader.use();
     RenderState::setViewMatrix(shader);
-    buffer.setData(rawData.getData(), rawData.getSize());
+    buffer.setStreamData(rawData.getData(), rawData.getSize());
     buffer.drawTriangles(vertices);
 }
 

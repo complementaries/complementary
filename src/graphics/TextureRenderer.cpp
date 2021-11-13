@@ -50,7 +50,7 @@ static void renderBox(const Vector& min, const Vector& max, const Vector& tMin, 
     data.add(max.x).add(max.y).add(tMax.x).add(tMax.y).add(c);
     data.add(max.x).add(min.y).add(tMax.x).add(tMin.y).add(c);
     data.add(min.x).add(max.y).add(tMin.x).add(tMax.y).add(c);
-    buffer.setData(data.getData(), data.getSize());
+    buffer.setStreamData(data.getData(), data.getSize());
     buffer.drawTriangles(6);
 }
 

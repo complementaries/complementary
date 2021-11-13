@@ -187,7 +187,7 @@ static void loadLevel(const char* name) {
     Player::restart();
     Game::setBackgroundParticleColor();
 
-    Objects::tick(false);
+    Objects::tick();
     Objects::lateTick();
 }
 

@@ -76,7 +76,7 @@ static void prepareRendering() {
     data.add(static_cast<float>(width)).add(static_cast<float>(height)).add(0.0f).add(c);
     data.add(static_cast<float>(width)).add(0.0f).add(0.0f).add(c);
     data.add(0.0f).add(static_cast<float>(height)).add(0.0f).add(c);
-    background.setData(data.getData(), data.getSize());
+    background.setStaticData(data.getData(), data.getSize());
     data.clear();
 
     for (int x = 0; x < width; x++) {
@@ -85,7 +85,7 @@ static void prepareRendering() {
         }
     }
     vertices = data.getSize() / (sizeof(float) * 3 + 4);
-    buffer.setData(data.getData(), data.getSize());
+    buffer.setStaticData(data.getData(), data.getSize());
     dirty = false;
 }
 

@@ -156,8 +156,7 @@ void Objects::handleCollision(const Vector& position, const Vector& size) {
     }
 }
 
-void Objects::tick(bool test) {
-    int staticO = 0;
+void Objects::tick() {
     for (auto& o : objects) {
         o->tick();
 
@@ -165,10 +164,6 @@ void Objects::tick(bool test) {
             ObjectRenderer::clearStaticBuffer();
             o->isStatic = false;
         }
-        staticO += o->isStatic;
-    }
-    if (!test) {
-        std::cout << staticO << " static objects\n";
     }
 
     for (size_t i = objects.size(); i > 0;) {

@@ -336,7 +336,7 @@ static void pollEvents() {
                     case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: {
                         if (value > 0.5f && !Input::getButton(ButtonType::SWITCH).pressed) {
                             Input::Internal::setButtonPressed(ButtonType::SWITCH);
-                        } else if(value <= 0.5f) {
+                        } else if (value <= 0.5f) {
                             Input::Internal::setButtonReleased(ButtonType::SWITCH);
                         }
                         break;

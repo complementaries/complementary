@@ -79,8 +79,8 @@ void WindObject::handleSound(int soundId) {
 
 float WindObject::nearestWind() {
     float smallestDistance = biggestFloat;
-    for (int i = 0; i < windObjects.size(); i++) {
-        float currDistance = abs(windObjects[i]);
+    for (float windObject : windObjects) {
+        float currDistance = abs(windObject);
         if (smallestDistance > currDistance) {
             smallestDistance = currDistance;
         }

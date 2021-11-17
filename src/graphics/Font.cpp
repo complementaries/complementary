@@ -96,7 +96,7 @@ bool Font::init() {
     }
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addVector2().addRGBA());
     texture.init();
-    const char* path = "assets/symbols.png";
+    const char* path = "assets/font.png";
     SDL_Surface* font = IMG_Load(path);
     if (font == nullptr) {
         Utils::printError("cannot load font file '%s': %s\n", path, IMG_GetError());

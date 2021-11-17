@@ -96,7 +96,7 @@ bool Font::init() {
     }
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addVector2().addRGBA());
     texture.init();
-    const char* path = "assets/font.png";
+    const char* path = "assets/symbols.png";
     SDL_Surface* font = IMG_Load(path);
     if (font == nullptr) {
         Utils::printError("cannot load font file '%s': %s\n", path, IMG_GetError());
@@ -137,6 +137,7 @@ bool Font::init() {
             return true;
         }
         int index = name[0];
+        printf("%d\n", index);
         rapidjson::Value::ConstObject intern = w.value.GetObject();
         if (readField(intern, "x", characters[index].x) ||
             readField(intern, "y", characters[index].y) ||

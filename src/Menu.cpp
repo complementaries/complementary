@@ -92,18 +92,8 @@ void Menu::tick() {
     }
 }
 
-static void renderControls(const Matrix& m, Vector pos, Vector baseSize) {
-    // Links/Rechts gehen:
-    // Jump: [A] / [B]
-    // Fähigkeit: [X]
-    // Weltwechsel: [L1] / [R1] bzw. [L] / [R]
-    // Weltwechsel + Fähigkeit: [Y]
-
-    constexpr const char* help[] = {
-        "Left/Right:", "[LEFT JOYSTICK]",   "[LEFT D-PAD]", "[RIGHT D-PAD]", "Jump:",
-        "[A] / [B]",   "Ability:",          "[X]",          "[L]",           "Switch:",
-        "[R]",         "Switch + Ability:", "[Y]"};
-    constexpr int length = sizeof(help) / sizeof(const char*);
+static void renderControls(const Matrix& m, Vector pos, Vector baseSize, const char* const* help,
+                           int length) {
     float smallFontSize = fontSize * 0.5f;
     Vector size;
     for (int i = 0; i < length; i++) {
@@ -116,10 +106,47 @@ static void renderControls(const Matrix& m, Vector pos, Vector baseSize) {
     ObjectRenderer::render(m);
     pos += (oversize - size) * 0.5f;
     Font::prepare(m);
-    constexpr Color colors[] = {ColorUtils::BLACK, ColorUtils::WHITE};
     for (int i = 0; i < length; i++) {
-        Font::draw(pos, smallFontSize, colors[help[i][0] == '['], help[i]);
+        if (help[i][0] == '[') {
+            Vector shifted = pos;
+            Font::draw(shifted, smallFontSize, ColorUtils::WHITE, "[");
+            shifted.x += Font::getWidth(smallFontSize, "[");
+            Font::draw(shifted, smallFontSize, ColorUtils::ORANGE, help[i] + 1);
+            shifted.x += Font::getWidth(smallFontSize, help[i] + 1);
+            Font::draw(shifted, smallFontSize, ColorUtils::WHITE, "]");
+        } else {
+            Font::draw(pos, smallFontSize, ColorUtils::BLACK, help[i]);
+        }
         pos.y += smallFontSize * yGapFactor;
+    }
+}
+
+static void renderControls(const Matrix& m, Vector pos, Vector baseSize) {
+    SDL_GameController* c = Input::getController();
+    if (c == nullptr) {
+        constexpr const char* help[] = {"Left/Right:",  "[A",      "[D",      "[LEFT-ARROW",
+                                        "[RIGHT-ARROW", "Jump:",   "[SPACE",  "Ability:",
+                                        "[LEFT-SHIFT",  "Switch:", "[ENTER]", "Switch + Ability:",
+                                        "[RIGHT-SHIFT"};
+        renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
+    } else {
+        SDL_GameControllerType type = SDL_GameControllerGetType(c);
+        if (type == SDL_CONTROLLER_TYPE_XBOX360 || type == SDL_CONTROLLER_TYPE_XBOXONE) {
+            constexpr const char* help[] = {"Left/Right:",       "[\5", "Jump:", "[A",      "[B",
+                                            "Ability:",          "[X",  "[L",    "Switch:", "[R",
+                                            "Switch + Ability:", "[Y"};
+            renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
+        } else if (type == SDL_CONTROLLER_TYPE_PS3 || type == SDL_CONTROLLER_TYPE_PS4) {
+            constexpr const char* help[] = {"Left/Right:",       "[\5", "Jump:", "[\1",     "[\4",
+                                            "Ability:",          "[\3", "[L",    "Switch:", "[R",
+                                            "Switch + Ability:", "[\2"};
+            renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
+        } else {
+            constexpr const char* help[] = {"Left/Right:",       "[\5", "Jump:", "[A",      "[B",
+                                            "Ability:",          "[Y",  "[L",    "Switch:", "[R",
+                                            "Switch + Ability:", "[X"};
+            renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
+        }
     }
 }
 

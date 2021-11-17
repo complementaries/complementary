@@ -4,7 +4,7 @@
   "bold": false,
   "italic": false,
   "width": 1683,
-  "height": 520,
+  "height": 619,
   "characters": {
     "0":{"x":1266,"y":124,"width":99,"height":99,"originX":6,"originY":93,"advance":100},
     "1":{"x":792,"y":421,"width":43,"height":99,"originX":6,"originY":93,"advance":44},
@@ -100,6 +100,11 @@
     "{":{"x":311,"y":0,"width":56,"height":118,"originX":6,"originY":103,"advance":56},
     "|":{"x":897,"y":421,"width":31,"height":99,"originX":6,"originY":93,"advance":31},
     "}":{"x":367,"y":0,"width":56,"height":118,"originX":6,"originY":103,"advance":56},
-    "~":{"x":1543,"y":421,"width":68,"height":31,"originX":6,"originY":59,"advance":69}
+    "~":{"x":1543,"y":421,"width":68,"height":31,"originX":6,"originY":59,"advance":69},
+    "\u0001":{"x":0,"y":520,"width":126,"height":99,"originX":19,"originY":93,"advance":100},
+    "\u0002":{"x":126,"y":520,"width":112,"height":99,"originX":16,"originY":93,"advance":100},
+    "\u0003":{"x":238,"y":520,"width":99,"height":99,"originX":6,"originY":93,"advance":100},
+    "\u0004":{"x":337,"y":520,"width":99,"height":99,"originX":6,"originY":93,"advance":100},
+    "\u0005":{"x":436,"y":520,"width":99,"height":99,"originX":6,"originY":93,"advance":100}
   }
 }

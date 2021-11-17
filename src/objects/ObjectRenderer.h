@@ -18,6 +18,7 @@ namespace ObjectRenderer {
                      Color yc, Color zc);
     void addRectangle(const Vector& position, const Vector& size, Color c);
     void addRectangle(const Vector& position, const Vector& size, Color c, float zLayer);
+    void addSpike(const Vector& position, bool left, bool right, bool up, bool down, Color c);
 
     void bindBuffer(bool isStatic);
     void setDefaultZ(float z);

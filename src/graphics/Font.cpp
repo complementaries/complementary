@@ -137,7 +137,6 @@ bool Font::init() {
             return true;
         }
         int index = name[0];
-        printf("%d\n", index);
         rapidjson::Value::ConstObject intern = w.value.GetObject();
         if (readField(intern, "x", characters[index].x) ||
             readField(intern, "y", characters[index].y) ||

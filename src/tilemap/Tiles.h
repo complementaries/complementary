@@ -15,6 +15,7 @@ class Tiles {
     static SpikeTile SPIKES_RIGHT;
     static SpikeTile SPIKES_UP;
     static SpikeTile SPIKES_DOWN;
+    static SpikeTile SPIKES;
     static SpawnTile SPAWN_POINT;
     static GoalTile GOAL_LEFT;
     static GoalTile GOAL_RIGHT;

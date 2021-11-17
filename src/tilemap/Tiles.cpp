@@ -12,6 +12,7 @@ SpikeTile Tiles::SPIKES_LEFT{Face::LEFT};
 SpikeTile Tiles::SPIKES_RIGHT{Face::RIGHT};
 SpikeTile Tiles::SPIKES_UP{Face::UP};
 SpikeTile Tiles::SPIKES_DOWN{Face::DOWN};
+SpikeTile Tiles::SPIKES{Face::MAX};
 SpawnTile Tiles::SPAWN_POINT;
 GoalTile Tiles::GOAL_LEFT{Face::LEFT};
 GoalTile Tiles::GOAL_RIGHT{Face::RIGHT};
@@ -35,6 +36,7 @@ void Tiles::init() {
     addTile(GOAL_RIGHT);
     addTile(GOAL_UP);
     addTile(GOAL_DOWN);
+    addTile(SPIKES);
 }
 
 const Tile& Tiles::get(char id) {

@@ -4,6 +4,7 @@
 #include "graphics/RenderState.h"
 #include "graphics/gl/Shader.h"
 #include "graphics/gl/VertexBuffer.h"
+#include "tilemap/tiles/SpikeTile.h"
 
 static GL::Shader shader;
 static GL::VertexBuffer buffer;
@@ -92,6 +93,11 @@ void ObjectRenderer::addRectangle(const Vector& position, const Vector& size, Co
 
 void ObjectRenderer::addRectangle(const Vector& position, const Vector& size, Color c) {
     addRectangle(position, size, c, zLayer);
+}
+
+void ObjectRenderer::addSpike(const Vector& position, bool left, bool right, bool up, bool down,
+                              Color c) {
+    SpikeTile::addSpike(data[dataIndex], position.x, position.y, zLayer, left, right, up, down, c);
 }
 
 void ObjectRenderer::bindBuffer(bool isStatic) {

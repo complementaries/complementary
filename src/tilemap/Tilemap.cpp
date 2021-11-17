@@ -54,6 +54,9 @@ void Tilemap::setHeight(int newHeight) {
 }
 
 const Tile& Tilemap::getTile(int x, int y) {
+    if (x < 0 || x >= width || y < 0 || y >= height) {
+        return Tiles::get(-1);
+    }
     return Tiles::get(tiles[width * y + x]);
 }
 

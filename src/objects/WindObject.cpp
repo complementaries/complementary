@@ -4,7 +4,6 @@
 #include "Objects.h"
 #include "player/Player.h"
 #include "sound/SoundManager.h"
-#include <iostream>
 #include <memory>
 
 static std::vector<float> windObjects;
@@ -24,7 +23,6 @@ WindObject::WindObject(const WindObjectData& data) {
     } else {
         this->index = windObjects.size();
     }
-    std::cout << this->index << std::endl;
     windObjects.push_back(biggestFloat);
 }
 

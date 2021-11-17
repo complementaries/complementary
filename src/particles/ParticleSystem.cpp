@@ -104,15 +104,19 @@ static bool isColliding(const ParticleSystemData& s, Particle& p) {
             // Make the hitbox of spikes a bit smaller because it looks weird if
             // the particles hover above the spike triangles
             if (tile == Tiles::SPIKES_UP) {
-                if (p.position.y - 0.25f > y) {
+                if (p.position.y - 0.4f > y) {
                     return true;
                 }
             } else if (tile == Tiles::SPIKES_LEFT) {
-                if (p.position.x - 0.25f > x) {
+                if (p.position.x - 0.4f > x) {
                     return true;
                 }
             } else if (tile == Tiles::SPIKES_RIGHT) {
-                if (p.position.x < x + 0.75f) {
+                if (p.position.x < x + 0.6f) {
+                    return true;
+                }
+            } else if (tile == Tiles::SPIKES) {
+                if (p.position.y - 0.4f > y && p.position.x - 0.4f > x && p.position.x < x + 0.6f) {
                     return true;
                 }
             } else if (tile.isSolid()) {

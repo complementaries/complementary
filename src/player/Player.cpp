@@ -9,6 +9,7 @@
 #include "AbilityCutscene.h"
 #include "Arguments.h"
 #include "Game.h"
+#include "GoalCutscene.h"
 #include "Input.h"
 #include "Savegame.h"
 #include "Utils.h"
@@ -424,6 +425,9 @@ void Player::restart() {
 }
 
 void Player::kill() {
+    if (GoalCutscene::isActive()) {
+        return;
+    }
     dashParticles->stop();
     SoundManager::playSoundEffect(Sound::DEATH);
     deathParticles->position = getCenter();

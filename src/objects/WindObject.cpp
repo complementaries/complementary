@@ -13,6 +13,9 @@ WindObject::WindObject() {
 WindObject::~WindObject() {
     if (this->index) {
         windObjects.clear();
+        if (SoundManager::soundPlaying(Sound::WIND)) {
+            SoundManager::stopSound(Sound::WIND);
+        }
     }
 }
 

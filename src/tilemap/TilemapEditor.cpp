@@ -345,9 +345,7 @@ void TilemapEditor::flush() {
     int width, height;
     stbte_get_dimensions(stbTileMap, &width, &height);
 
-    Tilemap::setWidth(width);
-    Tilemap::setHeight(height);
-
+    Tilemap::setSize(width, height);
     Objects::clear();
 
     for (int y = 0; y < height; y++) {

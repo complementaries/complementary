@@ -45,12 +45,10 @@ Vector Tilemap::getSize() {
     return Vector(width, height);
 }
 
-void Tilemap::setWidth(int newWidth) {
+void Tilemap::setSize(int newWidth, int newHeight) {
     width = newWidth;
-}
-
-void Tilemap::setHeight(int newHeight) {
     height = newHeight;
+    tiles.resize(newWidth * newHeight);
 }
 
 const Tile& Tilemap::getTile(int x, int y) {

@@ -212,6 +212,7 @@ bool SoundManager::soundPlaying(int soundId) {
 }
 
 void SoundManager::quit() {
+    Arguments::muted = true;
     // clean up our resources
     for (SoundObject object : soundArray) {
         if (object.sound != nullptr) {

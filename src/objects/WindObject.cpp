@@ -1,36 +1,31 @@
 #include "WindObject.h"
 
+#include <unordered_map>
+
 #include "ObjectRenderer.h"
 #include "Objects.h"
 #include "player/Player.h"
 #include "sound/SoundManager.h"
-#include <memory>
 
-static std::vector<float> windObjects;
+static std::unordered_map<int, float> windObjects;
 
-WindObject::WindObject() {
+WindObject::WindObject() : index(windObjects.size()) {
+    windObjects[index] = biggestFloat;
 }
 
 WindObject::~WindObject() {
-    if (this->index) {
-        windObjects.clear();
-        if (SoundManager::soundPlaying(Sound::WIND)) {
-            SoundManager::stopSound(Sound::WIND);
-        }
+    windObjects.erase(index);
+    if (windObjects.empty() && SoundManager::soundPlaying(Sound::WIND)) {
+        SoundManager::stopSound(Sound::WIND);
     }
 }
 
-WindObject::WindObject(const WindObjectData& data) {
+WindObject::WindObject(const WindObjectData& data) : WindObject() {
     this->data = data;
-    if (windObjects.empty()) {
-        this->index = 0;
-    } else {
-        this->index = windObjects.size();
-    }
-    windObjects.push_back(biggestFloat);
 }
 
-WindObject::WindObject(const Vector& position, const Vector& size, const Vector& force) {
+WindObject::WindObject(const Vector& position, const Vector& size, const Vector& force)
+    : WindObject() {
     this->position = position;
     data.size = size;
     data.force = force;
@@ -81,8 +76,8 @@ void WindObject::handleSound(int soundId) {
 
 float WindObject::nearestWind() {
     float smallestDistance = biggestFloat;
-    for (float windObject : windObjects) {
-        float currDistance = abs(windObject);
+    for (auto& windObject : windObjects) {
+        float currDistance = abs(windObject.second);
         if (smallestDistance > currDistance) {
             smallestDistance = currDistance;
         }

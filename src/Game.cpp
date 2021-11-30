@@ -28,7 +28,7 @@
 #include "graphics/gl/VertexBuffer.h"
 #include "imgui/ImGuiUtils.h"
 #include "objects/ColorObject.h"
-#include "objects/DoorObject.h"
+#include "objects/LevelDoorObject.h"
 #include "objects/MovingObject.h"
 #include "objects/ObjectRenderer.h"
 #include "objects/Objects.h"
@@ -223,9 +223,9 @@ void Game::loadLevelSelect() {
 
     for (auto& obj : Objects::getObjects()) {
         // Destroy doors of accessible levels
-        auto door = std::dynamic_pointer_cast<DoorObject>(obj);
+        auto door = std::dynamic_pointer_cast<LevelDoorObject>(obj);
         if (door != nullptr && door->data.type < Savegame::getCompletedLevels()) {
-            door->destroy();
+            door->open();
         }
     }
 }

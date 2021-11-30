@@ -1,6 +1,7 @@
 #include "RenderState.h"
 
 #include "Arguments.h"
+#include "Game.h"
 #include "Utils.h"
 #include "graphics/Window.h"
 #include "graphics/gl/Shader.h"
@@ -49,6 +50,8 @@ static float glowScale = 1.0f;
 static float zoom = 1.0f;
 static Vector zoomOffset = Vector();
 static GLenum textureTarget = GL_TEXTURE_2D;
+
+static float offsetX = 0.0f;
 
 bool RenderState::init() {
     if (Arguments::samples > 1) {
@@ -106,6 +109,28 @@ bool RenderState::init() {
            glow.compile({"assets/shaders/glow.vs", "assets/shaders/glow.fs"});
 }
 
+static int getTilemapWidth() {
+    if (Game::getCurrentLevel() == -1) {
+        return Tilemap::getWidth() / 2;
+    }
+    return Tilemap::getWidth();
+}
+
+static int getTilemapXOffset() {
+    if (Game::getCurrentLevel() == -1) {
+        int width = Tilemap::getWidth() / 2;
+        Vector pos = Player::getPosition();
+        if (pos.x > width) {
+            return width;
+        }
+    }
+    return 0;
+}
+
+static float getXOffset() {
+    return Game::getCurrentLevel() == -1 ? offsetX : 0.0f;
+}
+
 static Vector getShake(float ticks) {
     float falloff = expf(-ticks * 0.09f);
     if (falloff < 0.05f) {
@@ -117,27 +142,31 @@ static Vector getShake(float ticks) {
 }
 
 void RenderState::updateViewMatrix(float lag) {
-    int x = Window::getWidth() / Tilemap::getWidth();
+    int width = getTilemapWidth();
+    int x = Window::getWidth() / width;
     int y = Window::getHeight() / Tilemap::getHeight();
     float factor = std::min(x, y);
-    Vector realSize(Tilemap::getWidth() * factor, Tilemap::getHeight() * factor);
+    Vector realSize(width * factor, Tilemap::getHeight() * factor);
     viewMatrix.unit()
         .transform(realSize / Vector(-Window::getWidth(), Window::getHeight()))
         .scale(Vector(factor / Window::getWidth(), -factor / Window::getHeight()) * 2.0f);
 }
 
 void RenderState::updatePlayerViewMatrix(float lag) {
-    int x = Window::getWidth() / Tilemap::getWidth();
+    int width = getTilemapWidth();
+    int x = Window::getWidth() / width;
     int y = Window::getHeight() / Tilemap::getHeight();
     float factor = std::min(x, y);
-    Vector realSize(Tilemap::getWidth() * factor, Tilemap::getHeight() * factor);
+    Vector realSize(width * factor, Tilemap::getHeight() * factor);
     viewMatrix.unit()
         .transform(realSize / Vector(-Window::getWidth(), Window::getHeight()))
-        .scale(Vector(factor / Window::getWidth(), -factor / Window::getHeight()) * 2.0f);
+        .scale(Vector(factor / Window::getWidth(), -factor / Window::getHeight()) * 2.0f)
+        .transform(Vector(-getXOffset(), 0.0f));
     viewMatrix.transform(getShake(shakeTicks + lag));
 
     Vector c = Player::getCenter(lag) + zoomOffset;
-    viewMatrix.transform(c).scale(Vector(zoom, zoom)).transform(-c);
+    Vector offset = Vector(getXOffset(), 0.0f);
+    viewMatrix.transform(c - offset).scale(Vector(zoom, zoom)).transform(-c + offset);
     float ft = std::min(zoom - 1.0f, 1.0f);
     Vector diff = (realSize / factor * 0.5f - c) / zoom * ft;
     viewMatrix.transform(diff);
@@ -166,6 +195,10 @@ void RenderState::addRandomizedShake(float strength) {
 }
 
 void RenderState::tick() {
+    if (Game::getCurrentLevel() == -1) {
+        offsetX = offsetX * 0.9f + getTilemapXOffset() * 0.1f;
+    }
+
     shakeTicks++;
     lastMixRadius = mixRadius;
     mixRadius += (1.5f + mixRadius * 0.02f) * mixDirection;
@@ -267,8 +300,8 @@ void RenderState::renderEffects(float lag) {
     mixer.use();
     setViewMatrix(mixer);
     Matrix texToPos;
-    texToPos.transform(Vector(0.0f, Tilemap::getHeight()));
-    texToPos.scale(Vector(Tilemap::getWidth(), -Tilemap::getHeight()));
+    texToPos.transform(Vector(getXOffset(), Tilemap::getHeight()));
+    texToPos.scale(Vector(getTilemapWidth(), -Tilemap::getHeight()));
     mixer.setMatrix("texToPos", texToPos);
     mixer.setVector("center", mixCenter);
     mixer.setFloat("radius", lastMixRadius + (mixRadius - lastMixRadius) * lag);

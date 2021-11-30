@@ -10,6 +10,7 @@ static std::vector<float> windObjects;
 
 WindObject::WindObject() {
 }
+
 WindObject::~WindObject() {
     if (this->index) {
         windObjects.clear();

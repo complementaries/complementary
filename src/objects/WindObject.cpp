@@ -40,20 +40,25 @@ void WindObject::onCollision() {
 void WindObject::tick() {
     handleSound(Sound::WIND);
     constexpr Color colors[] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
-    particles->data.startColor = ColorUtils::setAlpha(colors[Player::invertColors()], 150);
+    particles->data.startColor = ColorUtils::setAlpha(colors[Player::invertColors()], 80);
     particles->data.endColor = ColorUtils::setAlpha(colors[Player::invertColors()], 0);
 }
 
 void WindObject::postInit() {
-    particles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/windTEST.cmob");
-    particles->data.minStartVelocity = data.force * 2.0f;
+    particles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/wind.cmob");
+    particles->data.minStartVelocity = data.force * 1.0f;
     particles->data.maxStartVelocity = data.force * 2.0f;
     particles->data.boxSize = Vector(abs(data.force.y) < 0.001f ? 0 : data.size.x,
                                      abs(data.force.x) < 0.001f ? 0 : data.size.y);
     particles->data.clampBoxSize = data.size;
-    particles->data.maxLifetime = 500;
+    particles->data.maxLifetime = (data.force.x > data.force.y ? data.size.x : data.size.y) * 100;
     particles->position = this->position + data.size / 2;
-    particles->data.boxLifetimeLoss = 4;
+    particles->data.boxLifetimeLoss = 20;
+    particles->data.maxEmissionInterval =
+        std::max(1, static_cast<int>(30 - (abs(data.force.x) + abs(data.force.y)) * 300));
+    particles->data.maxEmissionRate =
+        6 * std::max(1, static_cast<int>((particles->data.boxSize.x + particles->data.boxSize.y) /
+                                         10.0f));
     particles->play();
 }
 

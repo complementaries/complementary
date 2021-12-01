@@ -14,7 +14,7 @@ enum class ParticleType {
     DIAMOND,
 };
 
-enum class SpawnPositionType { CENTER, BOX_EDGE, BOX };
+enum class SpawnPositionType { CENTER, BOX_EDGE, BOX, WIND };
 
 enum class Layer { BEHIND_TILEMAP, OVER_TILEMAP };
 
@@ -45,6 +45,7 @@ struct ParticleSystemData final {
     Layer layer = Layer::BEHIND_TILEMAP;
     bool invertColor = false;
     int boxLifetimeLoss = 0;
+    Vector clampBoxSize = Vector(0, 0);
 };
 
 struct Particle final {

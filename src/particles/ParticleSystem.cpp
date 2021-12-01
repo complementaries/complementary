@@ -226,6 +226,22 @@ void ParticleSystem::lateTick() {
                                                                        data.boxSize.x * 0.5f);
                     particlePosition.y = position.y + random.nextFloat(-data.boxSize.y * 0.5f,
                                                                        data.boxSize.y * 0.5f);
+                } else if (data.spawnPositionType == SpawnPositionType::WIND) {
+                    int line = random.next(0, 2);
+                    int xSign = data.minStartVelocity.x < 0 ? -1 : 1;
+                    int ySign = data.minStartVelocity.y < 0 ? -1 : 1;
+                    Vector box =
+                        Vector(abs(data.boxSize.x) > 0 ? data.boxSize.x : data.clampBoxSize.x,
+                               abs(data.boxSize.y) > 0 ? data.boxSize.y : data.clampBoxSize.y);
+                    if (data.boxSize.y == 0 || (data.boxSize.x != 0 && line == 0)) {
+                        particlePosition.x =
+                            position.x + random.nextFloat(-box.x * 0.5f, box.x * 0.5f);
+                        particlePosition.y = position.y + -ySign * box.y * 0.5f;
+                    } else {
+                        particlePosition.x = position.x + -xSign * box.x * 0.5f;
+                        particlePosition.y =
+                            position.y + random.nextFloat(-box.y * 0.5f, box.y * 0.5f);
+                    }
                 }
 
                 float startVelocityX =
@@ -350,10 +366,12 @@ void ParticleSystem::spawnDiamond(const Vector& position, const Vector& velocity
 }
 
 bool ParticleSystem::isInBox(const Particle& particle) const {
-    return particle.position.x > position.x - data.boxSize.x * 0.5f &&
-           particle.position.x < position.x + data.boxSize.x * 0.5f &&
-           particle.position.y > position.y - data.boxSize.y * 0.5f &&
-           particle.position.y < position.y + data.boxSize.y * 0.5f;
+    bool useClampPos = abs(data.clampBoxSize.x) > 0 || abs(data.clampBoxSize.y) > 0;
+    Vector size = useClampPos ? data.clampBoxSize : data.boxSize;
+    return particle.position.x > position.x - size.x * 0.5f &&
+           particle.position.x < position.x + size.x * 0.5f &&
+           particle.position.y > position.y - size.y * 0.5f &&
+           particle.position.y < position.y + size.y * 0.5f;
 }
 
 std::shared_ptr<ObjectBase> ParticleSystem::clone() {
@@ -386,9 +404,10 @@ void ParticleSystem::renderImGui() {
     ImGui::Checkbox("Clamp pos. in bounds", &data.clampPositionInBounds);
     ImGui::Checkbox("invert color", &data.invertColor);
 
-    const char* spawnPosTypes[] = {"Center", "Box Edge", "Box"};
-    ImGui::ListBox("Spawn pos type", (int*)&data.spawnPositionType, spawnPosTypes, 3);
+    const char* spawnPosTypes[] = {"Center", "Box Edge", "Box", "Wind"};
+    ImGui::ListBox("Spawn pos type", (int*)&data.spawnPositionType, spawnPosTypes, 4);
     ImGui::DragFloat2("Box Size", data.boxSize.data());
+    ImGui::DragFloat2("Clamp Box Size", data.clampBoxSize.data());
 
     const char* layers[] = {"behinde tilemap", "over tilemap"};
     ImGui::ListBox("Layer", (int*)&data.layer, layers, 2);

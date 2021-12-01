@@ -45,11 +45,13 @@ void WindObject::tick() {
 }
 
 void WindObject::postInit() {
-    particles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/wind.cmob");
+    particles = Objects::instantiateObject<ParticleSystem>("assets/particlesystems/windTEST.cmob");
     particles->data.minStartVelocity = data.force * 2.0f;
     particles->data.maxStartVelocity = data.force * 2.0f;
-    particles->data.boxSize = data.size;
-    particles->data.maxLifetime = std::max(data.size.x, data.size.y) * 10;
+    particles->data.boxSize = Vector(abs(data.force.y) < 0.001f ? 0 : data.size.x,
+                                     abs(data.force.x) < 0.001f ? 0 : data.size.y);
+    particles->data.clampBoxSize = data.size;
+    particles->data.maxLifetime = 500;
     particles->position = this->position + data.size / 2;
     particles->data.boxLifetimeLoss = 4;
     particles->play();

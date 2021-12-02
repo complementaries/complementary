@@ -82,7 +82,7 @@ void LevelTagObject::initTileEditorData(std::vector<TileEditorProp>& props) {
     props.insert(props.end(),
                  {TileEditorProp::Int("Size X", data.size.x, 0, 10),
                   TileEditorProp::Int("Size Y", data.size.y, 0, 10),
-                  TileEditorProp::Float("Level", static_cast<float>(data.level), 0, 20)});
+                  TileEditorProp::Float("Level", static_cast<float>(data.level), 0, 100)});
 }
 
 void LevelTagObject::applyTileEditorData(float* props) {

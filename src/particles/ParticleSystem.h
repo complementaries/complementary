@@ -1,6 +1,7 @@
 #ifndef PARTICLE_SYSTEM_H
 #define PARTICLE_SYSTEM_H
 
+#include <array>
 #include <vector>
 
 #include "graphics/Color.h"
@@ -14,7 +15,7 @@ enum class ParticleType {
     DIAMOND,
 };
 
-enum class SpawnPositionType { CENTER, BOX_EDGE, BOX, WIND };
+enum class SpawnPositionType { CENTER, BOX_EDGE, BOX, WIND, BOX_EDGE_SPIKY };
 
 enum class Layer { BEHIND_TILEMAP, OVER_TILEMAP };
 
@@ -78,6 +79,7 @@ class ParticleSystem : public Object<ParticleSystemData> {
     float getColliderOffset();
 
     bool isPlaying() const;
+    void setSpikes(const std::array<bool, 4>& spikes);
 
   private:
     std::vector<Particle> triangles;
@@ -99,6 +101,7 @@ class ParticleSystem : public Object<ParticleSystemData> {
     int currentLifetime = 0;
     bool playing = false;
     Random random;
+    std::array<bool, 4> spiky;
 };
 
 namespace ParticleRenderer {

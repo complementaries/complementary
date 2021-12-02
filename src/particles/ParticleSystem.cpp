@@ -246,8 +246,17 @@ void ParticleSystem::lateTick() {
 
                 float startVelocityX =
                     random.nextFloat(data.minStartVelocity.x, data.maxStartVelocity.x);
-                float startVelocityY =
-                    random.nextFloat(data.minStartVelocity.y, data.maxStartVelocity.y);
+                float startVelocityY;
+                if (data.symmetrical && data.minStartVelocity.x != 0 &&
+                    data.minStartVelocity.y != 0) {
+                    startVelocityY = data.minStartVelocity.y +
+                                     ((startVelocityX - data.minStartVelocity.x) /
+                                      (data.maxStartVelocity.x - data.minStartVelocity.x) *
+                                      (data.maxStartVelocity.y - data.minStartVelocity.y));
+                } else {
+                    startVelocityY =
+                        random.nextFloat(data.minStartVelocity.y, data.maxStartVelocity.y);
+                }
                 Vector startVelocity(startVelocityX, startVelocityY);
                 switch (data.type) {
                     case ParticleType::TRIANGLE:
@@ -389,6 +398,7 @@ void ParticleSystem::renderImGui() {
 
     ImGui::DragFloat2("Min start velocity", data.minStartVelocity.data(), 0.05f);
     ImGui::DragFloat2("Max start velocity", data.maxStartVelocity.data(), 0.05f);
+    ImGui::Checkbox("symmetrical", &data.symmetrical);
     ImGui::DragFloat("Gravity", &data.gravity);
     ImGui::DragFloat("Attract speed", &data.attractSpeed, 0.01f);
 

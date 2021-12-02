@@ -46,6 +46,7 @@ struct ParticleSystemData final {
     bool invertColor = false;
     int boxLifetimeLoss = 0;
     Vector clampBoxSize = Vector(0, 0);
+    bool symmetrical = false;
 };
 
 struct Particle final {

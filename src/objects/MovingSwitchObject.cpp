@@ -24,12 +24,10 @@ void MovingSwitchObject::postInit() {
     seenParticles->data.boxSize = size * 1.1f;
     seenParticles->data.minStartVelocity = Vector(-1.0f, -1.0f) * 0.035f;
     seenParticles->data.maxStartVelocity = Vector(1.0f, 1.0f) * 0.035f;
-    auto emissionRate = std::min(50.f, seenParticles->data.maxEmissionRate * size.x * size.y);
-
-    seenParticles->data.minEmissionRate = emissionRate;
+    seenParticles->data.minEmissionRate = std::min(50.f, 2.0f * size.x * size.y);
 
     hiddenParticles->data.boxSize = size;
-    hiddenParticles->data.minEmissionRate = emissionRate;
+    hiddenParticles->data.minEmissionRate = std::min(50.f, 5.0f * size.x * size.y);
 }
 
 void MovingSwitchObject::tick() {

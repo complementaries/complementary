@@ -170,7 +170,8 @@ void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
         p.velocity[1] += data.gravity;
         p.velocity += (position - p.position) * data.attractSpeed;
         Vector nextPosition = p.position + p.velocity + addVelocity;
-        if (!data.clampPositionInBounds || isInBox(p)) {
+        if ((!data.clampPositionInBounds || isInBox(p)) &&
+            data.spawnPositionType != SpawnPositionType::BOX_EDGE_SPIKY) {
             if (data.enableCollision) {
                 move(data, p);
             } else {
@@ -220,6 +221,33 @@ void ParticleSystem::lateTick() {
                         particlePosition.x = position.x + random.nextFloat(-data.boxSize.x * 0.5f,
                                                                            data.boxSize.x * 0.5f);
                         particlePosition.y = position.y + data.boxSize.y * 0.5f;
+                    }
+                } else if (data.spawnPositionType == SpawnPositionType::BOX_EDGE_SPIKY) {
+                    Face spawnFace = static_cast<Face>(random.next(0, static_cast<int>(Face::MAX)));
+                    if (spawnFace == Face::LEFT) {
+                        particlePosition.x = position.x - data.boxSize.x * 0.5f;
+                        particlePosition.y = position.y + random.nextFloat(-data.boxSize.y * 0.5f,
+                                                                           data.boxSize.y * 0.5f);
+                        float base = std::abs(0.25f - fmod(particlePosition.y, 0.5f));
+                        particlePosition.x += base * spiky[static_cast<int>(Face::LEFT)];
+                    } else if (spawnFace == Face::RIGHT) {
+                        particlePosition.x = position.x + data.boxSize.x * 0.5f;
+                        particlePosition.y = position.y + random.nextFloat(-data.boxSize.y * 0.5f,
+                                                                           data.boxSize.y * 0.5f);
+                        float base = std::abs(0.25f - fmod(particlePosition.y, 0.5f));
+                        particlePosition.x -= base * spiky[static_cast<int>(Face::RIGHT)];
+                    } else if (spawnFace == Face::UP) {
+                        particlePosition.x = position.x + random.nextFloat(-data.boxSize.x * 0.5f,
+                                                                           data.boxSize.x * 0.5f);
+                        particlePosition.y = position.y - data.boxSize.y * 0.5f;
+                        float base = std::abs(0.25f - fmod(particlePosition.x, 0.5f));
+                        particlePosition.y += base * spiky[static_cast<int>(Face::UP)];
+                    } else if (spawnFace == Face::DOWN) {
+                        particlePosition.x = position.x + random.nextFloat(-data.boxSize.x * 0.5f,
+                                                                           data.boxSize.x * 0.5f);
+                        particlePosition.y = position.y + data.boxSize.y * 0.5f;
+                        float base = std::abs(0.25f - fmod(particlePosition.x, 0.5f));
+                        particlePosition.y -= base * spiky[static_cast<int>(Face::DOWN)];
                     }
                 } else if (data.spawnPositionType == SpawnPositionType::BOX) {
                     particlePosition.x = position.x + random.nextFloat(-data.boxSize.x * 0.5f,
@@ -404,8 +432,8 @@ void ParticleSystem::renderImGui() {
     ImGui::Checkbox("Clamp pos. in bounds", &data.clampPositionInBounds);
     ImGui::Checkbox("invert color", &data.invertColor);
 
-    const char* spawnPosTypes[] = {"Center", "Box Edge", "Box", "Wind"};
-    ImGui::ListBox("Spawn pos type", (int*)&data.spawnPositionType, spawnPosTypes, 4);
+    const char* spawnPosTypes[] = {"Center", "Box Edge", "Box", "Wind", "Box Edge Spikes"};
+    ImGui::ListBox("Spawn pos type", (int*)&data.spawnPositionType, spawnPosTypes, 5);
     ImGui::DragFloat2("Box Size", data.boxSize.data());
     ImGui::DragFloat2("Clamp Box Size", data.clampBoxSize.data());
 
@@ -441,4 +469,8 @@ bool ParticleSystem::allowSaving() const {
 
 bool ParticleSystem::isPlaying() const {
     return playing && (data.duration <= 0.f || currentLifetime < data.duration);
+}
+
+void ParticleSystem::setSpikes(const std::array<bool, 4>& spikes) {
+    spiky = spikes;
 }

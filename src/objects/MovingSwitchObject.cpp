@@ -1,3 +1,5 @@
+#include <array>
+
 #include "MovingSwitchObject.h"
 
 #include "Objects.h"
@@ -31,6 +33,14 @@ void MovingSwitchObject::postInit() {
 }
 
 void MovingSwitchObject::tick() {
+    std::array<bool, 4> spikes;
+    spikes[0] = data.spiky[0];
+    spikes[1] = data.spiky[1];
+    spikes[2] = data.spiky[2];
+    spikes[3] = data.spiky[3];
+    hiddenParticles->setSpikes(spikes);
+    seenParticles->setSpikes(spikes);
+
     constexpr Color color[2] = {ColorUtils::BLACK, ColorUtils::WHITE};
     Vector size = this->getSize();
     if (isSolid()) {

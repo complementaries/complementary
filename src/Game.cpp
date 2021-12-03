@@ -502,7 +502,10 @@ void Game::renderImGui() {
         return;
     }
 
-    ImGui::Begin("DevGUI");
+    if (!ImGui::Begin("DevGUI")) {
+        ImGui::End();
+        return;
+    }
 
     if (ImGui::Button("Fade Out")) {
         fadeOut();
@@ -616,7 +619,7 @@ void Game::renderImGui() {
         }
     }
 
-    if (ImGui::CollapsingHeader("Player", ImGuiTreeNodeFlags_DefaultOpen)) {
+    if (ImGui::CollapsingHeader("Player")) {
         Player::renderImGui();
     }
 
@@ -636,60 +639,62 @@ void Game::renderImGui() {
         ImGui::PopDisabled();
     }
 
-    for (size_t i = 0; i < Objects::getObjects().size(); i++) {
-        auto object = Objects::getObjects()[i];
+    if (ImGui::CollapsingHeader("Objects")) {
+        for (size_t i = 0; i < Objects::getObjects().size(); i++) {
+            auto object = Objects::getObjects()[i];
 
-        const char* destructionInfo = "";
-        if (!object->destroyOnLevelLoad) {
-            destructionInfo = "[PERSISTENT] ";
-        }
-        if (object->shouldDestroy) {
-            destructionInfo = "[QUEUED FOR DESTRUCTION] ";
-        }
-
-        // Remove common prefixes
-        const char* displayFilePath = object->filePath;
-        if (strncmp(displayFilePath, "assets/", 7) == 0) {
-            displayFilePath += 7;
-        }
-
-        char header[256];
-        snprintf(header, 256, "%s#%zu: %s [%s] (prototype #%d)###%zu", destructionInfo, i,
-                 object->getTypeName(), displayFilePath, object->prototypeId, i);
-        char id[128];
-        snprintf(id, 128, "%zu", i);
-
-        ImGui::PushID(header);
-        if (ImGui::CollapsingHeader(header)) {
-            ImGui::DragFloat2("Position", object->position.data());
-            ImGui::InputInt("Prototype ID (dangerous)", &object->prototypeId);
-            ImGui::Spacing();
-
-            object->renderImGui();
-            if (ImGui::Button("Destroy")) {
-                object->destroy();
+            const char* destructionInfo = "";
+            if (!object->destroyOnLevelLoad) {
+                destructionInfo = "[PERSISTENT] ";
+            }
+            if (object->shouldDestroy) {
+                destructionInfo = "[QUEUED FOR DESTRUCTION] ";
             }
 
-            int pathStrLen = strlen(object->filePath);
-            bool isValidExtension = strncmp(object->filePath + (pathStrLen - 5), ".cmob", 5) == 0;
-            if (!isValidExtension) {
-                ImGui::PushDisabled();
+            // Remove common prefixes
+            const char* displayFilePath = object->filePath;
+            if (strncmp(displayFilePath, "assets/", 7) == 0) {
+                displayFilePath += 7;
             }
 
-            if (ImGui::Button("Save")) {
-                Objects::saveObject(object->filePath, *object);
-            }
+            char header[256];
+            snprintf(header, 256, "%s#%zu: %s [%s] (prototype #%d)###%zu", destructionInfo, i,
+                     object->getTypeName(), displayFilePath, object->prototypeId, i);
+            char id[128];
+            snprintf(id, 128, "%zu", i);
 
-            if (!isValidExtension) {
-                ImGui::PopDisabled();
-            }
+            ImGui::PushID(header);
+            if (ImGui::CollapsingHeader(header)) {
+                ImGui::DragFloat2("Position", object->position.data());
+                ImGui::InputInt("Prototype ID (dangerous)", &object->prototypeId);
+                ImGui::Spacing();
 
-            ImGui::SameLine();
-            ImGui::InputText("##loc", object->filePath, MAX_LEVEL_NAME_LENGTH);
+                object->renderImGui();
+                if (ImGui::Button("Destroy")) {
+                    object->destroy();
+                }
+
+                int pathStrLen = strlen(object->filePath);
+                bool isValidExtension =
+                    strncmp(object->filePath + (pathStrLen - 5), ".cmob", 5) == 0;
+                if (!isValidExtension) {
+                    ImGui::PushDisabled();
+                }
+
+                if (ImGui::Button("Save")) {
+                    Objects::saveObject(object->filePath, *object);
+                }
+
+                if (!isValidExtension) {
+                    ImGui::PopDisabled();
+                }
+
+                ImGui::SameLine();
+                ImGui::InputText("##loc", object->filePath, MAX_LEVEL_NAME_LENGTH);
+            }
+            ImGui::PopID();
         }
-        ImGui::PopID();
     }
-
     ImGui::End();
 }
 #endif

@@ -53,7 +53,8 @@ bool Window::init() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     window = SDL_CreateWindow("Complementary", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                              width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+                              width, height,
+                              SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     if (window == nullptr) {
         Utils::printError("SDL window failed to initialise: %s\n", SDL_GetError());
         return true;
@@ -129,6 +130,12 @@ static void resize(int w, int h) {
     height = h;
 }
 
+static void resize() {
+    int w, h;
+    SDL_GL_GetDrawableSize(window, &w, &h);
+    resize(w, h);
+}
+
 static void toggleFullscreen() {
     if (!fullscreen) {
         previousHeight = height;
@@ -148,15 +155,23 @@ static void toggleFullscreen() {
             Utils::printError("%s\n", SDL_GetError());
             return;
         }
+
+        float hdpi, vdpi;
+        if (SDL_GetDisplayDPI(displayIndex, nullptr, &hdpi, &vdpi) < 0) {
+            Utils::printError("%s\n", SDL_GetError());
+            hdpi = 1.f;
+            vdpi = 1.f;
+        }
+
         SDL_SetWindowSize(window, mode.w, mode.h);
-        resize(mode.w, mode.h);
+        resize(mode.w * hdpi, mode.h * vdpi);
     } else {
         if (SDL_SetWindowFullscreen(window, 0) < 0) {
             Utils::printError("%s\n", SDL_GetError());
             return;
         }
         SDL_SetWindowSize(window, previousWidth, previousHeight);
-        resize(previousWidth, previousHeight);
+        resize();
     }
 
     fullscreen = !fullscreen;
@@ -378,7 +393,7 @@ static void pollEvents() {
             }
             case SDL_WINDOWEVENT: {
                 if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
-                    resize(e.window.data1, e.window.data2);
+                    resize();
                 }
                 break;
             }

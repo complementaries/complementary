@@ -126,6 +126,7 @@ bool Window::init() {
 }
 
 static void resize(int w, int h) {
+    Utils::print("Resizing to %d, %d\n", w, h);
     Game::onWindowResize(w, h);
     width = w;
     height = h;
@@ -142,30 +143,10 @@ static void toggleFullscreen() {
         previousHeight = height;
         previousWidth = width;
 
-        SDL_DisplayMode mode = {};
-        int displayIndex = SDL_GetWindowDisplayIndex(window);
-        if (displayIndex < 0) {
+        if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) < 0) {
             Utils::printError("%s\n", SDL_GetError());
             return;
         }
-        if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN) < 0) {
-            Utils::printError("%s\n", SDL_GetError());
-            return;
-        }
-        if (SDL_GetDesktopDisplayMode(displayIndex, &mode) < 0) {
-            Utils::printError("%s\n", SDL_GetError());
-            return;
-        }
-
-        float hdpi, vdpi;
-        if (SDL_GetDisplayDPI(displayIndex, nullptr, &hdpi, &vdpi) < 0) {
-            Utils::printError("%s\n", SDL_GetError());
-            hdpi = 1.f;
-            vdpi = 1.f;
-        }
-
-        SDL_SetWindowSize(window, mode.w, mode.h);
-        resize(mode.w * hdpi, mode.h * vdpi);
     } else {
         if (SDL_SetWindowFullscreen(window, 0) < 0) {
             Utils::printError("%s\n", SDL_GetError());

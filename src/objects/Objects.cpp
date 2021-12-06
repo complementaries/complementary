@@ -75,6 +75,10 @@ void Objects::clear() {
     }
 }
 
+void Objects::clearPrototypes() {
+    prototypes.clear();
+}
+
 void Objects::add(std::shared_ptr<ObjectBase> o) {
 #ifndef NDEBUG
     o->initTileEditorData(o->getTileEditorProps());

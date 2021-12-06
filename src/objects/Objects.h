@@ -9,6 +9,7 @@ namespace Objects {
     bool init();
 
     void clear();
+    void clearPrototypes();
     void addPrototype(std::shared_ptr<ObjectBase> o);
     size_t getPrototypeCount();
     std::shared_ptr<ObjectBase> getPrototype(int id);

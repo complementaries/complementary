@@ -7,9 +7,10 @@
 #include "player/Player.h"
 #include "sound/SoundManager.h"
 
-static std::unordered_map<int, float> windObjects;
+std::unordered_map<int, float> windObjects;
+static int nextIndex = 0;
 
-WindObject::WindObject() : index(windObjects.size()) {
+WindObject::WindObject() : index(nextIndex++) {
     windObjects[index] = biggestFloat;
 }
 

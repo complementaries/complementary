@@ -15,6 +15,7 @@
 #include "Profiler.h"
 #include "Utils.h"
 #include "graphics/gl/Glew.h"
+#include "objects/Objects.h"
 #include "sound/SoundManager.h"
 
 typedef long long int Nanos;
@@ -472,6 +473,8 @@ void Window::run() {
     }
 
     Input::closeController();
+    Objects::clear();
+    Objects::clearPrototypes();
     SDL_DestroyWindow(window);
     SDL_Quit();
     SoundManager::quit();

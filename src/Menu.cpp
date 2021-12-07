@@ -151,6 +151,9 @@ static void renderControls(const Matrix& m, Vector pos, Vector baseSize) {
 }
 
 void Menu::render(float lag) {
+    if (type == MenuType::NONE) {
+        return;
+    }
     (void)lag;
 
     float aspect = static_cast<float>(Window::getWidth()) / Window::getHeight();
@@ -169,7 +172,9 @@ void Menu::render(float lag) {
     Vector overSize = size * 1.1f;
     Vector pos = (wSize - overSize) * 0.5f;
     if (type != MenuType::START) {
-        ObjectRenderer::addRectangle(pos, overSize, ColorUtils::setAlpha(ColorUtils::GRAY, 200));
+        ObjectRenderer::addRectangle(Vector(0, 0), Vector(Window::getWidth(), Window::getHeight()),
+                                     ColorUtils::setAlpha(ColorUtils::BLACK, 160));
+        ObjectRenderer::addRectangle(pos, overSize, ColorUtils::setAlpha(ColorUtils::WHITE, 255));
         ObjectRenderer::render(m);
     }
 

@@ -453,6 +453,18 @@ void Game::render(float lag) {
     ParticleRenderer::render();
 #endif
 
+    glDisable(GL_DEPTH_TEST);
+
+    if (getCurrentLevel() == -1) {
+        Color c = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
+        float x = RenderState::getXOffset();
+        float offset = -x + Tilemap::getWidth() * 0.5f;
+        ObjectRenderer::addRectangle(Vector(offset - 0.02f, 0.0f),
+                                     Vector(Tilemap::getWidth() / 2, Tilemap::getHeight()),
+                                     ColorUtils::setAlpha(c, 200));
+        ObjectRenderer::render();
+    }
+
     if (isInTitleScreen) {
         RenderState::updateViewMatrix(lag);
 
@@ -477,16 +489,6 @@ void Game::render(float lag) {
     ObjectRenderer::addRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
                                  ColorUtils::setAlpha(ColorUtils::BLACK, fade));
     ObjectRenderer::render(Matrix());
-
-    if (getCurrentLevel() == -1) {
-        float x = RenderState::getXOffset();
-        float offset = -x + Tilemap::getWidth() * 0.5f;
-        ObjectRenderer::addRectangle(Vector(offset - 0.02f, 0.0f),
-                                     Vector(Tilemap::getWidth() / 2, Tilemap::getHeight()),
-                                     ColorUtils::setAlpha(ColorUtils::BLACK, 200));
-        RenderState::updatePlayerViewMatrix(lag);
-        ObjectRenderer::render();
-    }
 
 #ifndef NDEBUG
     drawFpsDisplay();

@@ -1,6 +1,7 @@
 #ifndef NDEBUG
 #include "TilemapEditor.h"
 
+#include "graphics/Window.h"
 #include "objects/ColorObject.h"
 
 void STBTE_DRAW_RECT(int x0, int y0, int x1, int y1, unsigned int color);
@@ -47,9 +48,9 @@ static int tilemapBackgroundColor;
 #include "player/Player.h"
 #include <graphics/gl/Glew.h>
 
-static int globalScreenWidth;
-static int globalScreenHeight;
-static float globalZoom = 2.f;
+static float globalZoom = 2.0f;
+static constexpr int TILE_WIDTH = 12;
+static constexpr int TILE_HEIGHT = 12;
 
 const int OBJECT_ID_OFFSET = 1000;
 
@@ -66,14 +67,6 @@ struct QueueData {
 static std::vector<QueueData> objectQueue;
 static float zLayer;
 
-static int getZoomedWidth() {
-    return (int)(globalScreenWidth / globalZoom);
-}
-
-static int getZoomedHeight() {
-    return (int)(globalScreenHeight / globalZoom);
-}
-
 bool TilemapEditor::init() {
     if (shader.compile({"assets/shaders/editor.vs", "assets/shaders/editor.fs"})) {
         return true;
@@ -83,11 +76,8 @@ bool TilemapEditor::init() {
 }
 
 TilemapEditor::TilemapEditor(int screenWidth, int screenHeight) {
-    globalScreenWidth = screenWidth;
-    globalScreenHeight = screenHeight;
-    stbTileMap = stbte_create_map(Tilemap::getWidth(), Tilemap::getHeight(), 2,
-                                  getZoomedWidth() / Tilemap::getWidth(),
-                                  getZoomedHeight() / Tilemap::getHeight(), 255);
+    stbTileMap = stbte_create_map(Tilemap::getWidth(), Tilemap::getHeight(), 2, TILE_WIDTH,
+                                  TILE_HEIGHT, 255);
 
     stbTileMap->propmode = STBTE__propmode_always;
 
@@ -105,7 +95,7 @@ TilemapEditor::TilemapEditor(int screenWidth, int screenHeight) {
         stbte_define_tile(stbTileMap, OBJECT_ID_OFFSET + i, 1 << 1, "Objects");
     }
 
-    stbte_set_display(0, 0, getZoomedWidth(), getZoomedHeight());
+    stbte_set_display(0, 0, Window::getWidth(), Window::getHeight());
 
     for (int y = 0; y < Tilemap::getHeight(); y++) {
         for (int x = 0; x < Tilemap::getWidth(); x++) {
@@ -147,10 +137,10 @@ TilemapEditor::~TilemapEditor() {
 }
 
 void STBTE_DRAW_RECT(int x0, int y0, int x1, int y1, unsigned int color) {
-    float minX = (float)x0 * Tilemap::getWidth() / getZoomedWidth();
-    float maxX = (float)x1 * Tilemap::getWidth() / getZoomedWidth();
-    float minY = (float)y0 * Tilemap::getHeight() / getZoomedHeight();
-    float maxY = (float)y1 * Tilemap::getHeight() / getZoomedHeight();
+    float minX = static_cast<float>(x0) / TILE_WIDTH;
+    float maxX = static_cast<float>(x1) / TILE_WIDTH;
+    float minY = static_cast<float>(y0) / TILE_HEIGHT;
+    float maxY = static_cast<float>(y1) / TILE_HEIGHT;
 
     renderBuffer.add(minX).add(minY).add(zLayer).add(color);
     renderBuffer.add(maxX).add(minY).add(zLayer).add(color);
@@ -163,11 +153,9 @@ void STBTE_DRAW_RECT(int x0, int y0, int x1, int y1, unsigned int color) {
 
 void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* data) {
     (void)highlight;
-    (void)data;
-    (void)id;
 
-    float tileSpaceX = (float)x0 * Tilemap::getWidth() / getZoomedWidth();
-    float tileSpaceY = (float)y0 * Tilemap::getHeight() / getZoomedHeight();
+    float tileSpaceX = (float)x0 / TILE_WIDTH;
+    float tileSpaceY = (float)y0 / TILE_HEIGHT;
 
     if (id == Tiles::AIR.getId()) {
         float minX = tileSpaceX;
@@ -182,6 +170,20 @@ void STBTE_DRAW_TILE(int x0, int y0, unsigned short id, int highlight, float* da
         renderBuffer.add(maxX).add(minY).add(zLayer).add(color);
         renderBuffer.add(minX).add(maxY).add(zLayer).add(color);
     } else if (id < OBJECT_ID_OFFSET) {
+        if (data == nullptr) {
+            float minX = tileSpaceX;
+            float minY = tileSpaceY;
+            float maxX = minX + 1.0f;
+            float maxY = minY + 1.0f;
+            Color color = ColorUtils::invert(Tiles::WALL.getColor());
+            renderBuffer.add(minX).add(minY).add(zLayer).add(color);
+            renderBuffer.add(maxX).add(minY).add(zLayer).add(color);
+            renderBuffer.add(minX).add(maxY).add(zLayer).add(color);
+            renderBuffer.add(maxX).add(maxY).add(zLayer).add(color);
+            renderBuffer.add(maxX).add(minY).add(zLayer).add(color);
+            renderBuffer.add(minX).add(maxY).add(zLayer).add(color);
+        }
+
         Tiles::get(id).renderEditor(renderBuffer, tileSpaceX, tileSpaceY, zLayer);
     } else {
         // IDs >= 1000 identify object prototypes
@@ -301,23 +303,44 @@ void TilemapEditor::tick(float dt) {
     stbte_tick(stbTileMap, dt);
 }
 
+static void patchTiledata() {
+    float* data = const_cast<float*>(static_cast<const float*>(renderBuffer.getData()));
+    int length = renderBuffer.getSize() / sizeof(float);
+    for (int i = 0; i < length; i += 4) {
+        data[i] *= TILE_WIDTH;
+        data[i + 1] *= TILE_WIDTH;
+    }
+}
+
 void TilemapEditor::render() {
+    Matrix m;
+    m.transform(Vector(-1.0f, 1.0f))
+        .scale(Vector(2.0f / Window::getWidth(), -2.0f / Window::getHeight()));
+    m.scale(Vector(globalZoom, globalZoom));
+
     renderBuffer.clear();
     zLayer = 0.0f;
     stbte_draw(stbTileMap);
 
     shader.use();
-    RenderState::setViewMatrix(shader);
+    shader.setMatrix("view", m);
+
+    patchTiledata();
+
     int vertices = renderBuffer.getSize() / (sizeof(float) * 3 + 4);
     buffer.setStreamData(renderBuffer.getData(), renderBuffer.getSize());
     buffer.drawTriangles(vertices);
 
     RenderState::enableBlending();
+    ObjectRenderer::bindBuffer(false);
+    ObjectRenderer::dirtyStaticBuffer();
+    ObjectRenderer::setScale(Vector(TILE_WIDTH, TILE_HEIGHT));
     for (unsigned int i = 0; i < objectQueue.size(); i++) {
         ObjectRenderer::setDefaultZ(objectQueue[i].zLayer);
         objectQueue[i].object->renderEditor(1.0f, objectQueue[i].inPalette);
     }
-    ObjectRenderer::render();
+    ObjectRenderer::setScale(Vector(1.0f, 1.0f));
+    ObjectRenderer::render(m);
     objectQueue.clear();
     RenderState::disableBlending();
 }
@@ -327,14 +350,12 @@ void TilemapEditor::onMouseEvent(void* eventPtr) {
 }
 
 void TilemapEditor::onScreenResize(int width, int height) {
-    globalScreenWidth = width;
-    globalScreenHeight = height;
-    stbte_set_display(0, 0, getZoomedWidth(), getZoomedHeight());
+    stbte_set_display(0, 0, Window::getWidth() / globalZoom, Window::getHeight() / globalZoom);
 }
 
 void TilemapEditor::setZoom(float zoom) {
     globalZoom = zoom;
-    onScreenResize(globalScreenWidth, globalScreenHeight);
+    onScreenResize(0, 0);
 }
 
 float TilemapEditor::getZoom() {

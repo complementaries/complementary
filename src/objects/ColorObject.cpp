@@ -65,8 +65,8 @@ std::shared_ptr<ObjectBase> ColorObject::clone() {
 void ColorObject::initTileEditorData(std::vector<TileEditorProp>& props) {
     props.insert(props.end(),
                  {
-                     TileEditorProp::Int("Size X", data.size.x, 1, 5),
-                     TileEditorProp::Int("Size Y", data.size.y, 1, 5),
+                     TileEditorProp::Int("Size X", data.size.x, 1, 20),
+                     TileEditorProp::Int("Size Y", data.size.y, 1, 10),
                      TileEditorProp::Int("Ability 1", static_cast<int>(data.abilities[0]), 0.f,
                                          static_cast<int>(Ability::MAX) - 1),
                      TileEditorProp::Int("Ability 2", static_cast<int>(data.abilities[1]), 0.f,

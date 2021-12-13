@@ -23,6 +23,8 @@ namespace ObjectRenderer {
     void bindBuffer(bool isStatic);
     void setDefaultZ(float z);
     void resetDefaultZ();
+
+    void setScale(const Vector& scale);
 }
 
 #endif

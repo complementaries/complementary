@@ -172,13 +172,6 @@ void RenderState::updatePlayerViewMatrix(float lag) {
     viewMatrix.transform(diff);
 }
 
-void RenderState::updateEditorViewMatrix(float lag) {
-    viewMatrix.unit()
-        .transform(Vector(-1.0f, 1.0f))
-        .scale(Vector(2.0f / Tilemap::getWidth(), -2.0f / Tilemap::getHeight()));
-    viewMatrix.transform(getShake(shakeTicks + lag));
-}
-
 void RenderState::setViewMatrix(GL::Shader& shader) {
     shader.setMatrix("view", viewMatrix);
 }

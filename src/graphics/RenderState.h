@@ -8,7 +8,6 @@ namespace RenderState {
     bool init();
     void updateViewMatrix(float lag);
     void updatePlayerViewMatrix(float lag);
-    void updateEditorViewMatrix(float lag);
     void setViewMatrix(GL::Shader& shader);
     void addShake(const Vector& v);
     void addRandomizedShake(float strength);

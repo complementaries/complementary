@@ -420,7 +420,6 @@ void Game::render(float lag) {
     RenderState::bindAndClearDefaultFramebuffer();
 #ifndef NDEBUG
     if (tilemapEditor) {
-        RenderState::updateEditorViewMatrix(lag);
         tilemapEditor->render();
         return;
     }

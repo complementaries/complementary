@@ -19,7 +19,7 @@ struct MenuEntry {
 };
 
 std::vector<MenuEntry> lines;
-static float fontSize = 5.0f;
+static float fontSize = 4.5f;
 static unsigned int menuIndex = 1;
 static MenuType type = MenuType::NONE;
 constexpr float yGapFactor = 1.25f;
@@ -54,6 +54,11 @@ static void quitLevel() {
 
 static void controls() {
     showControls = !showControls;
+}
+
+static void toggleFullscreen() {
+    Window::toggleFullscreen();
+    Menu::showPauseMenu();
 }
 
 static void add(const char* s, MenuFunction mf) {
@@ -216,6 +221,14 @@ void Menu::showStartMenu() {
     add("Quit", quit);
 }
 
+static void fullScreenOption() {
+    if (Window::isFullscreen()) {
+        add("Set Windowed", toggleFullscreen);
+    } else {
+        add("Set Fullscreen", toggleFullscreen);
+    }
+}
+
 void Menu::showPauseMenu() {
     type = MenuType::PAUSE;
     clear();
@@ -224,6 +237,7 @@ void Menu::showPauseMenu() {
         add("[Pause]", nothing);
         add("Continue", unpause);
         add("Controls", controls);
+        fullScreenOption();
         add("Quit", quit);
         return;
     }
@@ -231,6 +245,7 @@ void Menu::showPauseMenu() {
     add("Continue", unpause);
     add("Restart", restart);
     add("Controls", controls);
+    fullScreenOption();
     add("Quit Level", quitLevel);
 }
 

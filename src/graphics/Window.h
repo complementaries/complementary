@@ -10,6 +10,9 @@ namespace Window {
 
     int getWidth();
     int getHeight();
+
+    void toggleFullscreen();
+    bool isFullscreen();
 }
 
 #endif

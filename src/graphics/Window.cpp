@@ -138,7 +138,7 @@ static void resize() {
     resize(w, h);
 }
 
-static void toggleFullscreen() {
+void Window::toggleFullscreen() {
     if (!fullscreen) {
         previousHeight = height;
         previousWidth = width;
@@ -157,6 +157,10 @@ static void toggleFullscreen() {
     }
 
     fullscreen = !fullscreen;
+}
+
+bool Window::isFullscreen() {
+    return fullscreen;
 }
 
 static void pollEvents() {
@@ -223,7 +227,7 @@ static void pollEvents() {
                     case SDLK_DOWN:
                     case SDLK_s: Input::Internal::setButtonReleased(ButtonType::DOWN); break;
                     case SDLK_p: Input::Internal::setButtonReleased(ButtonType::PAUSE); break;
-                    case SDLK_F11: toggleFullscreen(); break;
+                    case SDLK_F11: Window::toggleFullscreen(); break;
                 }
                 break;
             }

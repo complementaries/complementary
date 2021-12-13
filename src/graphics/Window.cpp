@@ -147,6 +147,10 @@ void Window::toggleFullscreen() {
             Utils::printError("%s\n", SDL_GetError());
             return;
         }
+
+#ifdef NDEBUG
+        SDL_ShowCursor(SDL_DISABLE);
+#endif
     } else {
         if (SDL_SetWindowFullscreen(window, 0) < 0) {
             Utils::printError("%s\n", SDL_GetError());
@@ -154,6 +158,10 @@ void Window::toggleFullscreen() {
         }
         SDL_SetWindowSize(window, previousWidth, previousHeight);
         resize();
+
+#ifdef NDEBUG
+        SDL_ShowCursor(SDL_ENABLE);
+#endif
     }
 
     fullscreen = !fullscreen;

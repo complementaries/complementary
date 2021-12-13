@@ -31,6 +31,7 @@ static GL::Shader shader;
 static GL::VertexBuffer buffer;
 static Vector lastPosition;
 static Vector position;
+static Vector lastBaseVelocity;
 static Vector baseVelocity;
 static float lastRenderForce = 0.0f;
 static float renderForce = 0.0f;
@@ -296,6 +297,13 @@ static void tickCollision() {
 
     for (Face face : FaceUtils::getFaces()) {
         Vector min = position + FaceUtils::getDirection(face) * step;
+        if (face == Face::DOWN) {
+            float base = lastBaseVelocity.y;
+            if (base < 0.0) {
+                base = 0.0f;
+            }
+            min += FaceUtils::getDirection(face) * base;
+        }
         Vector max = min + data.size;
 
         int faceAsInt = static_cast<int>(face);
@@ -425,7 +433,7 @@ void Player::restart() {
 }
 
 void Player::kill() {
-    if (GoalCutscene::isActive()) {
+    if (GoalCutscene::isActive() || isDead()) {
         return;
     }
     dashParticles->stop();
@@ -834,6 +842,7 @@ void Player::tick() {
     } else {
         data.velocity *= actualDrag;
         data.velocity += (Vector(1.0f, 1.0f) - actualDrag) * baseVelocity;
+        lastBaseVelocity = baseVelocity;
         baseVelocity = Vector();
         dashParticles->stop();
     }
@@ -961,13 +970,18 @@ void Player::render(float lag) {
     buf.clear();
     Color color = useOverrideColor ? overrideColor : AbilityUtils::getColor(abilities[worldType]);
 
+    float base = lastBaseVelocity.y * 2.0f;
+    if (base < 0.0) {
+        base = 0.0f;
+    }
+
     float shear = lastTopShear + (topShear - lastTopShear) * lag;
     buf.add(0.0f).add(0.0f).add(color);
     buf.add(1.0f).add(0.0f).add(color);
-    buf.add(shear + 0.0f).add(1.0f).add(color);
-    buf.add(shear + 1.0f).add(1.0f).add(color);
+    buf.add(shear + 0.0f).add(1.0f + base).add(color);
+    buf.add(shear + 1.0f).add(1.0f + base).add(color);
     buf.add(1.0f).add(0.0f).add(color);
-    buf.add(shear + 0.0f).add(1.0f).add(color);
+    buf.add(shear + 0.0f).add(1.0f + base).add(color);
     addGlider(buf, color);
 
     buffer.setStreamData(buf.getData(), buf.getSize());

@@ -41,6 +41,7 @@ void MovingObject::tick() {
     float length = velocity.getLength();
     if (length < 0.0005f || data.speed < 0.0005f) {
         velocity = Vector();
+        movingBack = !movingBack;
         return;
     }
     if (length < data.speed) {
@@ -58,8 +59,16 @@ void MovingObject::tick() {
     step.normalize();
     step *= 0.01f;
     while (Player::isColliding(*this)) {
+        if ((step.y > 0.0f && data.spiky[static_cast<int>(Face::DOWN)]) ||
+            (step.y < 0.0f && data.spiky[static_cast<int>(Face::UP)]) ||
+            (step.x < 0.0f && data.spiky[static_cast<int>(Face::LEFT)]) ||
+            (step.x > 0.0f && data.spiky[static_cast<int>(Face::RIGHT)])) {
+            Player::kill();
+            break;
+        }
         Player::moveForced(step);
     }
+
     Vector grow(0.0f, 0.1f);
     Objects::forceMoveParticles(position - grow, data.size + grow, velocity);
 }
@@ -125,7 +134,7 @@ void MovingObject::initTileEditorData(std::vector<TileEditorProp>& props) {
                   TileEditorProp::Int("Size Y", data.size.y, 0, 40),
                   TileEditorProp::Float("Goal X", data.goal.x, -20.f, 20.f),
                   TileEditorProp::Float("Goal Y", data.goal.y, -20.f, 20.f),
-                  TileEditorProp::Float("Speed", data.speed, 0.f, 0.5f),
+                  TileEditorProp::Float("Speed", data.speed, 0.0f, 0.2f, 0.005f),
                   TileEditorProp::Bool("LEFT", data.spiky[static_cast<int>(Face::LEFT)]),
                   TileEditorProp::Bool("RIGHT", data.spiky[static_cast<int>(Face::RIGHT)]),
                   TileEditorProp::Bool("UP", data.spiky[static_cast<int>(Face::UP)]),

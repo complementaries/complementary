@@ -127,7 +127,7 @@ static int getTilemapXOffset() {
     return 0;
 }
 
-static float getXOffset() {
+float RenderState::getXOffset() {
     return Game::getCurrentLevel() == -1 ? offsetX : 0.0f;
 }
 

@@ -28,6 +28,8 @@ namespace RenderState {
     void disableBlending();
 
     void setZoom(float zoom, Vector zoomOffset = Vector());
+
+    float getXOffset();
 }
 
 #endif

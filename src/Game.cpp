@@ -478,6 +478,16 @@ void Game::render(float lag) {
                                  ColorUtils::setAlpha(ColorUtils::BLACK, fade));
     ObjectRenderer::render(Matrix());
 
+    if (getCurrentLevel() == -1) {
+        float x = RenderState::getXOffset();
+        float offset = -x + Tilemap::getWidth() * 0.5f;
+        ObjectRenderer::addRectangle(Vector(offset - 0.02f, 0.0f),
+                                     Vector(Tilemap::getWidth() / 2, Tilemap::getHeight()),
+                                     ColorUtils::setAlpha(ColorUtils::BLACK, 200));
+        RenderState::updatePlayerViewMatrix(lag);
+        ObjectRenderer::render();
+    }
+
 #ifndef NDEBUG
     drawFpsDisplay();
 #endif

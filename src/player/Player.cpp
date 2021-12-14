@@ -573,7 +573,8 @@ static void tickIdleAndRunAnimation() {
     }
     idle = true;
     idleTicks++;
-    if (std::abs(data.velocity.x) < 0.01f) {
+    float base = data.velocity.x - lastBaseVelocity.x;
+    if (std::abs(base) < 0.01f) {
         addRenderForce(sinf(idleTicks * 0.08f) * 0.01f, Face::DOWN);
     }
 }
@@ -586,7 +587,9 @@ static void addTopShear(float shear) {
 static void tickShear() {
     lastTopShear = topShear;
     if (Player::isColliding(Face::DOWN)) {
-        addTopShear(data.velocity.x * 0.2f);
+        float base = data.velocity.x;
+        base -= lastBaseVelocity.x;
+        addTopShear(base * 0.2f);
     }
     topShear *= 0.9f;
 }
@@ -855,8 +858,9 @@ void Player::tick() {
     if (isColliding(Face::DOWN)) {
         fakeGrounded = data.coyoteTicks;
         dashUseable = true;
-        if (std::abs(data.velocity.x) > 0.02f && dashTicks <= 0) {
-            if (data.velocity.x > 0) {
+        float velX = data.velocity.x - lastBaseVelocity.x;
+        if (std::abs(velX) > 0.02f && dashTicks <= 0) {
+            if (velX > 0) {
                 PlayerParticles::setParticleVelocities(walkParticles, -1, 1, -1, -1);
                 PlayerParticles::setParticlePosition(walkParticles, -1, 1,
                                                      walkParticles->data.startSize * 2.0f, 0);

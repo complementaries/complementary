@@ -24,6 +24,7 @@ static unsigned int menuIndex = 1;
 static MenuType type = MenuType::NONE;
 constexpr float yGapFactor = 1.25f;
 static bool showControls = false;
+static bool closeWithPause = false;
 
 static void nothing() {
 }
@@ -34,6 +35,7 @@ static void quit() {
 
 static void unpause() {
     Menu::clear();
+    closeWithPause = false;
     type = MenuType::NONE;
 }
 
@@ -75,6 +77,11 @@ static void openMenu() {
 }
 
 void Menu::tick() {
+    if (Input::getButton(ButtonType::PAUSE).pressedFirstFrame && closeWithPause) {
+        unpause();
+        return;
+    }
+
     openMenu();
 
     if (lines.size() == 0) {
@@ -219,6 +226,7 @@ void Menu::showStartMenu() {
     add("[Complementary]", nothing);
     add("Start", start);
     add("Quit", quit);
+    closeWithPause = false;
 }
 
 static void fullScreenOption() {
@@ -233,6 +241,7 @@ void Menu::showPauseMenu() {
     type = MenuType::PAUSE;
     clear();
     menuIndex = 1;
+    closeWithPause = true;
     if (Game::getCurrentLevel() == -1) {
         add("[Pause]", nothing);
         add("Continue", unpause);

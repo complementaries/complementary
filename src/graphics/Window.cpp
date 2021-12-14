@@ -236,6 +236,7 @@ static void pollEvents() {
                     case SDLK_s: Input::Internal::setButtonReleased(ButtonType::DOWN); break;
                     case SDLK_p: Input::Internal::setButtonReleased(ButtonType::PAUSE); break;
                     case SDLK_F11: Window::toggleFullscreen(); break;
+                    case SDLK_ESCAPE: Input::Internal::setButtonReleased(ButtonType::PAUSE); break;
                 }
                 break;
             }

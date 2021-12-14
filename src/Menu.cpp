@@ -10,6 +10,63 @@
 #include "objects/ObjectRenderer.h"
 #include "player/Player.h"
 
+typedef std::vector<const char*> Help;
+
+const char* ABILITY = "Ability:";
+const char* SWITCH = "Switch:";
+const char* ABILITY_SWITCH = "Switch + Ability:";
+
+Help HELP_KEYBOARD = {"Left/Right:", "[A",           "[D",          "[LEFT-ARROW", "[RIGHT-ARROW",
+                      "Jump:",       "[SPACE",       ABILITY,       "[LEFT-SHIFT", SWITCH,
+                      "[ENTER",      ABILITY_SWITCH, "[RIGHT-SHIFT"};
+Help HELP_XBOX = {"Left/Right:", "[\5",      "Jump:", "[A",       "[B",           ABILITY,
+                  "[X",          "[L1 / L2", SWITCH,  "[R1 / R2", ABILITY_SWITCH, "[Y"};
+Help HELP_PS = {"Left/Right:", "[\5",      "Jump:", "[\1",      "[\4",          ABILITY,
+                "[\3",         "[L1 / L2", SWITCH,  "[R1 / R2", ABILITY_SWITCH, "[\2"};
+Help HELP = {"Left/Right:", "[\5",     "Jump:", "[A",      "[B",           ABILITY,
+             "[Y",          "[L / ZL", SWITCH,  "[R / ZR", ABILITY_SWITCH, "[X"};
+
+static const Help& getRelevantHelp() {
+    SDL_GameController* c = Input::getController();
+    if (c == nullptr) {
+        return HELP_KEYBOARD;
+    }
+    SDL_GameControllerType type = SDL_GameControllerGetType(c);
+    if (type == SDL_CONTROLLER_TYPE_XBOX360 || type == SDL_CONTROLLER_TYPE_XBOXONE) {
+        return HELP_XBOX;
+    } else if (type == SDL_CONTROLLER_TYPE_PS3 || type == SDL_CONTROLLER_TYPE_PS4) {
+        return HELP_PS;
+    }
+    return HELP;
+}
+
+static int searchFor(const Help& help, const char* search) {
+    for (unsigned int i = 0; i < help.size(); i++) {
+        if (help[i] == search) {
+            return i + 1;
+        }
+    }
+    return -1;
+}
+
+static const char* getHelp(const char* search) {
+    const Help& help = getRelevantHelp();
+    int index = searchFor(help, search);
+    return index < 0 ? "ERROR" : help[index] + 1;
+}
+
+const char* Menu::getSwitchHelp() {
+    return getHelp(SWITCH);
+}
+
+const char* Menu::getAbilityHelp() {
+    return getHelp(ABILITY);
+}
+
+const char* Menu::getAbilitySwitchHelp() {
+    return getHelp(ABILITY_SWITCH);
+}
+
 typedef void (*MenuFunction)();
 
 struct MenuEntry {
@@ -104,11 +161,10 @@ void Menu::tick() {
     }
 }
 
-static void renderControls(const Matrix& m, Vector pos, Vector baseSize, const char* const* help,
-                           int length) {
+static void renderControls(const Matrix& m, Vector pos, Vector baseSize, const Help& help) {
     float smallFontSize = fontSize * 0.5f;
     Vector size;
-    for (int i = 0; i < length; i++) {
+    for (unsigned int i = 0; i < help.size(); i++) {
         size.x = std::max(size.x, Font::getWidth(smallFontSize, help[i]));
         size.y += smallFontSize * yGapFactor;
     }
@@ -118,7 +174,7 @@ static void renderControls(const Matrix& m, Vector pos, Vector baseSize, const c
     ObjectRenderer::render(m);
     pos += (oversize - size) * 0.5f;
     Font::prepare(m);
-    for (int i = 0; i < length; i++) {
+    for (unsigned int i = 0; i < help.size(); i++) {
         if (help[i][0] == '[') {
             Vector shifted = pos;
             Font::draw(shifted, smallFontSize, ColorUtils::WHITE, "[");
@@ -134,35 +190,7 @@ static void renderControls(const Matrix& m, Vector pos, Vector baseSize, const c
 }
 
 static void renderControls(const Matrix& m, Vector pos, Vector baseSize) {
-    SDL_GameController* c = Input::getController();
-    if (c == nullptr) {
-        constexpr const char* help[] = {"Left/Right:",  "[A",      "[D",      "[LEFT-ARROW",
-                                        "[RIGHT-ARROW", "Jump:",   "[SPACE",  "Ability:",
-                                        "[LEFT-SHIFT",  "Switch:", "[ENTER]", "Switch + Ability:",
-                                        "[RIGHT-SHIFT"};
-        renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
-    } else {
-        SDL_GameControllerType type = SDL_GameControllerGetType(c);
-        if (type == SDL_CONTROLLER_TYPE_XBOX360 || type == SDL_CONTROLLER_TYPE_XBOXONE) {
-            constexpr const char* help[] = {
-                "Left/Right:",       "[\5", "Jump:",    "[A",      "[B",
-                "Ability:",          "[X",  "[L1 / L2", "Switch:", "[R1 / R2",
-                "Switch + Ability:", "[Y"};
-            renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
-        } else if (type == SDL_CONTROLLER_TYPE_PS3 || type == SDL_CONTROLLER_TYPE_PS4) {
-            constexpr const char* help[] = {
-                "Left/Right:",       "[\5", "Jump:",    "[\1",     "[\4",
-                "Ability:",          "[\3", "[L1 / L2", "Switch:", "[R1 / R2",
-                "Switch + Ability:", "[\2"};
-            renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
-        } else {
-            constexpr const char* help[] = {
-                "Left/Right:",       "[\5", "Jump:",   "[A",      "[B",
-                "Ability:",          "[Y",  "[L / ZL", "Switch:", "[R / ZR",
-                "Switch + Ability:", "[X"};
-            renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
-        }
-    }
+    renderControls(m, pos, baseSize, getRelevantHelp());
 }
 
 void Menu::render(float lag) {

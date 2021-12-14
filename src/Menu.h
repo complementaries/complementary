@@ -12,6 +12,10 @@ namespace Menu {
     void showStartMenu();
     void showPauseMenu();
     MenuType getType();
+
+    const char* getSwitchHelp();
+    const char* getAbilityHelp();
+    const char* getAbilitySwitchHelp();
 }
 
 #endif

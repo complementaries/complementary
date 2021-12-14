@@ -293,7 +293,6 @@ static void playFakeSwitchAnimation() {
 }
 
 void Game::tick() {
-    std::cout << fade << "\n";
 #ifndef NDEBUG
     Profiler::tick();
     Profiler::Timer tickTimer(Profiler::tickNanos);

@@ -144,19 +144,22 @@ static void renderControls(const Matrix& m, Vector pos, Vector baseSize) {
     } else {
         SDL_GameControllerType type = SDL_GameControllerGetType(c);
         if (type == SDL_CONTROLLER_TYPE_XBOX360 || type == SDL_CONTROLLER_TYPE_XBOXONE) {
-            constexpr const char* help[] = {"Left/Right:",       "[\5", "Jump:", "[A",      "[B",
-                                            "Ability:",          "[X",  "[L",    "Switch:", "[R",
-                                            "Switch + Ability:", "[Y"};
+            constexpr const char* help[] = {
+                "Left/Right:",       "[\5", "Jump:",    "[A",      "[B",
+                "Ability:",          "[X",  "[L1 / L2", "Switch:", "[R1 / R2",
+                "Switch + Ability:", "[Y"};
             renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
         } else if (type == SDL_CONTROLLER_TYPE_PS3 || type == SDL_CONTROLLER_TYPE_PS4) {
-            constexpr const char* help[] = {"Left/Right:",       "[\5", "Jump:", "[\1",     "[\4",
-                                            "Ability:",          "[\3", "[L",    "Switch:", "[R",
-                                            "Switch + Ability:", "[\2"};
+            constexpr const char* help[] = {
+                "Left/Right:",       "[\5", "Jump:",    "[\1",     "[\4",
+                "Ability:",          "[\3", "[L1 / L2", "Switch:", "[R1 / R2",
+                "Switch + Ability:", "[\2"};
             renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
         } else {
-            constexpr const char* help[] = {"Left/Right:",       "[\5", "Jump:", "[A",      "[B",
-                                            "Ability:",          "[Y",  "[L",    "Switch:", "[R",
-                                            "Switch + Ability:", "[X"};
+            constexpr const char* help[] = {
+                "Left/Right:",       "[\5", "Jump:",   "[A",      "[B",
+                "Ability:",          "[Y",  "[L / ZL", "Switch:", "[R / ZR",
+                "Switch + Ability:", "[X"};
             renderControls(m, pos, baseSize, help, sizeof(help) / sizeof(const char*));
         }
     }

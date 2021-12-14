@@ -344,6 +344,9 @@ void Game::tick() {
         }
         AbilityCutscene::tick();
         GoalCutscene::tick();
+        if (Player::isDead()) {
+            worldSwitchBuffer = 0;
+        }
         Player::setAllowedToMove(!AbilityCutscene::isActive() && !GoalCutscene::isActive() &&
                                  !Menu::isActive() && !ImGui::IsAnyItemActive() &&
                                  !Player::isDead());

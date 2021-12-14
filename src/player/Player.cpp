@@ -451,7 +451,7 @@ bool Player::isDead() {
 }
 
 bool Player::isAllowedToMove() {
-    return allowedToMove;
+    return allowedToMove && !Game::isFading();
 }
 
 void Player::setAllowedToMove(bool value) {
@@ -609,7 +609,7 @@ void Player::tick() {
     leftWallJumpCooldown -= leftWallJumpCooldown > 0;
     rightWallJumpCooldown -= rightWallJumpCooldown > 0;
 
-    if (allowedToMove) {
+    if (isAllowedToMove()) {
         int sign = Input::getHorizontal() < 0
                        ? -1 + static_cast<float>(leftWallJumpCooldown) / data.wallJumpMoveCooldown
                        : 1 - static_cast<float>(rightWallJumpCooldown) / data.wallJumpMoveCooldown;
@@ -619,7 +619,7 @@ void Player::tick() {
 
     if (gravityEnabled) {
         if (hasAbility(Ability::GLIDER) && data.velocity.y > 0 &&
-            Input::getButton(ButtonType::ABILITY).pressed && allowedToMove) {
+            Input::getButton(ButtonType::ABILITY).pressed && isAllowedToMove()) {
             addForce(Face::DOWN, data.gliderGravity);
             gliderParticles->data.boxSize.x = 1.5f;
             PlayerParticles::setParticlePosition(
@@ -639,7 +639,7 @@ void Player::tick() {
     }
 
     if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
-        dashTicks == 0 && dashCoolDown == 0 && dashUseable && allowedToMove) {
+        dashTicks == 0 && dashCoolDown == 0 && dashUseable && isAllowedToMove()) {
         dashParticles->play();
         Input::playRumble(0.2f, 100);
         dashTicks = data.maxDashTicks;
@@ -651,15 +651,15 @@ void Player::tick() {
         RenderState::addRandomizedShake(0.1f);
     }
 
-    if (Input::getButton(ButtonType::JUMP).pressedFirstFrame && allowedToMove) {
+    if (Input::getButton(ButtonType::JUMP).pressedFirstFrame && isAllowedToMove()) {
         jumpBufferTicks = data.maxJumpBufferTicks;
     }
     jumpBufferTicks -= jumpBufferTicks > 0;
 
-    if (leftWallBuffer > 0 && Input::getButton(ButtonType::LEFT).pressed && allowedToMove) {
+    if (leftWallBuffer > 0 && Input::getButton(ButtonType::LEFT).pressed && isAllowedToMove()) {
         leftWallJumpBuffer = 15;
     } else if (rightWallBuffer > 0 && Input::getButton(ButtonType::RIGHT).pressed &&
-               allowedToMove) {
+               isAllowedToMove()) {
         rightWallJumpBuffer = 15;
     }
     if (jumpBufferTicks > 0) {
@@ -750,14 +750,14 @@ void Player::tick() {
     rightWallBuffer -= rightWallBuffer > 0;
     leftWallJumpBuffer -= leftWallJumpBuffer > 0;
     rightWallJumpBuffer -= rightWallJumpBuffer > 0;
-    if (!Input::getButton(ButtonType::JUMP).pressed && jumpTicks > 0 && allowedToMove) {
+    if (!Input::getButton(ButtonType::JUMP).pressed && jumpTicks > 0 && isAllowedToMove()) {
         jumpTicks = 0;
     }
     if (jumpTicks > 0) {
         addForce(Face::UP, data.jumpBoost * (1.0f / powf(1.1f, data.maxJumpTicks + 1 - jumpTicks)));
         jumpTicks--;
     }
-    if (!Input::getButton(ButtonType::JUMP).pressed && wallJumpTicks > 0 && allowedToMove) {
+    if (!Input::getButton(ButtonType::JUMP).pressed && wallJumpTicks > 0 && isAllowedToMove()) {
         wallJumpTicks = 0;
     }
     if (wallJumpTicks > 0) {
@@ -781,7 +781,7 @@ void Player::tick() {
         xLeft = std::clamp(xLeft, 0, Tilemap::getWidth() - 1);
         xRight = std::clamp(xRight, 0, Tilemap::getWidth() - 1);
         y = std::clamp(y, 0, Tilemap::getHeight() - 1);
-        if (leftWall && Input::getButton(ButtonType::LEFT).pressed && allowedToMove) {
+        if (leftWall && Input::getButton(ButtonType::LEFT).pressed && isAllowedToMove()) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::LEFT);
             resetDash();
@@ -798,7 +798,7 @@ void Player::tick() {
                 !Objects::collidesWithAnySolid(Vector(xLeft, y), Vector(0.1f, 0.1f))) {
                 wallStickParticles->stop();
             }
-        } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed && allowedToMove) {
+        } else if (rightWall && Input::getButton(ButtonType::RIGHT).pressed && isAllowedToMove()) {
             actualDrag[1] *= data.wallJumpDrag;
             setRenderForceFace(Face::RIGHT);
             resetDash();

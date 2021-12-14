@@ -293,6 +293,7 @@ static void playFakeSwitchAnimation() {
 }
 
 void Game::tick() {
+    std::cout << fade << "\n";
 #ifndef NDEBUG
     Profiler::tick();
     Profiler::Timer tickTimer(Profiler::tickNanos);
@@ -745,7 +746,7 @@ void Game::setFade(int amount) {
 }
 
 bool Game::isFading() {
-    return fade != 0 && fade != 255;
+    return fade > 200;
 }
 
 int Game::getCurrentLevel() {

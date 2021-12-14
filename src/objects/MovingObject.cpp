@@ -1,5 +1,7 @@
 #include "MovingObject.h"
 
+#include <cmath>
+
 #include "ObjectRenderer.h"
 #include "objects/Objects.h"
 #include "player/Player.h"
@@ -36,19 +38,25 @@ void MovingObject::reset() {
 void MovingObject::tick() {
     lastPosition = position;
 
+    float fullLength = data.goal.getLength();
+    float startDistance = (position - initialPosition).getLength();
+    float base = (startDistance / fullLength) * 0.7f + 0.15f;
+    float modifier = (1.0f - cosf(base * static_cast<float>(M_PI) * 2.0f)) * 0.75f;
+    float speed = data.speed * modifier;
+
     auto goal = movingBack ? initialPosition : initialPosition + data.goal;
     velocity = goal - position;
     float length = velocity.getLength();
-    if (length < 0.0005f || data.speed < 0.0005f) {
+    if (length < 0.0005f || speed < 0.0005f) {
         velocity = Vector();
         movingBack = !movingBack;
         return;
     }
-    if (length < data.speed) {
+    if (length < speed) {
         position = goal;
         movingBack = !movingBack;
     } else {
-        velocity *= data.speed / length;
+        velocity *= speed / length;
         position += velocity;
     }
 

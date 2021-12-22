@@ -68,14 +68,15 @@ struct PlayerData {
     float wallJumpDrag = 0.3f;
     int wallJumpMoveCooldown = 15;
     float gravity = 0.0275f;
-    int coyoteTicks = 8;
+    int coyoteTicks = 4;
     Vector drag{0.7f, 0.9f};
-    int maxJumpBufferTicks = 10;
+    int maxJumpBufferTicks = 6;
     int maxDashTicks = 24;
     int maxDashCooldown = 24;
     float dashStrength = 0.35f;
     float gliderGravity = 0.005f;
     int maxJumpCount = 2;
+    int wallJumpBufferTicks = 3;
 };
 
 static PlayerData data;
@@ -657,10 +658,10 @@ void Player::tick() {
     jumpBufferTicks -= jumpBufferTicks > 0;
 
     if (leftWallBuffer > 0 && Input::getButton(ButtonType::LEFT).pressed && isAllowedToMove()) {
-        leftWallJumpBuffer = 15;
+        leftWallJumpBuffer = data.wallJumpBufferTicks;
     } else if (rightWallBuffer > 0 && Input::getButton(ButtonType::RIGHT).pressed &&
                isAllowedToMove()) {
-        rightWallJumpBuffer = 15;
+        rightWallJumpBuffer = data.wallJumpBufferTicks;
     }
     if (jumpBufferTicks > 0) {
         if ((fakeGrounded > 0 ||

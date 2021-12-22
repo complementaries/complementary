@@ -66,6 +66,7 @@ static std::shared_ptr<ParticleSystem> backgroundParticles;
 constexpr int BACKGROUND_PARTICLE_ALPHA_BLACK = 60;
 constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
 
+constexpr int MAX_WORLD_SWITCH_BUFFER = 9;
 static int worldSwitchBuffer = 0;
 
 long totalTicks = 0;
@@ -351,7 +352,7 @@ void Game::tick() {
                                  !Menu::isActive() && !ImGui::IsAnyItemActive() &&
                                  !Player::isDead());
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame) {
-            worldSwitchBuffer = 20;
+            worldSwitchBuffer = MAX_WORLD_SWITCH_BUFFER;
         }
         if (Player::isAllowedToMove()) {
             worldSwitchBuffer -= worldSwitchBuffer > 0;

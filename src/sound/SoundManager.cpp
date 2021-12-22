@@ -138,15 +138,17 @@ bool SoundManager::loadSounds() {
     loadSound(Sound::DARK_BG, "assets/sounds/dark.ogg", musicVolume);
     loadSound(Sound::WORLD_SWITCH, "assets/sounds/switch.ogg", MIX_MAX_VOLUME / 4);
     loadSound(Sound::JUMP, "assets/sounds/jump.ogg", MIX_MAX_VOLUME / 2);
-    loadSound(Sound::DASH, "assets/sounds/dash.ogg", MIX_MAX_VOLUME);
+    loadSound(Sound::DASH, "assets/sounds/dash.ogg", MIX_MAX_VOLUME / 2);
     loadSound(Sound::WIND, "assets/sounds/wind.ogg", MIX_MAX_VOLUME / 2);
     loadSound(Sound::COLLECT, "assets/sounds/collect.ogg", MIX_MAX_VOLUME / 2);
-    loadSound(Sound::DEATH, "assets/sounds/death.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::DEATH, "assets/sounds/death.ogg", MIX_MAX_VOLUME / 4);
     loadSound(Sound::TITLE, "assets/sounds/title.ogg", MIX_MAX_VOLUME / 2);
     loadSound(Sound::DOOR, "assets/sounds/door.ogg", MIX_MAX_VOLUME / 4);
     loadSound(Sound::TELEPORT, "assets/sounds/teleport.ogg", MIX_MAX_VOLUME / 4);
     loadSound(Sound::EXPLODE, "assets/sounds/explode.ogg", MIX_MAX_VOLUME / 3);
     loadSound(Sound::NEW_ABILITY, "assets/sounds/ability.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::ABILITY, "assets/sounds/ability_collect.ogg", MIX_MAX_VOLUME / 2);
+    loadSound(Sound::NO_ABILITY, "assets/sounds/ability_loose.ogg", MIX_MAX_VOLUME / 4);
     return false;
 }
 

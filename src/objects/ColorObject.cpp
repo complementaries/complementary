@@ -1,10 +1,12 @@
 #include "ColorObject.h"
 
+#include <memory>
+
 #include "ObjectRenderer.h"
 #include "Objects.h"
 #include "Savegame.h"
 #include "player/Player.h"
-#include <memory>
+#include "sound/SoundManager.h"
 
 ColorObject::ColorObject(ColorObjectData data) {
     this->data = data;
@@ -27,10 +29,15 @@ void ColorObject::postInit() {
 }
 
 void ColorObject::onFaceCollision(Face playerFace) {
+    Ability a = Player::getAbility();
     Player::setAbilities(data.abilities[0], data.abilities[1],
                          Savegame::abilitiesUnlocked(data.abilities[0], data.abilities[1]) ||
                              data.abilities[0] == Ability::NONE ||
                              data.abilities[1] == Ability::NONE);
+    Ability b = Player::getAbility();
+    if (a != b) {
+        SoundManager::playSoundEffect(b == Ability::NONE ? Sound::NO_ABILITY : Sound::ABILITY);
+    }
 }
 
 bool ColorObject::collidesWith(const Vector& pPosition, const Vector& pSize) const {

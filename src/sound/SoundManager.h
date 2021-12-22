@@ -19,6 +19,8 @@ namespace Sound {
         TELEPORT,
         EXPLODE,
         NEW_ABILITY,
+        ABILITY,
+        NO_ABILITY,
         MAX
     };
 }

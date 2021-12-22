@@ -447,16 +447,14 @@ void Window::run() {
         {
 #ifndef NDEBUG
             Profiler::Timer timer(Profiler::postGameRenderNanos);
-#endif
             // Start the Dear ImGui frame
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplSDL2_NewFrame(window);
             ImGui::NewFrame();
-#ifndef NDEBUG
             Game::renderImGui();
-#endif
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#endif
         }
         {
 #ifndef NDEBUG

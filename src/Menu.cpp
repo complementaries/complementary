@@ -170,18 +170,18 @@ static void renderControls(const Matrix& m, Vector pos, Vector baseSize, const H
     }
     Vector oversize = size * 1.1f;
     pos.y += baseSize.y * 0.5f - oversize.y * 0.5f;
-    ObjectRenderer::addRectangle(pos, oversize, ColorUtils::setAlpha(ColorUtils::GRAY, 200));
+    ObjectRenderer::addRectangle(pos, oversize, ColorUtils::WHITE);
     ObjectRenderer::render(m);
     pos += (oversize - size) * 0.5f;
     Font::prepare(m);
     for (unsigned int i = 0; i < help.size(); i++) {
         if (help[i][0] == '[') {
             Vector shifted = pos;
-            Font::draw(shifted, smallFontSize, ColorUtils::WHITE, "[");
+            Font::draw(shifted, smallFontSize, ColorUtils::BLACK, "[");
             shifted.x += Font::getWidth(smallFontSize, "[");
             Font::draw(shifted, smallFontSize, ColorUtils::ORANGE, help[i] + 1);
             shifted.x += Font::getWidth(smallFontSize, help[i] + 1);
-            Font::draw(shifted, smallFontSize, ColorUtils::WHITE, "]");
+            Font::draw(shifted, smallFontSize, ColorUtils::BLACK, "]");
         } else {
             Font::draw(pos, smallFontSize, ColorUtils::BLACK, help[i]);
         }
@@ -217,7 +217,7 @@ void Menu::render(float lag) {
     if (type != MenuType::START) {
         ObjectRenderer::addRectangle(Vector(0, 0), Vector(Window::getWidth(), Window::getHeight()),
                                      ColorUtils::setAlpha(ColorUtils::BLACK, 160));
-        ObjectRenderer::addRectangle(pos, overSize, ColorUtils::setAlpha(ColorUtils::WHITE, 255));
+        ObjectRenderer::addRectangle(pos, overSize, ColorUtils::WHITE);
         ObjectRenderer::render(m);
     }
 

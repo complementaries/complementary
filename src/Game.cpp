@@ -240,6 +240,7 @@ bool Game::inTitleScreen() {
 }
 
 void Game::nextLevel() {
+    worldSwitchBuffer = 0;
     if (nextLevelIndex >= 0 && nextLevelIndex < static_cast<int>(levelNames.size())) {
         loadLevel(levelNames[nextLevelIndex].c_str());
         RenderState::setZoom(1.f);

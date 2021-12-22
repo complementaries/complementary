@@ -68,7 +68,7 @@ struct PlayerData {
     float wallJumpDrag = 0.3f;
     int wallJumpMoveCooldown = 15;
     float gravity = 0.0275f;
-    int coyoteTicks = 4;
+    int coyoteTicks = 5;
     Vector drag{0.7f, 0.9f};
     int maxJumpBufferTicks = 6;
     int maxDashTicks = 24;
@@ -76,7 +76,7 @@ struct PlayerData {
     float dashStrength = 0.35f;
     float gliderGravity = 0.005f;
     int maxJumpCount = 2;
-    int wallJumpBufferTicks = 3;
+    int wallJumpBufferTicks = 4;
 };
 
 static PlayerData data;
@@ -128,10 +128,6 @@ bool Player::init() {
         return true;
     }
     buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
-
-    load();
-
-    Utils::print("player load\n");
 
     deathParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/death.cmob");
@@ -1069,41 +1065,7 @@ void Player::renderImGui() {
     if (ImGui::Button("Respawn")) {
         kill();
     }
-
-    if (ImGui::Button("Load")) {
-        load();
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button("Save")) {
-        save();
-    }
     ImGui::Unindent();
-}
-
-void Player::load() {
-    std::ifstream stream;
-    stream.open("assets/player.cmpl", std::ios::binary);
-    if (!stream.good()) {
-        printf("Failed to load player data.\n");
-        return;
-    }
-
-    char magic[5];
-    stream.read(magic, 4);
-    magic[4] = 0;
-
-    // File magic must be CMPL
-    assert(strcmp(magic, "CMPL") == 0);
-    stream.read((char*)&data, sizeof(PlayerData));
-}
-
-void Player::save() {
-    std::ofstream stream;
-    stream.open("assets/player.cmpl", std::ios::binary);
-
-    stream.write("CMPL", 4);
-    stream.write((char*)&data, sizeof(PlayerData));
 }
 
 // PARTICLE HELPERS

@@ -106,6 +106,7 @@ const char* Input::getButtonName(ButtonType type) {
         case ButtonType::JUMP: return "Jump";
         case ButtonType::SWITCH: return "Switch";
         case ButtonType::ABILITY: return "Ability";
+        case ButtonType::SWITCH_AND_ABILITY: return "Switch and Ability";
         case ButtonType::LEFT: return "Left";
         case ButtonType::RIGHT: return "Right";
         case ButtonType::UP: return "Up";

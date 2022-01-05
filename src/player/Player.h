@@ -44,6 +44,8 @@ namespace Player {
     Ability getPassiveAbility();
     bool isDashing();
     bool isGliding();
+    bool isGrounded();
+    bool isWallSticking();
 
     void tick();
     void render(float lag);

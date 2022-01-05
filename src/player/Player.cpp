@@ -539,8 +539,19 @@ bool Player::isDashing() {
 }
 
 bool Player::isGliding() {
-    return hasAbility(Ability::GLIDER) && Input::getButton(ButtonType::ABILITY).pressed &&
+    return hasAbility(Ability::GLIDER) &&
+           (Input::getButton(ButtonType::ABILITY).pressed ||
+            Input::getButton(ButtonType::SWITCH_AND_ABILITY).pressed) &&
            isAllowedToMove();
+}
+
+bool Player::isGrounded() {
+    return fakeGrounded > 0;
+}
+
+bool Player::isWallSticking() {
+    return hasAbility(Ability::WALL_JUMP) && !isGrounded() &&
+           (leftWallBuffer > 0 || rightWallBuffer > 0);
 }
 
 bool Player::invertColors() {
@@ -617,7 +628,9 @@ void Player::tick() {
 
     if (gravityEnabled) {
         if (hasAbility(Ability::GLIDER) && data.velocity.y > 0 &&
-            Input::getButton(ButtonType::ABILITY).pressed && isAllowedToMove()) {
+            (Input::getButton(ButtonType::ABILITY).pressed ||
+             Input::getButton(ButtonType::SWITCH_AND_ABILITY).pressed) &&
+            isAllowedToMove()) {
             addForce(Face::DOWN, data.gliderGravity);
             gliderParticles->data.boxSize.x = 1.5f;
             PlayerParticles::setParticlePosition(
@@ -636,7 +649,9 @@ void Player::tick() {
         dashDirection = -1.0f;
     }
 
-    if (hasAbility(Ability::DASH) && Input::getButton(ButtonType::ABILITY).pressedFirstFrame &&
+    if (hasAbility(Ability::DASH) &&
+        (Input::getButton(ButtonType::ABILITY).pressedFirstFrame ||
+         Input::getButton(ButtonType::SWITCH_AND_ABILITY).pressedFirstFrame) &&
         dashTicks == 0 && dashCoolDown == 0 && dashUseable && isAllowedToMove()) {
         dashParticles->play();
         Input::playRumble(0.2f, 100);

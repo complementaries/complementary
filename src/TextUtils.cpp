@@ -34,6 +34,26 @@ void TextUtils::drawTimer(Vector position, long ticks) {
                buffer);
 }
 
+void TextUtils::drawPopupObjectSpace(Vector position, char* text, int alpha) {
+    static constexpr float HEIGHT = 0.7f;
+    float width = Font::getWidth(HEIGHT, text);
+    Vector size(width, HEIGHT);
+    Vector oversize = Vector(0.2f, 0.2f);
+    position += Vector(width * -0.5f, 1 + oversize.y);
+
+    Color col = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
+    col = ColorUtils::setAlpha(col, alpha);
+
+    ObjectRenderer::addRectangle(position - oversize * 0.5f, size + oversize, col, -1.0f);
+    ObjectRenderer::render();
+
+    Font::prepare(-1.0f);
+    col = Player::invertColors() ? ColorUtils::BLACK : ColorUtils::WHITE;
+    col = ColorUtils::setAlpha(col, alpha);
+    Font::draw(position, HEIGHT, col, text);
+    Font::setZ(0.0f);
+}
+
 void TextUtils::drawBestTimeObjectSpace(Vector position, long ticks, int alpha) {
     char buffer[256];
     createTextBuffer(buffer, 256, ticks);

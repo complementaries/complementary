@@ -16,6 +16,7 @@ namespace Menu {
     const char* getSwitchHelp();
     const char* getAbilityHelp();
     const char* getAbilitySwitchHelp();
+    const char* getJumpHelp();
 }
 
 #endif

@@ -6,6 +6,7 @@
 
 namespace TextUtils {
     void drawTimer(Vector position, long ticks);
+    void drawPopupObjectSpace(Vector position, char* text, int alpha);
     void drawBestTimeObjectSpace(Vector position, long ticks, int alpha);
 }
 #endif

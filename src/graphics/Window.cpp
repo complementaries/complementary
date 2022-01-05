@@ -192,8 +192,7 @@ static void pollEvents() {
                             Input::Internal::setButtonPressed(ButtonType::SWITCH);
                             break;
                         case SDLK_RSHIFT:
-                            Input::Internal::setButtonPressed(ButtonType::SWITCH);
-                            Input::Internal::setButtonPressed(ButtonType::ABILITY);
+                            Input::Internal::setButtonPressed(ButtonType::SWITCH_AND_ABILITY);
                             break;
                         case SDLK_LSHIFT:
                             Input::Internal::setButtonPressed(ButtonType::ABILITY);
@@ -220,8 +219,7 @@ static void pollEvents() {
                     case SDLK_SPACE: Input::Internal::setButtonReleased(ButtonType::JUMP); break;
                     case SDLK_RETURN: Input::Internal::setButtonReleased(ButtonType::SWITCH); break;
                     case SDLK_RSHIFT:
-                        Input::Internal::setButtonReleased(ButtonType::SWITCH);
-                        Input::Internal::setButtonReleased(ButtonType::ABILITY);
+                        Input::Internal::setButtonReleased(ButtonType::SWITCH_AND_ABILITY);
                         break;
                     case SDLK_LSHIFT:
                         Input::Internal::setButtonReleased(ButtonType::ABILITY);
@@ -251,8 +249,7 @@ static void pollEvents() {
                         Input::Internal::setButtonPressed(ButtonType::ABILITY);
                         break;
                     case SDL_CONTROLLER_BUTTON_Y:
-                        Input::Internal::setButtonPressed(ButtonType::SWITCH);
-                        Input::Internal::setButtonPressed(ButtonType::ABILITY);
+                        Input::Internal::setButtonPressed(ButtonType::SWITCH_AND_ABILITY);
                         break;
                     case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
                         Input::Internal::setButtonPressed(ButtonType::SWITCH);
@@ -286,8 +283,7 @@ static void pollEvents() {
                         Input::Internal::setButtonReleased(ButtonType::ABILITY);
                         break;
                     case SDL_CONTROLLER_BUTTON_Y:
-                        Input::Internal::setButtonReleased(ButtonType::SWITCH);
-                        Input::Internal::setButtonReleased(ButtonType::ABILITY);
+                        Input::Internal::setButtonReleased(ButtonType::SWITCH_AND_ABILITY);
                         break;
                     case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
                         Input::Internal::setButtonReleased(ButtonType::SWITCH);

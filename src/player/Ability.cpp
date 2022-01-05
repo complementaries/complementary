@@ -1,4 +1,7 @@
 #include "Ability.h"
+#include "Menu.h"
+
+#include <cstdio>
 
 Color AbilityUtils::getColor(Ability a) {
     switch (a) {
@@ -18,5 +21,20 @@ const char* AbilityUtils::getName(Ability a) {
         case Ability::WALL_JUMP: return "Wall Jump";
         case Ability::NONE: return "None";
         default: return "???";
+    }
+}
+
+bool AbilityUtils::getDescription(Ability a, char* buffer, int length) {
+    switch (a) {
+        case Ability::DOUBLE_JUMP: return false;
+        case Ability::GLIDER:
+            snprintf(buffer, length, "Hold [%s] to glide", Menu::getAbilityHelp());
+            return true;
+        case Ability::DASH:
+            snprintf(buffer, length, "Press [%s] to dash", Menu::getAbilityHelp());
+            return true;
+        case Ability::WALL_JUMP: return false;
+        case Ability::NONE: return false;
+        default: return false;
     }
 }

@@ -9,6 +9,7 @@ enum class ButtonType {
     JUMP,
     SWITCH,
     ABILITY,
+    SWITCH_AND_ABILITY,
     LEFT,
     RIGHT,
     UP,

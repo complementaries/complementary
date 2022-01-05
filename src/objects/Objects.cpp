@@ -19,6 +19,7 @@
 #include "objects/MovingObject.h"
 #include "objects/MovingSwitchObject.h"
 #include "objects/ObjectRenderer.h"
+#include "objects/TutorialObject.h"
 #include "objects/WindObject.h"
 #include "particles/ParticleSystem.h"
 #include "player/Player.h"
@@ -46,6 +47,7 @@ bool Objects::init() {
     addPrototype(std::make_shared<DoorObject>(Vector(), Vector(1.0f, 1.0f), 2));
     addPrototype(std::make_shared<LevelTagObject>(Vector(), Vector(1.0f, 1.0f)));
     addPrototype(std::make_shared<LevelDoorObject>(Vector(), Vector(1.0f, 1.0f), 0));
+    addPrototype(std::make_shared<TutorialObject>(Vector(), Vector(1.0f, 1.0f)));
     return ObjectRenderer::init();
 }
 

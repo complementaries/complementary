@@ -112,11 +112,19 @@ void AbilityCutscene::render(float lag) {
     TextureRenderer::renderIcon(iconPos, iconPos + size, ability, alpha, smooth);
 
     Font::prepare();
-    float width = Font::getWidth(2, AbilityUtils::getName(ability));
-    Vector textPos(wSize.x / 2 - width / 2, wSize.y / 2 + 3.f);
+
     Color col = AbilityUtils::getColor(ability);
     col = ColorUtils::setAlpha(col, alpha);
-    Font::draw(textPos, 2, col, AbilityUtils::getName(ability));
+    float row1Width = Font::getWidth(2, AbilityUtils::getName(ability));
+    Vector row1Pos(wSize.x / 2 - row1Width / 2, wSize.y / 2 + 3.f);
+    Font::draw(row1Pos, 2, col, AbilityUtils::getName(ability));
+
+    char description[128];
+    AbilityUtils::getDescription(ability, description, 128);
+
+    float row2Width = Font::getWidth(1, description);
+    Vector row2Pos(wSize.x / 2 - row2Width / 2, wSize.y / 2 + 5.5f);
+    Font::draw(row2Pos, 1, col, description);
 }
 
 bool AbilityCutscene::isActive() {

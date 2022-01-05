@@ -3,6 +3,11 @@
 
 #include "math/Vector.h"
 
+enum class GameMode {
+    DEFAULT,
+    SPEEDRUN,
+};
+
 namespace Game {
     bool init();
     void tick();
@@ -10,9 +15,11 @@ namespace Game {
 #ifndef NDEBUG
     void renderImGui();
 #endif
+    GameMode getMode();
     void setNextLevelIndex(int index);
     void nextLevel();
-    void exitTitleScreen();
+    void loadTitleScreen();
+    void exitTitleScreen(GameMode mode);
     bool inTitleScreen();
     bool loadLevelSelect();
     void switchWorld();

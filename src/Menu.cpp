@@ -101,8 +101,13 @@ static void unpause() {
     type = MenuType::NONE;
 }
 
-static void start() {
-    Game::exitTitleScreen();
+static void startDefault() {
+    Game::exitTitleScreen(GameMode::DEFAULT);
+    unpause();
+}
+
+static void startSpeedrun() {
+    Game::exitTitleScreen(GameMode::SPEEDRUN);
     unpause();
 }
 
@@ -111,9 +116,14 @@ static void restart() {
     Player::restart();
 }
 
-static void quitLevel() {
+static void quitToLevelSelect() {
     unpause();
     Game::loadLevelSelect();
+}
+
+static void quitToTitle() {
+    unpause();
+    Game::loadTitleScreen();
 }
 
 static void controls() {
@@ -260,7 +270,8 @@ void Menu::showStartMenu() {
     clear();
     menuIndex = 1;
     add("[Complementary]", nothing);
-    add("Start", start);
+    add("Campaign", startDefault);
+    add("Speed Mode", startSpeedrun);
     add("Quit", quit);
     closeWithPause = false;
 }
@@ -283,7 +294,7 @@ void Menu::showPauseMenu() {
         add("Continue", unpause);
         add("Controls", controls);
         fullScreenOption();
-        add("Quit", quit);
+        add("Quit to Title Screen", quitToTitle);
         return;
     }
     add("[Pause]", nothing);
@@ -291,7 +302,11 @@ void Menu::showPauseMenu() {
     add("Restart", restart);
     add("Controls", controls);
     fullScreenOption();
-    add("Quit Level", quitLevel);
+    if (Game::getMode() == GameMode::DEFAULT) {
+        add("Quit Level", quitToLevelSelect);
+    } else if (Game::getMode() == GameMode::SPEEDRUN) {
+        add("Quit to Title Screen", quitToTitle);
+    }
 }
 
 MenuType Menu::getType() {

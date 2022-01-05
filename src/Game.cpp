@@ -49,6 +49,8 @@ static Vector levelSelectPosition;
 static std::vector<std::string> levelNames = {};
 // TODO: make the level list configurable in the UI and get rid of this
 static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "map0";
+static GameMode mode = GameMode::DEFAULT;
+static bool showingSpeedrunResult = false;
 
 #ifndef NDEBUG
 static char objectLoadLocation[MAX_LEVEL_NAME_LENGTH] = "assets/particlesystems/object.cmob";
@@ -70,9 +72,7 @@ constexpr int MAX_WORLD_SWITCH_BUFFER = 9;
 static int worldSwitchBuffer = 0;
 
 long totalTicks = 0;
-long ticksInCurrentLevel = 0;
-
-static void loadTitleScreen();
+long timerTicks = 0;
 
 static void findLevels() {
 #ifdef _WIN32
@@ -204,7 +204,7 @@ static bool loadLevel(const char* name) {
     return false;
 }
 
-static void loadTitleScreen() {
+void Game::loadTitleScreen() {
     assert(!loadLevel("title"));
     isInTitleScreen = true;
     RenderState::setZoom(4.f, Vector(0.f, -2.f));
@@ -212,11 +212,18 @@ static void loadTitleScreen() {
     Player::setAbilities(Ability::WALL_JUMP, Ability::DASH, true);
     titleEffectParticles->play();
     SoundManager::playContinuousSound(Sound::TITLE);
+    currentLevelIndex = 0;
 }
 
-void Game::exitTitleScreen() {
-    if (loadLevelSelect()) {
-        return;
+void Game::exitTitleScreen(GameMode gameMode) {
+    mode = gameMode;
+    if (mode == GameMode::DEFAULT) {
+        if (loadLevelSelect()) {
+            return;
+        }
+    } else if (mode == GameMode::SPEEDRUN) {
+        nextLevelIndex = 0;
+        nextLevel();
     }
     isInTitleScreen = false;
     titleEffectParticles->stop();
@@ -224,6 +231,7 @@ void Game::exitTitleScreen() {
     SoundManager::playMusic();
     SoundManager::stopSound(Sound::TITLE);
     Player::setAbilities(Ability::NONE, Ability::NONE, false);
+    timerTicks = 0;
 }
 
 bool Game::loadLevelSelect() {
@@ -264,16 +272,20 @@ void Game::nextLevel() {
         }
         RenderState::setZoom(1.f);
         currentLevelIndex = nextLevelIndex;
-        nextLevelIndex = -1;
-    } else {
+        if (mode == GameMode::SPEEDRUN) {
+            nextLevelIndex = currentLevelIndex + 1;
+        } else {
+            nextLevelIndex = -1;
+        }
+    } else if (mode == GameMode::DEFAULT) {
         Utils::print("Completed level with index %d\n", currentLevelIndex);
 
         bool shouldSave = false;
         uint32_t bestCompletionTime = Savegame::getCompletionTime(currentLevelIndex);
         Utils::print("Completed level %d in %d ticks. Best time: %d \n", currentLevelIndex,
-                     ticksInCurrentLevel, bestCompletionTime);
-        if (ticksInCurrentLevel < bestCompletionTime || bestCompletionTime == 0) {
-            Savegame::setCompletionTime(currentLevelIndex, ticksInCurrentLevel);
+                     timerTicks, bestCompletionTime);
+        if (timerTicks < bestCompletionTime || bestCompletionTime == 0) {
+            Savegame::setCompletionTime(currentLevelIndex, timerTicks);
             Utils::print("Saving record time\n");
             shouldSave = true;
         }
@@ -287,6 +299,8 @@ void Game::nextLevel() {
         }
 
         loadLevelSelect();
+    } else if (mode == GameMode::SPEEDRUN) {
+        showingSpeedrunResult = true;
     }
 }
 
@@ -327,6 +341,14 @@ void Game::tick() {
     }
     fade = std::clamp(fade + fadeAdd, 0, 255);
     RenderState::tick();
+
+    if (showingSpeedrunResult) {
+        if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
+            showingSpeedrunResult = false;
+            loadTitleScreen();
+        }
+        return;
+    }
 
     if (isInTitleScreen) {
         RenderState::setZoom(4.f, Vector(0.f, -2.f + sinf(totalTicks * 0.01f) * 0.13f));
@@ -408,10 +430,10 @@ void Game::tick() {
 
     totalTicks++;
     if (Player::isAllowedToMove()) {
-        ticksInCurrentLevel++;
-        if (ticksInCurrentLevel > UINT32_MAX) {
+        timerTicks++;
+        if (timerTicks > UINT32_MAX) {
             // Sanitize high counter values
-            ticksInCurrentLevel = UINT32_MAX;
+            timerTicks = UINT32_MAX;
         }
     }
 }
@@ -452,31 +474,34 @@ void Game::render(float lag) {
 #endif
     RenderState::updatePlayerViewMatrix(lag);
     RenderState::prepareEffectFramebuffer();
+
     Tilemap::renderBackground();
-    Player::render(lag);
+    if (!showingSpeedrunResult) {
+        Player::render(lag);
 
-    RenderState::enableBlending();
-    Tilemap::render();
+        RenderState::enableBlending();
+        Tilemap::render();
 
-    ParticleRenderer::prepare();
+        ParticleRenderer::prepare();
 #ifndef NDEBUG
-    {
-        Profiler::Timer timer(Profiler::objectRenderNanos);
-        Objects::render(lag);
-    }
-    {
-        Profiler::Timer timer(Profiler::objectTextRenderNanos);
-        Objects::renderText(lag);
-    }
-    {
-        Profiler::Timer timer(Profiler::particleRenderNanos);
-        ParticleRenderer::render();
-    }
+        {
+            Profiler::Timer timer(Profiler::objectRenderNanos);
+            Objects::render(lag);
+        }
+        {
+            Profiler::Timer timer(Profiler::objectTextRenderNanos);
+            Objects::renderText(lag);
+        }
+        {
+            Profiler::Timer timer(Profiler::particleRenderNanos);
+            ParticleRenderer::render();
+        }
 #else
-    Objects::render(lag);
-    Objects::renderText(lag);
-    ParticleRenderer::render();
+        Objects::render(lag);
+        Objects::renderText(lag);
+        ParticleRenderer::render();
 #endif
+    }
 
     glDisable(GL_DEPTH_TEST);
 
@@ -509,7 +534,7 @@ void Game::render(float lag) {
         TextureRenderer::render(lag);
     }
     if (!isInTitleScreen && currentLevelIndex > -1) {
-        TextUtils::drawTimer(Vector(0.2f, 0.2f), ticksInCurrentLevel);
+        TextUtils::drawTimer(Vector(0.2f, 0.2f), timerTicks);
     }
     ObjectRenderer::addRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
                                  ColorUtils::setAlpha(ColorUtils::BLACK, fade));
@@ -766,6 +791,10 @@ void Game::onMouseEvent(void* eventPointer) {
 #endif
 }
 
+GameMode Game::getMode() {
+    return mode;
+}
+
 void Game::fadeIn(int speed) {
     fadeAdd = -speed;
 }
@@ -792,7 +821,9 @@ void Game::setLevelScreenPosition(const Vector& v) {
 }
 
 void Game::resetTickCounter() {
-    ticksInCurrentLevel = 0;
+    if (mode != GameMode::SPEEDRUN) {
+        timerTicks = 0;
+    }
 }
 
 void Game::pause() {

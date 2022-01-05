@@ -397,6 +397,7 @@ void Game::tick() {
         if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame ||
             Input::getButton(ButtonType::SWITCH_AND_ABILITY).pressedFirstFrame) {
             worldSwitchBuffer = MAX_WORLD_SWITCH_BUFFER;
+            playFakeSwitchAnimation();
         }
         if (Player::isAllowedToMove()) {
             worldSwitchBuffer -= worldSwitchBuffer > 0;
@@ -405,7 +406,6 @@ void Game::tick() {
                 switchWorld();
             } else if (worldSwitchBuffer == 1) {
                 worldSwitchBuffer = 0;
-                playFakeSwitchAnimation();
             }
         }
 #ifndef NDEBUG

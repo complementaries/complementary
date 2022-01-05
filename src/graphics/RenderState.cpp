@@ -220,7 +220,7 @@ void RenderState::tick() {
         }
     }
 
-    if (mixRadius > 15.f && fakeMixing) {
+    if (mixRadius > 18.f && fakeMixing) {
         mixDirection = -1;
     }
 }

@@ -2,7 +2,7 @@
 directory = jpeg-9c
 source_url = http://ijg.org/files/jpegsrc.v9c.tar.gz
 source_filename = jpegsrc.v9c.tar.gz
-source_hash = 1e9793e1c6ba66e7e0b6e5fe7fd0f9e935cc697854d5737adec54d93e5b3f730
+source_hash = 682aee469c3ca857c4c38c37a6edadbfca4b04d42e56613b11590ec6aa4a278d
 patch_directory = jpeg-9c
 
 [provide]

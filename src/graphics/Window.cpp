@@ -29,6 +29,19 @@ static int previousWidth = 850;
 static int previousHeight = 480;
 static bool fullscreen = false;
 
+static void resize(int w, int h) {
+    Utils::print("Resizing to %d, %d\n", w, h);
+    Game::onWindowResize(w, h);
+    width = w;
+    height = h;
+}
+
+static void resize() {
+    int w, h;
+    SDL_GL_GetDrawableSize(window, &w, &h);
+    resize(w, h);
+}
+
 bool Window::init() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         Utils::printError("SDL failed to initialise: %s\n", SDL_GetError());
@@ -122,20 +135,9 @@ bool Window::init() {
     if (SDL_WasInit(SDL_INIT_HAPTIC) != 1) SDL_InitSubSystem(SDL_INIT_HAPTIC);
     SDL_GameControllerEventState(SDL_ENABLE);
 
+    resize(); // Fix initial viewport size on Retina display
+
     return false;
-}
-
-static void resize(int w, int h) {
-    Utils::print("Resizing to %d, %d\n", w, h);
-    Game::onWindowResize(w, h);
-    width = w;
-    height = h;
-}
-
-static void resize() {
-    int w, h;
-    SDL_GL_GetDrawableSize(window, &w, &h);
-    resize(w, h);
 }
 
 void Window::toggleFullscreen() {

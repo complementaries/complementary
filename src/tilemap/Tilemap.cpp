@@ -108,10 +108,12 @@ void Tilemap::forceReload() {
     dirty = true;
 }
 
-void Tilemap::load(const char* path) {
+bool Tilemap::load(const char* path) {
     std::ifstream stream;
     stream.open(path, std::ios::binary);
-    assert(stream.is_open());
+    if (stream.fail()) {
+        return true;
+    }
 
     char magic[5];
     stream.read(magic, 4);
@@ -131,6 +133,7 @@ void Tilemap::load(const char* path) {
 
     Player::setPosition(getSpawnPoint());
     Player::setAbilities(Ability::NONE, Ability::NONE, false);
+    return false;
 }
 
 Vector Tilemap::getSpawnPoint() {
@@ -144,9 +147,12 @@ Vector Tilemap::getSpawnPoint() {
     return Vector();
 }
 
-void Tilemap::save(const char* path) {
+bool Tilemap::save(const char* path) {
     std::ofstream stream;
     stream.open(path, std::ios::binary);
+    if (stream.fail()) {
+        return true;
+    }
 
     stream.write("CMTM", 4);
     stream.write((const char*)&width, 4);
@@ -154,4 +160,5 @@ void Tilemap::save(const char* path) {
     stream.write(tiles.data(), width * height);
 
     stream.close();
+    return false;
 }

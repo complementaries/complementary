@@ -14,7 +14,7 @@ namespace Game {
     void nextLevel();
     void exitTitleScreen();
     bool inTitleScreen();
-    void loadLevelSelect();
+    bool loadLevelSelect();
     void switchWorld();
 
     void onWindowResize(int width, int height);

@@ -46,29 +46,29 @@ void GoalTile::onLoad(int x, int y) const {
     constexpr float v = 0.05f;
     switch (face) {
         case Face::UP:
-            p->position = Vector(x + 0.5f, y + 1.0f);
+            p->position = Vector(x + 0.5f, y - 2.0f);
             p->data.boxSize = Vector(1.0f - p->data.startSize, 0.0f);
-            p->data.minStartVelocity = Vector(0.0f, -v);
-            p->data.maxStartVelocity = Vector(0.0f, 0.0f);
+            p->data.minStartVelocity = Vector(0.0f, v);
+            p->data.maxStartVelocity = Vector(0.0f, v * 0.5f);
             break;
         case Face::DOWN:
-            p->position = Vector(x + 0.5f, y);
+            p->position = Vector(x + 0.5f, y + 3.0f);
             p->data.boxSize = Vector(1.0f - p->data.startSize, 0.0f);
-            p->data.minStartVelocity = Vector(0.0f, 0.0f);
-            p->data.maxStartVelocity = Vector(0.0f, v);
+            p->data.minStartVelocity = Vector(0.0f, -v * 0.5f);
+            p->data.maxStartVelocity = Vector(0.0f, -v);
             break;
         case Face::LEFT:
-            p->position = Vector(x + 1.0f, y + 0.5f);
+            p->position = Vector(x - 2.0f, y + 0.5f);
             p->data.boxSize = Vector(0.0f, 1.0f - p->data.startSize);
-            p->data.minStartVelocity = Vector(-v, 0.0f);
-            p->data.maxStartVelocity = Vector(0.0f, 0.0f);
+            p->data.minStartVelocity = Vector(v, 0.0f);
+            p->data.maxStartVelocity = Vector(v * 0.5f, 0.0f);
             break;
         default:
         case Face::RIGHT:
-            p->position = Vector(x, y + 0.5f);
+            p->position = Vector(x + 3.0f, y + 0.5f);
             p->data.boxSize = Vector(0.0f, 1.0f - p->data.startSize);
-            p->data.minStartVelocity = Vector(0.0f, 0.0f);
-            p->data.maxStartVelocity = Vector(v, 0.0f);
+            p->data.minStartVelocity = Vector(-v * 0.5f, 0.0f);
+            p->data.maxStartVelocity = Vector(-v, 0.0f);
             break;
     }
     p->play();

@@ -165,7 +165,14 @@ static void onTileLoad() {
     backgroundParticles->position = Tilemap::getSize() / 2;
 }
 
-static void loadLevel(const char* name) {
+static bool loadLevel(const char* name) {
+#ifndef NDEBUG
+    if (strcmp(name, "_autosave") != 0) {
+        Utils::print("Creating autosave.\n", name);
+        Objects::save("assets/maps/_autosave.cmom");
+        Tilemap::save("assets/maps/_autosave.cmtm");
+    }
+#endif
     Utils::print("Loading level %s\n", name);
 
     char formattedTilemapName[MAX_LEVEL_NAME_LENGTH];
@@ -178,9 +185,13 @@ static void loadLevel(const char* name) {
     snprintf(formattedObjectmapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmom", name);
     snprintf(currentLevelName, MAX_LEVEL_NAME_LENGTH, "%s", name);
 
-    Tilemap::load(formattedTilemapName);
+    if (Tilemap::load(formattedTilemapName)) {
+        return true;
+    }
     Objects::clear();
-    Objects::load(formattedObjectmapName);
+    if (Objects::load(formattedObjectmapName)) {
+        return true;
+    }
     onTileLoad();
 
     Game::setFade(254);
@@ -190,10 +201,11 @@ static void loadLevel(const char* name) {
 
     Objects::tick();
     Objects::lateTick();
+    return false;
 }
 
 static void loadTitleScreen() {
-    loadLevel("title");
+    assert(!loadLevel("title"));
     isInTitleScreen = true;
     RenderState::setZoom(4.f, Vector(0.f, -2.f));
     Menu::showStartMenu();
@@ -203,8 +215,10 @@ static void loadTitleScreen() {
 }
 
 void Game::exitTitleScreen() {
+    if (loadLevelSelect()) {
+        return;
+    }
     isInTitleScreen = false;
-    loadLevelSelect();
     titleEffectParticles->stop();
     titleEffectParticles->clear();
     SoundManager::playMusic();
@@ -212,8 +226,10 @@ void Game::exitTitleScreen() {
     Player::setAbilities(Ability::NONE, Ability::NONE, false);
 }
 
-void Game::loadLevelSelect() {
-    loadLevel("level_select");
+bool Game::loadLevelSelect() {
+    if (loadLevel("level_select")) {
+        return true;
+    }
     RenderState::setZoom(1.0f);
     if (levelSelectPosition.x != 0.0f || levelSelectPosition.y != 0.0f) {
         Player::setPosition(levelSelectPosition);
@@ -229,6 +245,7 @@ void Game::loadLevelSelect() {
             door->open();
         }
     }
+    return false;
 }
 
 void Game::setNextLevelIndex(int next) {
@@ -242,7 +259,9 @@ bool Game::inTitleScreen() {
 void Game::nextLevel() {
     worldSwitchBuffer = 0;
     if (nextLevelIndex >= 0 && nextLevelIndex < static_cast<int>(levelNames.size())) {
-        loadLevel(levelNames[nextLevelIndex].c_str());
+        if (loadLevel(levelNames[nextLevelIndex].c_str())) {
+            return;
+        }
         RenderState::setZoom(1.f);
         currentLevelIndex = nextLevelIndex;
         nextLevelIndex = -1;
@@ -581,20 +600,32 @@ void Game::renderImGui() {
         snprintf(objectMapName, MAX_LEVEL_NAME_LENGTH, "assets/maps/%s.cmom", currentLevelName);
 
         if (ImGui::Button("Load")) {
-            loadLevel(currentLevelName);
+            if (loadLevel(currentLevelName)) {
+                Utils::print("Failed to load map.\n");
+            }
         }
 
         ImGui::SameLine();
         if (ImGui::Button("Save")) {
-            Tilemap::save(tileMapName);
-            Objects::save(objectMapName);
+            if (Tilemap::save(tileMapName) || Objects::save(objectMapName)) {
+                Utils::print("Failed to save map.\n");
+            }
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Load autosave")) {
+            if (loadLevel("_autosave")) {
+                Utils::print("Failed to load map.\n");
+            }
         }
     }
 
     if (ImGui::CollapsingHeader("Levels")) {
         for (auto& levelName : levelNames) {
             if (ImGui::Button(levelName.c_str())) {
-                loadLevel(levelName.c_str());
+                if (loadLevel(levelName.c_str())) {
+                    Utils::print("Failed to load map.\n");
+                }
             }
         }
     }

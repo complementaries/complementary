@@ -214,10 +214,12 @@ void Objects::renderText(float lag) {
     }
 }
 
-void Objects::load(const char* path) {
+bool Objects::load(const char* path) {
     std::ifstream stream;
     stream.open(path, std::ios::binary);
-    assert(!stream.bad());
+    if (stream.fail()) {
+        return true;
+    }
 
     char magic[5];
     stream.read(magic, 4);
@@ -256,9 +258,10 @@ void Objects::load(const char* path) {
 #endif
         object->postInit();
     }
+    return false;
 }
 
-void Objects::save(const char* path) {
+bool Objects::save(const char* path) {
     reset();
     static char empty[8];
 
@@ -269,7 +272,9 @@ void Objects::save(const char* path) {
 
     std::ofstream stream;
     stream.open(path, std::ios::binary);
-    assert(!stream.bad());
+    if (stream.fail()) {
+        return true;
+    }
 
     stream.write("CMOM", 4);
     stream.write(empty, 8);
@@ -308,9 +313,8 @@ void Objects::save(const char* path) {
         stream.write((char*)&prototypeId, 4);
         stream.write((char*)&objectsToSave[i]->position, sizeof(Vector));
         stream.write((char*)&pointers[i], 4);
-        Utils::print("Saving object %zu with prototypeId %d at position %d\n", i, prototypeId,
-                     pointers[i]);
     }
+    return false;
 }
 
 std::shared_ptr<ObjectBase> Objects::loadObject(const char* path, Vector position) {

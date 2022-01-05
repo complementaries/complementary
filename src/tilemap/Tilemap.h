@@ -22,8 +22,8 @@ namespace Tilemap {
 
     void forceReload();
 
-    void load(const char* path);
-    void save(const char* path);
+    bool load(const char* path);
+    bool save(const char* path);
 }
 
 #endif

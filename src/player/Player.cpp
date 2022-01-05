@@ -539,7 +539,8 @@ bool Player::isDashing() {
 }
 
 bool Player::isGliding() {
-    return hasAbility(Ability::GLIDER) && Input::getButton(ButtonType::ABILITY).pressed;
+    return hasAbility(Ability::GLIDER) && Input::getButton(ButtonType::ABILITY).pressed &&
+           isAllowedToMove();
 }
 
 bool Player::invertColors() {

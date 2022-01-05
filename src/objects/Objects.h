@@ -46,8 +46,8 @@ namespace Objects {
     void render(float lag);
     void renderText(float lag);
 
-    void load(const char* path);
-    void save(const char* path);
+    bool load(const char* path);
+    bool save(const char* path);
 
     void forceMoveParticles(const Vector& position, const Vector& size, const Vector& velocity);
 

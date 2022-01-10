@@ -264,8 +264,8 @@ static void pollEvents() {
             case SDL_CONTROLLERBUTTONDOWN: {
                 switch (e.cbutton.button) {
                     case SDL_CONTROLLER_BUTTON_A:
-                        Input::Internal::setButtonPressed(ButtonType::CONFIRM);
                     case SDL_CONTROLLER_BUTTON_B:
+                        Input::Internal::setButtonPressed(ButtonType::CONFIRM);
                         Input::Internal::setButtonPressed(ButtonType::JUMP);
                         break;
                     case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
@@ -299,8 +299,8 @@ static void pollEvents() {
             case SDL_CONTROLLERBUTTONUP: {
                 switch (e.cbutton.button) {
                     case SDL_CONTROLLER_BUTTON_A:
-                        Input::Internal::setButtonReleased(ButtonType::CONFIRM);
                     case SDL_CONTROLLER_BUTTON_B:
+                        Input::Internal::setButtonReleased(ButtonType::CONFIRM);
                         Input::Internal::setButtonReleased(ButtonType::JUMP);
                         break;
                     case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:

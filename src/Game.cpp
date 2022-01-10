@@ -205,7 +205,9 @@ static bool loadLevel(const char* name) {
 }
 
 void Game::loadTitleScreen() {
-    assert(!loadLevel("title"));
+    bool titleLoaded = loadLevel("title");
+    (void)titleLoaded;
+    assert(!titleLoaded);
     isInTitleScreen = true;
     RenderState::setZoom(4.f, Vector(0.f, -2.f));
     Menu::showStartMenu();

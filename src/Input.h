@@ -15,6 +15,7 @@ enum class ButtonType {
     UP,
     DOWN,
     PAUSE,
+    CONFIRM,
 
     MAX
 };

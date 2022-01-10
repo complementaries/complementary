@@ -167,9 +167,8 @@ void Menu::tick() {
         menuIndex++;
         showControls = false;
     }
-    if ((Input::getButton(ButtonType::JUMP).pressedFirstFrame ||
-         Input::getButton(ButtonType::SWITCH).pressedFirstFrame) &&
-        menuIndex < lines.size()) {
+    if (Input::getButton(ButtonType::CONFIRM).pressedFirstFrame && menuIndex < lines.size()) {
+        Input::getButton(ButtonType::CONFIRM).reset();
         Input::getButton(ButtonType::JUMP).reset();
         Input::getButton(ButtonType::SWITCH).reset();
         lines[menuIndex].function();

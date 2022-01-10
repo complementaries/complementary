@@ -187,9 +187,13 @@ static void pollEvents() {
             case SDL_KEYDOWN: {
                 if (!e.key.repeat) {
                     switch (e.key.keysym.sym) {
-                        case SDLK_SPACE: Input::Internal::setButtonPressed(ButtonType::JUMP); break;
+                        case SDLK_SPACE:
+                            Input::Internal::setButtonPressed(ButtonType::JUMP);
+                            Input::Internal::setButtonPressed(ButtonType::CONFIRM);
+                            break;
                         case SDLK_RETURN:
                             Input::Internal::setButtonPressed(ButtonType::SWITCH);
+                            Input::Internal::setButtonPressed(ButtonType::CONFIRM);
                             break;
                         case SDLK_RSHIFT:
                             Input::Internal::setButtonPressed(ButtonType::SWITCH_AND_ABILITY);
@@ -219,8 +223,14 @@ static void pollEvents() {
             }
             case SDL_KEYUP: {
                 switch (e.key.keysym.sym) {
-                    case SDLK_SPACE: Input::Internal::setButtonReleased(ButtonType::JUMP); break;
-                    case SDLK_RETURN: Input::Internal::setButtonReleased(ButtonType::SWITCH); break;
+                    case SDLK_SPACE:
+                        Input::Internal::setButtonReleased(ButtonType::JUMP);
+                        Input::Internal::setButtonReleased(ButtonType::CONFIRM);
+                        break;
+                    case SDLK_RETURN:
+                        Input::Internal::setButtonReleased(ButtonType::SWITCH);
+                        Input::Internal::setButtonReleased(ButtonType::CONFIRM);
+                        break;
                     case SDLK_RSHIFT:
                         Input::Internal::setButtonReleased(ButtonType::SWITCH_AND_ABILITY);
                         break;

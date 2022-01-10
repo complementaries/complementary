@@ -194,7 +194,7 @@ static void pollEvents() {
                         case SDLK_RSHIFT:
                             Input::Internal::setButtonPressed(ButtonType::SWITCH_AND_ABILITY);
                             break;
-                        case SDLK_LSHIFT:
+                        case SDLK_RCTRL:
                             Input::Internal::setButtonPressed(ButtonType::ABILITY);
                             break;
                         case SDLK_LEFT:
@@ -202,7 +202,10 @@ static void pollEvents() {
                         case SDLK_RIGHT:
                         case SDLK_d: Input::Internal::setButtonPressed(ButtonType::RIGHT); break;
                         case SDLK_UP:
-                        case SDLK_w: Input::Internal::setButtonPressed(ButtonType::UP); break;
+                        case SDLK_w:
+                            Input::Internal::setButtonPressed(ButtonType::UP);
+                            Input::Internal::setButtonPressed(ButtonType::JUMP);
+                            break;
                         case SDLK_DOWN:
                         case SDLK_s: Input::Internal::setButtonPressed(ButtonType::DOWN); break;
                         case SDLK_m: SoundManager::mute(); break;
@@ -221,15 +224,16 @@ static void pollEvents() {
                     case SDLK_RSHIFT:
                         Input::Internal::setButtonReleased(ButtonType::SWITCH_AND_ABILITY);
                         break;
-                    case SDLK_LSHIFT:
-                        Input::Internal::setButtonReleased(ButtonType::ABILITY);
-                        break;
+                    case SDLK_RCTRL: Input::Internal::setButtonReleased(ButtonType::ABILITY); break;
                     case SDLK_LEFT:
                     case SDLK_a: Input::Internal::setButtonReleased(ButtonType::LEFT); break;
                     case SDLK_RIGHT:
                     case SDLK_d: Input::Internal::setButtonReleased(ButtonType::RIGHT); break;
                     case SDLK_UP:
-                    case SDLK_w: Input::Internal::setButtonReleased(ButtonType::UP); break;
+                    case SDLK_w:
+                        Input::Internal::setButtonReleased(ButtonType::UP);
+                        Input::Internal::setButtonReleased(ButtonType::JUMP);
+                        break;
                     case SDLK_DOWN:
                     case SDLK_s: Input::Internal::setButtonReleased(ButtonType::DOWN); break;
                     case SDLK_p: Input::Internal::setButtonReleased(ButtonType::PAUSE); break;

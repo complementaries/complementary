@@ -53,8 +53,8 @@ void LevelTagObject::renderText(float lag) {
     Vector pos = position + data.size * 0.5f;
     pos.x -= width * 0.5f;
     pos.y -= SIZE * 0.5f;
-    Color c =
-        ColorUtils::setAlpha(Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK, 100);
+    constexpr Color colors[2] = {ColorUtils::DARK_GRAY, ColorUtils::LIGHT_GRAY};
+    Color c = colors[Player::invertColors()];
     Font::draw(pos, SIZE, c, buffer);
 
     if (bestTimeAlpha > 0) {

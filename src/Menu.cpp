@@ -17,9 +17,9 @@ const char* SWITCH = "Switch:";
 const char* ABILITY_SWITCH = "Switch + Ability:";
 const char* JUMP = "Jump:";
 
-Help HELP_KEYBOARD = {"Left/Right:", "[A",           "[D",          "[LEFT-ARROW", "[RIGHT-ARROW",
-                      JUMP,          "[SPACE",       ABILITY,       "[LEFT-SHIFT", SWITCH,
-                      "[ENTER",      ABILITY_SWITCH, "[RIGHT-SHIFT"};
+Help HELP_KEYBOARD = {"Left/Right:", "[A",     "[D",           "[LEFT-ARROW", "[RIGHT-ARROW",
+                      JUMP,          "[SPACE", "[W",           ABILITY,       "[RIGHT-CONTROL",
+                      SWITCH,        "[ENTER", ABILITY_SWITCH, "[RIGHT-SHIFT"};
 Help HELP_XBOX = {"Left/Right:", "[\5",      JUMP,   "[A",       "[B",           ABILITY,
                   "[X",          "[L1 / L2", SWITCH, "[R1 / R2", ABILITY_SWITCH, "[Y"};
 Help HELP_PS = {"Left/Right:", "[\5",      JUMP,   "[\1",      "[\4",          ABILITY,

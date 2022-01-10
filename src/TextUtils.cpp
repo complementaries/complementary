@@ -61,7 +61,7 @@ void TextUtils::drawPopupObjectSpace(Vector position, char* text, int alpha) {
     Font::draw(position, HEIGHT, col, text);
     Font::setZ(0.0f);
 }
-#include <iostream>
+
 void TextUtils::drawBestTimeObjectSpace(Vector position, long ticks, int alpha) {
     char buffer[256];
     createTextBuffer(buffer, 256, ticks);
@@ -133,7 +133,6 @@ void TextUtils::drawStartHelp(Vector position, int alpha) {
     if (pos.x < mapStart) {
         shift.x = -pos.x + mapStart;
     }
-    std::cout << shift.x << " " << pos.x << " " << mapStart << " " << mapWidth << "\n";
     Vector end = pos + size + oversize;
     if (end.x > mapWidth) {
         shift = Vector(mapWidth - end.x, 0.0f);

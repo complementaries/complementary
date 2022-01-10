@@ -45,7 +45,6 @@ static void logNanos(const char* msg, Profiler::Nanos n) {
 }
 
 static void logTickNanos() {
-    return;
     if (tps.getUpdatesPerSecond() > 98.0f || timerTicks < 500) {
         return;
     }
@@ -57,7 +56,6 @@ static void logTickNanos() {
 }
 
 static void logRenderNanos() {
-    return;
     if (fps.getUpdatesPerSecond() > 59.0f || timerTicks < 500) {
         return;
     }

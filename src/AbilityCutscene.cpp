@@ -119,7 +119,7 @@ void AbilityCutscene::render(float lag) {
     Vector row1Pos(wSize.x / 2 - row1Width / 2, wSize.y / 2 + 3.f);
     Font::draw(row1Pos, 2, col, AbilityUtils::getName(ability));
 
-    char description[128];
+    char description[128] = {};
     AbilityUtils::getDescription(ability, description, 128);
 
     float row2Width = Font::getWidth(1, description);

@@ -213,6 +213,8 @@ void Game::loadTitleScreen() {
     Menu::showStartMenu();
     Player::setAbilities(Ability::WALL_JUMP, Ability::DASH, true);
     titleEffectParticles->play();
+    SoundManager::stopSound(Sound::LIGHT_BG);
+    SoundManager::stopSound(Sound::DARK_BG);
     SoundManager::playContinuousSound(Sound::TITLE);
     currentLevelIndex = 0;
 }

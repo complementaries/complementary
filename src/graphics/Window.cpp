@@ -25,6 +25,8 @@ static SDL_Window* window = nullptr;
 static bool running = false;
 static int width = 850;
 static int height = 480;
+static int drawableWidth = 850;
+static int drawableHeight = 480;
 static int previousWidth = 850;
 static int previousHeight = 480;
 static bool fullscreen = false;
@@ -32,13 +34,18 @@ static bool fullscreen = false;
 static void resize(int w, int h) {
     Utils::print("Resizing to %d, %d\n", w, h);
     Game::onWindowResize(w, h);
-    width = w;
-    height = h;
+
+    int windowW, windowH;
+    SDL_GetWindowSize(window, &windowW, &windowH);
+    width = windowW;
+    height = windowH;
 }
 
 static void resize() {
     int w, h;
     SDL_GL_GetDrawableSize(window, &w, &h);
+    drawableWidth = w;
+    drawableHeight = h;
     resize(w, h);
 }
 
@@ -199,6 +206,7 @@ static void pollEvents() {
                             Input::Internal::setButtonPressed(ButtonType::SWITCH_AND_ABILITY);
                             break;
                         case SDLK_RCTRL:
+                        case SDLK_RALT:
                             Input::Internal::setButtonPressed(ButtonType::ABILITY);
                             break;
                         case SDLK_LEFT:
@@ -234,7 +242,8 @@ static void pollEvents() {
                     case SDLK_RSHIFT:
                         Input::Internal::setButtonReleased(ButtonType::SWITCH_AND_ABILITY);
                         break;
-                    case SDLK_RCTRL: Input::Internal::setButtonReleased(ButtonType::ABILITY); break;
+                    case SDLK_RCTRL:
+                    case SDLK_RALT: Input::Internal::setButtonReleased(ButtonType::ABILITY); break;
                     case SDLK_LEFT:
                     case SDLK_a: Input::Internal::setButtonReleased(ButtonType::LEFT); break;
                     case SDLK_RIGHT:
@@ -494,4 +503,12 @@ int Window::getWidth() {
 
 int Window::getHeight() {
     return height;
+}
+
+int Window::getDrawableWidth() {
+    return drawableWidth;
+}
+
+int Window::getDrawableHeight() {
+    return drawableHeight;
 }

@@ -10,6 +10,8 @@ namespace Window {
 
     int getWidth();
     int getHeight();
+    int getDrawableWidth();
+    int getDrawableHeight();
 
     void toggleFullscreen();
     bool isFullscreen();

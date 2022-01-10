@@ -346,7 +346,7 @@ void TilemapEditor::render() {
 }
 
 void TilemapEditor::onMouseEvent(void* eventPtr) {
-    stbte_mouse_sdl(stbTileMap, eventPtr, 1.f / globalZoom, 1.f / globalZoom, 0, 0);
+    stbte_mouse_sdl(stbTileMap, eventPtr, 1.0f / globalZoom, 1.0f / globalZoom, 0, 0);
 }
 
 void TilemapEditor::onScreenResize(int width, int height) {

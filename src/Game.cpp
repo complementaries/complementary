@@ -59,6 +59,8 @@ static TilemapEditor* tilemapEditor;
 
 static bool paused;
 static bool singleStep;
+static bool levelAvailable = false;
+static int levelAvailableAlpha = 0;
 
 static int fade = 0;
 static int fadeAdd = 0;
@@ -440,6 +442,46 @@ void Game::tick() {
             timerTicks = UINT32_MAX;
         }
     }
+
+    levelAvailable = false;
+    if (Game::getCurrentLevel() == -1 && !GoalCutscene::isActive()) {
+        Vector center = Player::getCenter();
+        int minX = std::max(static_cast<int>(center.x - 1.5f), 0);
+        int maxX = std::min(static_cast<int>(center.x + 2.5f), Tilemap::getWidth());
+        int y = center.y;
+        constexpr float startDistance = 5.0f;
+        float minDistance = startDistance;
+        Vector goal;
+        Face face;
+        for (int x = minX; x < maxX; x++) {
+            const Tile& tile = Tilemap::getTile(x, y);
+            if (tile == Tiles::GOAL_LEFT || tile == Tiles::GOAL_RIGHT) {
+                float distance = std::abs(x - center.x);
+                if (distance < minDistance) {
+                    face = tile == Tiles::GOAL_LEFT ? Face::LEFT : Face::RIGHT;
+                    minDistance = distance;
+                    goal = Vector(x, y);
+                }
+            }
+        }
+        if (minDistance < startDistance) {
+            if (Input::getButton(ButtonType::JUMP).pressed) {
+                GoalCutscene::show(goal, face);
+                Game::setLevelScreenPosition(goal + FaceUtils::getDirection(face) * 2.0f);
+            }
+            levelAvailable = true;
+        }
+    }
+    levelAvailableAlpha += (levelAvailable * 2 - 1) * 10;
+    levelAvailableAlpha = std::clamp(levelAvailableAlpha, 0, 255);
+}
+
+bool Game::canEnterLevel() {
+    return levelAvailable;
+}
+
+int Game::levelStartAlpha() {
+    return levelAvailableAlpha;
 }
 
 #ifndef NDEBUG
@@ -505,6 +547,7 @@ void Game::render(float lag) {
         Objects::renderText(lag);
         ParticleRenderer::render();
 #endif
+        Tilemap::renderForeground();
     }
 
     glDisable(GL_DEPTH_TEST);

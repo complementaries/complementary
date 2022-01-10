@@ -16,7 +16,7 @@ GoalTile::GoalTile(Face face) : Tile(ColorUtils::BLACK, false, "default"), face(
 }
 
 void GoalTile::onCollision(int x, int y) const {
-    if (!GoalCutscene::isActive()) {
+    if (!GoalCutscene::isActive() && Game::getCurrentLevel() != -1) {
         GoalCutscene::show(Vector(x, y), face);
         if (Game::getCurrentLevel() == -1) {
             Game::setLevelScreenPosition(Player::getPosition() + FaceUtils::getDirection(face) * 2);
@@ -28,7 +28,7 @@ bool GoalTile::isWall() const {
     return false;
 }
 
-void GoalTile::render(Buffer& buffer, float x, float y, float z) const {
+void GoalTile::renderTransparent(Buffer& buffer, float x, float y, float z) const {
     if (z == -0.2f) {
         z = -0.1f;
     }

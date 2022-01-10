@@ -16,6 +16,7 @@ static GL::Shader shader;
 static GL::VertexBuffer buffer;
 static GL::VertexBuffer background;
 static int vertices = 0;
+static int verticesTransparent = 0;
 static bool dirty = true;
 static int width = 0;
 static int height = 0;
@@ -86,6 +87,12 @@ static void prepareRendering() {
         }
     }
     vertices = data.getSize() / (sizeof(float) * 3 + 4);
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            Tilemap::getTile(x, y).renderTransparent(data, x, y, -0.5f);
+        }
+    }
+    verticesTransparent = data.getSize() / (sizeof(float) * 3 + 4) - vertices;
     buffer.setStaticData(data.getData(), data.getSize());
     dirty = false;
 }
@@ -102,6 +109,13 @@ void Tilemap::render() {
     RenderState::setViewMatrix(shader);
     prepareRendering();
     buffer.drawTriangles(vertices);
+}
+
+void Tilemap::renderForeground() {
+    shader.use();
+    RenderState::setViewMatrix(shader);
+    prepareRendering();
+    buffer.drawTriangles(verticesTransparent, vertices);
 }
 
 void Tilemap::forceReload() {

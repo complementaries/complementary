@@ -9,6 +9,7 @@
 #include "objects/Objects.h"
 #include "player/Player.h"
 #include "sound/SoundManager.h"
+#include <iostream>
 
 #include <cmath>
 #include <memory>
@@ -68,6 +69,14 @@ void LevelTagObject::renderText(float lag) {
             } else {
                 TextUtils::drawBestTimeObjectSpace(Player::getPosition(), completionTime,
                                                    bestTimeAlpha);
+            }
+        } else {
+            if (Game::levelStartAlpha() < 150) {
+                glDepthMask(false);
+                TextUtils::drawStartHelp(Player::getPosition(), Game::levelStartAlpha());
+                glDepthMask(true);
+            } else {
+                TextUtils::drawStartHelp(Player::getPosition(), Game::levelStartAlpha());
             }
         }
     }

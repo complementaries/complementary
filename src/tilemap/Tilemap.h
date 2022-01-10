@@ -19,6 +19,7 @@ namespace Tilemap {
 
     void renderBackground();
     void render();
+    void renderForeground();
 
     void forceReload();
 

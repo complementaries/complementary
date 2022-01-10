@@ -103,11 +103,11 @@ void GL::VertexBuffer::setStreamData(const void* data, int length) {
 
 void setData(const void* data, int length, int dataType);
 
-void GL::VertexBuffer::drawTriangles(int vertices) const {
+void GL::VertexBuffer::drawTriangles(int vertices, int offset) const {
     bindArray();
-    glDrawArrays(GL_TRIANGLES, 0, vertices);
+    glDrawArrays(GL_TRIANGLES, offset, vertices);
 #ifndef NDEBUG
-    if (vertexSize * vertices != dataSize) {
+    if (vertexSize * vertices > dataSize) {
         fprintf(stderr, "invalid vertices on drawTriangles: %d %d %d\n", vertexSize, vertices,
                 dataSize);
     }

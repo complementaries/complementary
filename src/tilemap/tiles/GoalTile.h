@@ -13,7 +13,7 @@ class GoalTile : public Tile {
 
     bool isWall() const override;
     void onCollision(int x, int y) const override;
-    void render(Buffer& buffer, float x, float y, float z) const override;
+    void renderTransparent(Buffer& buffer, float x, float y, float z) const override;
     void onLoad(int x, int y) const override;
 
   private:

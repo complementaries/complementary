@@ -44,8 +44,16 @@ void Tile::render(Buffer& buffer, float x, float y, float z) const {
     (void)z;
 }
 
+void Tile::renderTransparent(Buffer& buffer, float x, float y, float z) const {
+    (void)buffer;
+    (void)x;
+    (void)y;
+    (void)z;
+}
+
 void Tile::renderEditor(Buffer& buffer, float x, float y, float z) const {
     render(buffer, x, y, z);
+    renderTransparent(buffer, x, y, z);
 }
 
 bool Tile::operator==(const Tile& other) const {

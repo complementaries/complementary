@@ -47,6 +47,26 @@ jobs:
           path: |
             upload
 
+      - name: Build (Debug)
+        shell: bash
+        run: |
+          meson build-debug
+          ninja -C build-debug
+
+      - name: Prepare upload (Debug)
+        shell: bash
+        run: |
+          mkdir -p upload-debug
+          cp build-debug/complementary upload-debug/complementary
+          cp -r assets upload-debug/assets
+          
+      - name: Upload artifacts (Debug)
+        uses: actions/upload-artifact@v2
+        with:
+          name: complementary-linux-debug
+          path: |
+            upload-debug
+
   build-mac:
     runs-on: macos-10.15
     steps:
@@ -91,6 +111,26 @@ jobs:
           path: |
             upload
 
+      - name: Build (Debug)
+        shell: bash
+        run: |
+          meson build-debug
+          ninja -C build-debug
+
+      - name: Prepare upload (Debug)
+        shell: bash
+        run: |
+          mkdir -p upload-debug
+          cp build-debug/complementary upload-debug/complementary
+          cp -r assets upload-debug/assets
+          
+      - name: Upload artifacts (Debug)
+        uses: actions/upload-artifact@v2
+        with:
+          name: complementary-mac-debug
+          path: |
+            upload-debug
+
   build-windows:
     runs-on: windows-2019
     steps:
@@ -133,6 +173,27 @@ jobs:
           name: complementary-windows
           path: |
             upload
+
+      - name: Build (Debug)
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          meson build-debug --backend vs
+          meson compile -C build-debug -j0
+
+      - name: Prepare upload
+        shell: cmd
+        run: |
+          mkdir upload-debug
+          copy build-debug\complementary.exe upload-debug\complementary.exe /B
+          xcopy assets upload-debug\assets /E /I
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: complementary-windows-debug
+          path: |
+            upload-debug
 
   check-style:
     runs-on: ubuntu-latest

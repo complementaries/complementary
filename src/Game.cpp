@@ -452,7 +452,7 @@ void Game::tick() {
         constexpr float startDistance = 5.0f;
         float minDistance = startDistance;
         Vector goal;
-        Face face;
+        Face face = Face::LEFT;
         for (int x = minX; x < maxX; x++) {
             const Tile& tile = Tilemap::getTile(x, y);
             if (tile == Tiles::GOAL_LEFT || tile == Tiles::GOAL_RIGHT) {

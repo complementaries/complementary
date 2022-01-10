@@ -29,10 +29,7 @@ bool GoalTile::isWall() const {
 }
 
 void GoalTile::renderTransparent(Buffer& buffer, float x, float y, float z) const {
-    if (z == -0.2f) {
-        z = -0.1f;
-    }
-    const Color color[] = {getColor(), ColorUtils::setAlpha(ColorUtils::invert(getColor()), 0)};
+    const Color color[] = {getColor(), ColorUtils::setAlpha(getColor(), 0)};
     buffer.add(x).add(y).add(z).add(color[face == Face::LEFT || face == Face::UP]);
     buffer.add(x).add(y + 1.0f).add(z).add(color[face == Face::LEFT || face == Face::DOWN]);
     buffer.add(x + 1.0f).add(y).add(z).add(color[face == Face::RIGHT || face == Face::UP]);

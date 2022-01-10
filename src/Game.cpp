@@ -333,6 +333,40 @@ static void playFakeSwitchAnimation() {
     SoundManager::playSoundEffect(Sound::WORLD_SWITCH);
 }
 
+static void tickLevelSelect() {
+    levelAvailable = false;
+    if (Game::getCurrentLevel() == -1 && !GoalCutscene::isActive()) {
+        Vector center = Player::getCenter();
+        int minX = std::max(static_cast<int>(center.x - 1.5f), 0);
+        int maxX = std::min(static_cast<int>(center.x + 2.5f), Tilemap::getWidth());
+        int y = center.y;
+        constexpr float startDistance = 5.0f;
+        float minDistance = startDistance;
+        Vector goal;
+        Face face = Face::LEFT;
+        for (int x = minX; x < maxX; x++) {
+            const Tile& tile = Tilemap::getTile(x, y);
+            if (tile == Tiles::GOAL_LEFT || tile == Tiles::GOAL_RIGHT) {
+                float distance = std::abs(x - center.x);
+                if (distance < minDistance) {
+                    face = tile == Tiles::GOAL_LEFT ? Face::LEFT : Face::RIGHT;
+                    minDistance = distance;
+                    goal = Vector(x, y);
+                }
+            }
+        }
+        if (minDistance < startDistance) {
+            if (Input::getButton(ButtonType::JUMP).pressed) {
+                GoalCutscene::show(goal, face);
+                Game::setLevelScreenPosition(goal + FaceUtils::getDirection(face) * 2.0f);
+            }
+            levelAvailable = true;
+        }
+    }
+    levelAvailableAlpha += (levelAvailable * 2 - 1) * 10;
+    levelAvailableAlpha = std::clamp(levelAvailableAlpha, 0, 255);
+}
+
 void Game::tick() {
 #ifndef NDEBUG
     Profiler::tick();
@@ -347,6 +381,7 @@ void Game::tick() {
     }
     fade = std::clamp(fade + fadeAdd, 0, 255);
     RenderState::tick();
+    tickLevelSelect();
 
     if (showingSpeedrunResult) {
         if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
@@ -442,38 +477,6 @@ void Game::tick() {
             timerTicks = UINT32_MAX;
         }
     }
-
-    levelAvailable = false;
-    if (Game::getCurrentLevel() == -1 && !GoalCutscene::isActive()) {
-        Vector center = Player::getCenter();
-        int minX = std::max(static_cast<int>(center.x - 1.5f), 0);
-        int maxX = std::min(static_cast<int>(center.x + 2.5f), Tilemap::getWidth());
-        int y = center.y;
-        constexpr float startDistance = 5.0f;
-        float minDistance = startDistance;
-        Vector goal;
-        Face face = Face::LEFT;
-        for (int x = minX; x < maxX; x++) {
-            const Tile& tile = Tilemap::getTile(x, y);
-            if (tile == Tiles::GOAL_LEFT || tile == Tiles::GOAL_RIGHT) {
-                float distance = std::abs(x - center.x);
-                if (distance < minDistance) {
-                    face = tile == Tiles::GOAL_LEFT ? Face::LEFT : Face::RIGHT;
-                    minDistance = distance;
-                    goal = Vector(x, y);
-                }
-            }
-        }
-        if (minDistance < startDistance) {
-            if (Input::getButton(ButtonType::JUMP).pressed) {
-                GoalCutscene::show(goal, face);
-                Game::setLevelScreenPosition(goal + FaceUtils::getDirection(face) * 2.0f);
-            }
-            levelAvailable = true;
-        }
-    }
-    levelAvailableAlpha += (levelAvailable * 2 - 1) * 10;
-    levelAvailableAlpha = std::clamp(levelAvailableAlpha, 0, 255);
 }
 
 bool Game::canEnterLevel() {

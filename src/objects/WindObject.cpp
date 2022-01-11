@@ -54,7 +54,7 @@ void WindObject::postInit() {
     particles->data.clampBoxSize = data.size;
     particles->data.maxLifetime = (data.force.x > data.force.y ? data.size.x : data.size.y) * 100;
     particles->position = this->position + data.size / 2;
-    particles->data.boxLifetimeLoss = 20;
+    particles->data.boxLifetimeLoss = particles->data.maxLifetime * 0.075f;
     particles->data.maxEmissionInterval =
         std::max(1, static_cast<int>(30 - (abs(data.force.x) + abs(data.force.y)) * 300));
     particles->data.maxEmissionRate =

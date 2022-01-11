@@ -122,6 +122,7 @@ static int dead = 0;
 static bool hidden = false;
 
 static float gliderScale = 0.0f;
+static int deaths = 0;
 
 bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
@@ -427,6 +428,7 @@ void Player::restart() {
     }
     Game::setBackgroundParticleColor();
     ObjectRenderer::clearStaticBuffer();
+    deaths++;
 }
 
 void Player::kill() {
@@ -1124,4 +1126,12 @@ void PlayerParticles::setParticleColors() {
     setParticleColor(walljumpParticles);
     setParticleColor(colorSwitchParticles);
     setParticleColor(gliderParticles);
+}
+
+int Player::getDeaths() {
+    return deaths;
+}
+
+void Player::resetDeaths() {
+    deaths = -1;
 }

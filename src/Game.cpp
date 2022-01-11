@@ -167,6 +167,7 @@ static void onTileLoad() {
 }
 
 static bool loadLevel(const char* name) {
+    Player::resetDeaths();
 #ifndef NDEBUG
     if (strcmp(name, "_autosave") != 0) {
         Utils::print("Creating autosave.\n", name);

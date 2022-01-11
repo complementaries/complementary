@@ -22,13 +22,20 @@ void createTextBuffer(char* buffer, int bufSize, long ticks) {
     snprintf(buffer, bufSize, "%02.0f:%05.2f", minutes, fmod(seconds, 60));
 }
 
+void createFullTextBuffer(char* buffer, int bufSize, long ticks) {
+    float seconds = Window::SECONDS_PER_TICK * ticks;
+    float minutes = seconds / 60.f;
+    snprintf(buffer, bufSize, "#%d | %02.0f:%05.2f", Player::getDeaths(), minutes,
+             fmod(seconds, 60));
+}
+
 void TextUtils::drawTimer(Vector position, long ticks) {
     Matrix m;
     m.transform(Vector(-1.0f, 1.0f));
     m.scale(Vector(0.1f * Window::getHeight() / Window::getWidth(), -0.1f));
 
     char buffer[256];
-    createTextBuffer(buffer, 256, ticks);
+    createFullTextBuffer(buffer, 256, ticks);
 
     Vector size(Font::getWidth(1.0f, buffer), 1.0f);
     Vector oversize = size * 0.1f;

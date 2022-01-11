@@ -50,6 +50,9 @@ namespace Player {
     void tick();
     void render(float lag);
     void renderImGui();
+
+    int getDeaths();
+    void resetDeaths();
 }
 
 namespace PlayerParticles {

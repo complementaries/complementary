@@ -1133,5 +1133,9 @@ int Player::getDeaths() {
 }
 
 void Player::resetDeaths() {
-    deaths = -1;
+    deaths = 0;
+}
+
+void Player::subDeath() {
+    deaths--;
 }

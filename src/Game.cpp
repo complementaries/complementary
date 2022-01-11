@@ -167,7 +167,6 @@ static void onTileLoad() {
 }
 
 static bool loadLevel(const char* name) {
-    Player::resetDeaths();
 #ifndef NDEBUG
     if (strcmp(name, "_autosave") != 0) {
         Utils::print("Creating autosave.\n", name);
@@ -203,6 +202,11 @@ static bool loadLevel(const char* name) {
 
     Objects::tick();
     Objects::lateTick();
+    if (mode != GameMode::SPEEDRUN) {
+        Player::resetDeaths();
+    } else {
+        Player::subDeath();
+    }
     return false;
 }
 

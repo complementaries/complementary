@@ -53,6 +53,7 @@ namespace Player {
 
     int getDeaths();
     void resetDeaths();
+    void subDeath();
 }
 
 namespace PlayerParticles {

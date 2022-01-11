@@ -125,6 +125,7 @@ static void quitToLevelSelect() {
 static void quitToTitle() {
     unpause();
     Game::loadTitleScreen();
+    Player::resetDeaths();
 }
 
 static void controls() {
@@ -170,7 +171,7 @@ void Menu::tick() {
         return;
     }
     if (Input::getButton(ButtonType::UP).pressedFirstFrame &&
-        menuIndex > (1 + (type == MenuType::SPEEDRUN) * 2)) {
+        menuIndex > (1 + (type == MenuType::SPEEDRUN) * 3)) {
         menuIndex--;
         showControls = false;
     }
@@ -322,11 +323,15 @@ void Menu::showPauseMenu() {
 void Menu::showSpeedrunMenu() {
     type = MenuType::SPEEDRUN;
     clear();
-    menuIndex = 3;
+    menuIndex = 4;
     add("[Speedrun Completed]", nothing);
     long ticks = Game::getTimerTicks();
 
     char buffer[256];
+    snprintf(buffer, 256, "Deaths: %d", Player::getDeaths());
+    add(buffer, nothing);
+    Player::resetDeaths();
+
     float seconds = Window::SECONDS_PER_TICK * ticks;
     float minutes = seconds / 60.f;
     snprintf(buffer, 256, "Time: %02.0f:%05.2f", minutes, fmod(seconds, 60));

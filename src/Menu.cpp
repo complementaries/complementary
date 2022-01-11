@@ -1,5 +1,6 @@
 #include "Menu.h"
 
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -134,6 +135,10 @@ static void toggleFullscreen() {
     Window::toggleFullscreen();
 }
 
+static void openTitleScreen() {
+    Game::loadTitleScreen();
+}
+
 static void add(const char* s, MenuFunction mf) {
     lines.push_back({s, 0.0f, mf});
 }
@@ -164,7 +169,8 @@ void Menu::tick() {
     if (lines.size() == 0) {
         return;
     }
-    if (Input::getButton(ButtonType::UP).pressedFirstFrame && menuIndex > 1) {
+    if (Input::getButton(ButtonType::UP).pressedFirstFrame &&
+        menuIndex > (1 + (type == MenuType::SPEEDRUN) * 2)) {
         menuIndex--;
         showControls = false;
     }
@@ -311,6 +317,28 @@ void Menu::showPauseMenu() {
     } else if (Game::getMode() == GameMode::SPEEDRUN) {
         add("Quit to Title Screen", quitToTitle);
     }
+}
+
+void Menu::showSpeedrunMenu() {
+    type = MenuType::SPEEDRUN;
+    clear();
+    menuIndex = 3;
+    add("[Speedrun Completed]", nothing);
+    long ticks = Game::getTimerTicks();
+
+    char buffer[256];
+    float seconds = Window::SECONDS_PER_TICK * ticks;
+    float minutes = seconds / 60.f;
+    snprintf(buffer, 256, "Time: %02.0f:%05.2f", minutes, fmod(seconds, 60));
+    add(buffer, nothing);
+
+    seconds = Window::SECONDS_PER_TICK * 54364;
+    minutes = seconds / 60.f;
+    snprintf(buffer, 256, "Best Time: %02.0f:%05.2f", minutes, fmod(seconds, 60));
+
+    add(buffer, nothing);
+    add("Title Screen", openTitleScreen);
+    closeWithPause = false;
 }
 
 MenuType Menu::getType() {

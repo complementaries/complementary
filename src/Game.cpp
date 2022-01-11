@@ -50,7 +50,6 @@ static std::vector<std::string> levelNames = {};
 // TODO: make the level list configurable in the UI and get rid of this
 static char currentLevelName[MAX_LEVEL_NAME_LENGTH] = "map0";
 static GameMode mode = GameMode::DEFAULT;
-static bool showingSpeedrunResult = false;
 
 #ifndef NDEBUG
 static char objectLoadLocation[MAX_LEVEL_NAME_LENGTH] = "assets/particlesystems/object.cmob";
@@ -306,7 +305,7 @@ void Game::nextLevel() {
 
         loadLevelSelect();
     } else if (mode == GameMode::SPEEDRUN) {
-        showingSpeedrunResult = true;
+        Menu::showSpeedrunMenu();
     }
 }
 
@@ -382,14 +381,6 @@ void Game::tick() {
     fade = std::clamp(fade + fadeAdd, 0, 255);
     RenderState::tick();
     tickLevelSelect();
-
-    if (showingSpeedrunResult) {
-        if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
-            showingSpeedrunResult = false;
-            loadTitleScreen();
-        }
-        return;
-    }
 
     if (isInTitleScreen) {
         RenderState::setZoom(4.f, Vector(0.f, -2.f + sinf(totalTicks * 0.01f) * 0.13f));
@@ -526,33 +517,31 @@ void Game::render(float lag) {
     RenderState::prepareEffectFramebuffer();
 
     Tilemap::renderBackground();
-    if (!showingSpeedrunResult) {
-        Player::render(lag);
+    Player::render(lag);
 
-        RenderState::enableBlending();
-        Tilemap::render();
+    RenderState::enableBlending();
+    Tilemap::render();
 
-        ParticleRenderer::prepare();
+    ParticleRenderer::prepare();
 #ifndef NDEBUG
-        {
-            Profiler::Timer timer(Profiler::objectRenderNanos);
-            Objects::render(lag);
-        }
-        {
-            Profiler::Timer timer(Profiler::objectTextRenderNanos);
-            Objects::renderText(lag);
-        }
-        {
-            Profiler::Timer timer(Profiler::particleRenderNanos);
-            ParticleRenderer::render();
-        }
-#else
+    {
+        Profiler::Timer timer(Profiler::objectRenderNanos);
         Objects::render(lag);
-        Objects::renderText(lag);
-        ParticleRenderer::render();
-#endif
-        Tilemap::renderForeground();
     }
+    {
+        Profiler::Timer timer(Profiler::objectTextRenderNanos);
+        Objects::renderText(lag);
+    }
+    {
+        Profiler::Timer timer(Profiler::particleRenderNanos);
+        ParticleRenderer::render();
+    }
+#else
+    Objects::render(lag);
+    Objects::renderText(lag);
+    ParticleRenderer::render();
+#endif
+    Tilemap::renderForeground();
 
     glDisable(GL_DEPTH_TEST);
 
@@ -568,7 +557,6 @@ void Game::render(float lag) {
 
     if (isInTitleScreen) {
         RenderState::updateViewMatrix(lag);
-
         glDisable(GL_DEPTH_TEST);
         Menu::render(lag);
         RenderState::renderTitleScreenEffects(lag);
@@ -875,6 +863,10 @@ void Game::resetTickCounter() {
     if (mode != GameMode::SPEEDRUN) {
         timerTicks = 0;
     }
+}
+
+long Game::getTimerTicks() {
+    return timerTicks;
 }
 
 void Game::pause() {

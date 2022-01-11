@@ -25,7 +25,7 @@ void createTextBuffer(char* buffer, int bufSize, long ticks) {
 void createFullTextBuffer(char* buffer, int bufSize, long ticks) {
     float seconds = Window::SECONDS_PER_TICK * ticks;
     float minutes = seconds / 60.f;
-    snprintf(buffer, bufSize, "#%d | %02.0f:%05.2f", Player::getDeaths(), minutes,
+    snprintf(buffer, bufSize, "#%d - %02.0f:%05.2f", Player::getDeaths(), minutes,
              fmod(seconds, 60));
 }
 

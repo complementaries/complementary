@@ -21,12 +21,12 @@ const char* JUMP = "Jump:";
 Help HELP_KEYBOARD = {"Left/Right:", "[A",     "[D",           "[LEFT-ARROW", "[RIGHT-ARROW",
                       JUMP,          "[SPACE", "[W",           ABILITY,       "[RIGHT-CONTROL",
                       SWITCH,        "[ENTER", ABILITY_SWITCH, "[RIGHT-SHIFT"};
-Help HELP_XBOX = {"Left/Right:", "[\5",      JUMP,   "[A",       "[B",           ABILITY,
-                  "[X",          "[L1 / L2", SWITCH, "[R1 / R2", ABILITY_SWITCH, "[Y"};
-Help HELP_PS = {"Left/Right:", "[\5",      JUMP,   "[\1",      "[\4",          ABILITY,
-                "[\3",         "[L1 / L2", SWITCH, "[R1 / R2", ABILITY_SWITCH, "[\2"};
-Help HELP = {"Left/Right:", "[\5",     JUMP,   "[A",      "[B",           ABILITY,
-             "[Y",          "[L / ZL", SWITCH, "[R / ZR", ABILITY_SWITCH, "[X"};
+Help HELP_XBOX = {"Left/Right:",  "[\5",  JUMP,       "[A / B",       ABILITY,
+                  "[X / L1 / L2", SWITCH, "[R1 / R2", ABILITY_SWITCH, "[Y"};
+Help HELP_PS = {"Left/Right:",   "[\5",  JUMP,       "[\1 / \4",     ABILITY,
+                "[\3 / L1 / L2", SWITCH, "[R1 / R2", ABILITY_SWITCH, "[\2"};
+Help HELP = {"Left/Right:", "[\5",  JUMP,      "[A / B",       ABILITY,
+             "[Y / L / ZL", SWITCH, "[R / ZR", ABILITY_SWITCH, "[X"};
 
 static const Help& getRelevantHelp() {
     SDL_GameController* c = Input::getController();
@@ -82,7 +82,7 @@ struct MenuEntry {
 };
 
 std::vector<MenuEntry> lines;
-static float fontSize = 4.5f;
+static float fontSize = 4.0f;
 static unsigned int menuIndex = 1;
 static MenuType type = MenuType::NONE;
 constexpr float yGapFactor = 1.25f;

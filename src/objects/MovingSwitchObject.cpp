@@ -21,9 +21,7 @@ void MovingSwitchObject::postInit() {
     seenParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/switchobjectON.cmob");
     Vector size = this->getSize();
-    seenParticles->data.boxSize = size * 1.1f;
-    seenParticles->data.minStartVelocity = Vector(-1.0f, -1.0f) * 0.035f;
-    seenParticles->data.maxStartVelocity = Vector(1.0f, 1.0f) * 0.035f;
+    seenParticles->data.boxSize = size;
     seenParticles->data.minEmissionRate = std::min(50.f, 2.0f * size.x * size.y);
 
     hiddenParticles->data.boxSize = size;

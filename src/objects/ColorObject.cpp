@@ -26,6 +26,13 @@ bool ColorObject::isSolid() const {
 void ColorObject::postInit() {
     particles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/colorblock.cmob");
+    particles->play();
+
+    Vector size = this->getSize();
+    particles->position = position;
+    particles->data.boxSize = size;
+    particles->position = position + size / 2.0f;
+    particles->data.minEmissionRate = static_cast<int>((size.x + size.y) / 2.0f * 5.0f);
 }
 
 void ColorObject::onFaceCollision(Face playerFace) {
@@ -46,16 +53,9 @@ bool ColorObject::collidesWith(const Vector& pPosition, const Vector& pSize) con
 }
 
 void ColorObject::tick() {
-    particles->play();
     Color color = AbilityUtils::getColor(data.abilities[Player::invertColors()]);
-    Vector size = this->getSize();
-    particles->position = position;
-    particles->data.boxSize = size * 1.1f;
-    particles->position = position + size / 2.0f;
     particles->data.startColor = color;
     particles->data.endColor = ColorUtils::setAlpha(color, 150);
-    particles->data.minStartVelocity = -size * 0.01f;
-    particles->data.maxStartVelocity = size * 0.01f;
 }
 
 void ColorObject::render(float lag) {

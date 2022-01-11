@@ -26,7 +26,7 @@ class Buffer final : private NonCopyable {
     }
 
   private:
-    static constexpr int SIZE = 1024 * 1024 * 4;
+    static constexpr int SIZE = 1024 * 1024 * 8;
     int bytes;
     char* data;
 };

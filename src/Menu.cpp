@@ -132,7 +132,6 @@ static void controls() {
 
 static void toggleFullscreen() {
     Window::toggleFullscreen();
-    Menu::showPauseMenu();
 }
 
 static void add(const char* s, MenuFunction mf) {
@@ -149,6 +148,12 @@ static void openMenu() {
 }
 
 void Menu::tick() {
+    if (type == MenuType::PAUSE) {
+        int oldMenuIndex = menuIndex;
+        showPauseMenu();
+        menuIndex = oldMenuIndex;
+    }
+
     if (Input::getButton(ButtonType::PAUSE).pressedFirstFrame && closeWithPause) {
         unpause();
         return;

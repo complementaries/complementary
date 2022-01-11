@@ -29,7 +29,6 @@ static int drawableWidth = 850;
 static int drawableHeight = 480;
 static int previousWidth = 850;
 static int previousHeight = 480;
-static bool fullscreen = false;
 
 static void resize(int w, int h) {
     Utils::print("Resizing to %d, %d\n", w, h);
@@ -148,7 +147,7 @@ bool Window::init() {
 }
 
 void Window::toggleFullscreen() {
-    if (!fullscreen) {
+    if (!isFullscreen()) {
         previousHeight = height;
         previousWidth = width;
 
@@ -172,12 +171,10 @@ void Window::toggleFullscreen() {
         SDL_ShowCursor(SDL_ENABLE);
 #endif
     }
-
-    fullscreen = !fullscreen;
 }
 
 bool Window::isFullscreen() {
-    return fullscreen;
+    return SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
 }
 
 static void pollEvents() {

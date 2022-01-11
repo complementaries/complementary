@@ -38,6 +38,16 @@ void GoalTile::renderTransparent(Buffer& buffer, float x, float y, float z) cons
     buffer.add(x + 1.0f).add(y).add(z).add(color[face == Face::RIGHT || face == Face::UP]);
 }
 
+void GoalTile::renderEditor(Buffer& buffer, float x, float y, float z) const {
+    const Color color[] = {getColor(), ColorUtils::invert(getColor())};
+    buffer.add(x).add(y).add(z).add(color[face == Face::LEFT || face == Face::UP]);
+    buffer.add(x).add(y + 1.0f).add(z).add(color[face == Face::LEFT || face == Face::DOWN]);
+    buffer.add(x + 1.0f).add(y).add(z).add(color[face == Face::RIGHT || face == Face::UP]);
+    buffer.add(x + 1.0f).add(y + 1.0f).add(z).add(color[face == Face::RIGHT || face == Face::DOWN]);
+    buffer.add(x).add(y + 1.0f).add(z).add(color[face == Face::LEFT || face == Face::DOWN]);
+    buffer.add(x + 1.0f).add(y).add(z).add(color[face == Face::RIGHT || face == Face::UP]);
+}
+
 void GoalTile::onLoad(int x, int y) const {
     std::shared_ptr<ParticleSystem> p = Objects::instantiateClone(GoalTile::prototype);
     constexpr float v = 0.05f;

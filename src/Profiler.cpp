@@ -45,9 +45,7 @@ static void logNanos(const char* msg, Profiler::Nanos n) {
 }
 
 static void logTickNanos() {
-#ifdef _WIN32
     return;
-#endif
     if (tps.getUpdatesPerSecond() > 98.0f || timerTicks < 500) {
         return;
     }
@@ -59,9 +57,7 @@ static void logTickNanos() {
 }
 
 static void logRenderNanos() {
-#ifdef _WIN32
     return;
-#endif
     if (fps.getUpdatesPerSecond() > 59.0f || timerTicks < 500) {
         return;
     }

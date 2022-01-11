@@ -435,8 +435,9 @@ void Game::tick() {
         Player::setAllowedToMove(!AbilityCutscene::isActive() && !GoalCutscene::isActive() &&
                                  !Menu::isActive() && !ImGui::IsAnyItemActive() &&
                                  !Player::isDead());
-        if (Input::getButton(ButtonType::SWITCH).pressedFirstFrame ||
-            Input::getButton(ButtonType::SWITCH_AND_ABILITY).pressedFirstFrame) {
+        if ((Input::getButton(ButtonType::SWITCH).pressedFirstFrame ||
+             Input::getButton(ButtonType::SWITCH_AND_ABILITY).pressedFirstFrame) &&
+            (Player::isAllowedToMove() || isInTitleScreen)) {
             worldSwitchBuffer = MAX_WORLD_SWITCH_BUFFER;
             playFakeSwitchAnimation();
         }

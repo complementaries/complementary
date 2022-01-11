@@ -356,7 +356,7 @@ static void tickLevelSelect() {
             }
         }
         if (minDistance < startDistance) {
-            if (Input::getButton(ButtonType::JUMP).pressed) {
+            if (Input::getButton(ButtonType::JUMP).pressedFirstFrame) {
                 GoalCutscene::show(goal, face);
                 Game::setLevelScreenPosition(goal + FaceUtils::getDirection(face) * 2.0f);
             }

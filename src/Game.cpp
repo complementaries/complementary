@@ -338,6 +338,9 @@ static void playFakeSwitchAnimation() {
 }
 
 static void tickLevelSelect() {
+    if (isInTitleScreen) {
+        return;
+    }
     levelAvailable = false;
     if (Game::getCurrentLevel() == -1 && !GoalCutscene::isActive()) {
         Vector center = Player::getCenter();
@@ -385,7 +388,6 @@ void Game::tick() {
     }
     fade = std::clamp(fade + fadeAdd, 0, 255);
     RenderState::tick();
-    tickLevelSelect();
 
     if (isInTitleScreen) {
         RenderState::setZoom(4.f, Vector(0.f, -2.f + sinf(totalTicks * 0.01f) * 0.13f));
@@ -423,6 +425,7 @@ void Game::tick() {
         if (Menu::isActive() && Menu::getType() != MenuType::START) {
             return;
         }
+        tickLevelSelect();
         AbilityCutscene::tick();
         GoalCutscene::tick();
         if (Player::isDead()) {

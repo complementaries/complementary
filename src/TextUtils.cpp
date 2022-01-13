@@ -55,6 +55,9 @@ void TextUtils::drawPopupObjectSpace(Vector position, char* text, int alpha) {
     Vector size(width, HEIGHT);
     Vector oversize = Vector(0.2f, 0.2f);
     position += Vector(width * -0.5f, 1 + oversize.y);
+    if (position.x < 0.0f) {
+        position.x = 0.0f;
+    }
 
     Color col = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
     col = ColorUtils::setAlpha(col, alpha);

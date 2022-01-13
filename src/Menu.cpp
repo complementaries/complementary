@@ -78,11 +78,13 @@ typedef void (*MenuFunction)();
 struct MenuEntry {
     std::string text;
     float width;
+    float height;
     MenuFunction function;
+    bool selectable;
 };
 
 std::vector<MenuEntry> lines;
-static float fontSize = 4.0f;
+static const float fontSize = 4.0f;
 static unsigned int menuIndex = 1;
 static MenuType type = MenuType::NONE;
 constexpr float yGapFactor = 1.25f;
@@ -140,8 +142,8 @@ static void openTitleScreen() {
     Game::loadTitleScreen();
 }
 
-static void add(const char* s, MenuFunction mf) {
-    lines.push_back({s, 0.0f, mf});
+static void add(const char* s, MenuFunction mf, float size = fontSize, bool selectable = true) {
+    lines.push_back({s, 0.0f, size, mf, selectable});
 }
 
 static void openMenu() {
@@ -170,8 +172,8 @@ void Menu::tick() {
     if (lines.size() == 0) {
         return;
     }
-    if (Input::getButton(ButtonType::UP).pressedFirstFrame &&
-        menuIndex > (1 + (type == MenuType::SPEEDRUN) * 3)) {
+    if (Input::getButton(ButtonType::UP).pressedFirstFrame && menuIndex > 1 &&
+        lines[menuIndex - 1].selectable) {
         menuIndex--;
         showControls = false;
     }
@@ -233,9 +235,9 @@ void Menu::render(float lag) {
 
     Vector size;
     for (auto& e : lines) {
-        e.width = Font::getWidth(fontSize, e.text.c_str());
+        e.width = Font::getWidth(e.height, e.text.c_str());
         size.x = std::max(size.x, e.width);
-        size.y += fontSize * yGapFactor;
+        size.y += e.height * yGapFactor;
     }
 
     Vector overSize = size * 1.1f;
@@ -254,13 +256,13 @@ void Menu::render(float lag) {
         constexpr Color color[] = {ColorUtils::BLACK, ColorUtils::WHITE};
         if (index == menuIndex) {
             ObjectRenderer::addRectangle(pos - Vector(e.width * 0.5f + 0.3f, 0.f),
-                                         Vector(e.width + 0.6f, fontSize), ColorUtils::BLACK);
+                                         Vector(e.width + 0.6f, e.height), ColorUtils::BLACK);
             ObjectRenderer::render(m);
             Font::prepare(m);
         }
-        Font::draw(pos - Vector(e.width * 0.5f, 0.0f), fontSize, color[index == menuIndex],
+        Font::draw(pos - Vector(e.width * 0.5f, 0.0f), e.height, color[index == menuIndex],
                    e.text.c_str());
-        pos.y += fontSize * yGapFactor;
+        pos.y += e.height * yGapFactor;
         index++;
     }
     if (showControls) {
@@ -323,18 +325,18 @@ void Menu::showPauseMenu() {
 void Menu::showSpeedrunMenu(bool isNewRecord, uint64_t oldRecord) {
     type = MenuType::SPEEDRUN;
     clear();
-    add(isNewRecord ? "[New speedrun record!]" : "[Speedrun Completed]", nothing);
+    add(isNewRecord ? "[New speedrun record!]" : "[Speedrun Completed]", nothing, 4.0f, false);
     int64_t ticks = Game::getTimerTicks();
 
     char buffer[256];
     snprintf(buffer, 256, "Deaths: %d", Player::getDeaths());
-    add(buffer, nothing);
+    add(buffer, nothing, 4.0f, false);
     Player::resetDeaths();
 
     float seconds = Window::SECONDS_PER_TICK * ticks;
     float minutes = seconds / 60.f;
     snprintf(buffer, 256, "Time: %02.0f:%05.2f", minutes, fmod(seconds, 60));
-    add(buffer, nothing);
+    add(buffer, nothing, 4.0f, false);
 
     if (oldRecord > 0) {
         seconds = Window::SECONDS_PER_TICK * oldRecord;
@@ -343,9 +345,28 @@ void Menu::showSpeedrunMenu(bool isNewRecord, uint64_t oldRecord) {
                  isNewRecord ? "Previous best time: %02.0f:%05.2f" : "Best time: %02.0f:%05.2f",
                  minutes, fmod(seconds, 60));
 
-        add(buffer, nothing);
+        add(buffer, nothing, 4.0f, false);
     }
-    add("Title Screen", openTitleScreen);
+    add("Back to title Screen", openTitleScreen);
+
+    menuIndex = lines.size() - 1;
+
+    closeWithPause = false;
+}
+
+void Menu::showCredits() {
+    type = MenuType::START;
+    clear();
+    add("[Complementary]", nothing, 4.f, false);
+    add("", nothing, 2.f, false);
+    add("A game by Annabelle Nissl, Kajetan Hammerle and Rene Buchmayer", nothing, 2.f, false);
+    add("Sound effects from ryusa, pelicanicious, fedsmoker,", nothing, 2.f, false);
+    add("LittleRobotSoundFactory, djlprojects, tkky, ihitokage, Robinhood76, ", nothing, 2.f,
+        false);
+    add("martian, nsstudios and tissman from freesound.org", nothing, 2.f, false);
+    add("Thanks for playing!", nothing, 3.f, false);
+    add("", nothing, 2.f, false);
+    add("Back to title screen", openTitleScreen, 4.f);
 
     menuIndex = lines.size() - 1;
 

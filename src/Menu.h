@@ -14,6 +14,7 @@ namespace Menu {
     void showStartMenu();
     void showPauseMenu();
     void showSpeedrunMenu(bool isNewRecord, uint64_t oldRecord);
+    void showCredits();
     MenuType getType();
 
     const char* getSwitchHelp();

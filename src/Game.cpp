@@ -308,7 +308,12 @@ void Game::nextLevel() {
             Savegame::save();
         }
 
-        loadLevelSelect();
+        if (currentLevelIndex >= static_cast<int>(levelNames.size()) - 1) {
+            loadTitleScreen();
+            Menu::showCredits();
+        } else {
+            loadLevelSelect();
+        }
     } else if (mode == GameMode::SPEEDRUN) {
         uint64_t record = static_cast<uint64_t>(Savegame::getSpeedrunTime());
         uint64_t timerTicks = getTimerTicks();

@@ -1,6 +1,8 @@
 #ifndef MENU_H
 #define MENU_H
 
+#include <cstdint>
+
 enum class MenuType { NONE, START, SPEEDRUN, PAUSE };
 
 namespace Menu {
@@ -11,7 +13,7 @@ namespace Menu {
     void clear();
     void showStartMenu();
     void showPauseMenu();
-    void showSpeedrunMenu();
+    void showSpeedrunMenu(bool isNewRecord, uint64_t oldRecord);
     MenuType getType();
 
     const char* getSwitchHelp();

@@ -76,3 +76,11 @@ void Savegame::setCompletionTime(size_t levelIndex, uint32_t ticks) {
     assert(levelIndex < MAX_LEVEL_COUNT);
     data.completionTime[levelIndex] = ticks;
 }
+
+uint32_t Savegame::getSpeedrunTime() {
+    return data.speedrunTime;
+}
+
+void Savegame::setSpeedrunTime(uint32_t ticks) {
+    data.speedrunTime = ticks;
+}

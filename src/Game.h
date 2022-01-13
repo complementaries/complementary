@@ -45,7 +45,7 @@ namespace Game {
     bool canEnterLevel();
     int levelStartAlpha();
 
-    long getTimerTicks();
+    int64_t getTimerTicks();
 }
 
 #endif

@@ -320,12 +320,11 @@ void Menu::showPauseMenu() {
     }
 }
 
-void Menu::showSpeedrunMenu() {
+void Menu::showSpeedrunMenu(bool isNewRecord, uint64_t oldRecord) {
     type = MenuType::SPEEDRUN;
     clear();
-    menuIndex = 4;
-    add("[Speedrun Completed]", nothing);
-    long ticks = Game::getTimerTicks();
+    add(isNewRecord ? "[New speedrun record!]" : "[Speedrun Completed]", nothing);
+    int64_t ticks = Game::getTimerTicks();
 
     char buffer[256];
     snprintf(buffer, 256, "Deaths: %d", Player::getDeaths());
@@ -337,12 +336,19 @@ void Menu::showSpeedrunMenu() {
     snprintf(buffer, 256, "Time: %02.0f:%05.2f", minutes, fmod(seconds, 60));
     add(buffer, nothing);
 
-    seconds = Window::SECONDS_PER_TICK * 54364;
-    minutes = seconds / 60.f;
-    snprintf(buffer, 256, "Best Time: %02.0f:%05.2f", minutes, fmod(seconds, 60));
+    if (oldRecord > 0) {
+        seconds = Window::SECONDS_PER_TICK * oldRecord;
+        minutes = seconds / 60.f;
+        snprintf(buffer, 256,
+                 isNewRecord ? "Previous best time: %02.0f:%05.2f" : "Best time: %02.0f:%05.2f",
+                 minutes, fmod(seconds, 60));
 
-    add(buffer, nothing);
+        add(buffer, nothing);
+    }
     add("Title Screen", openTitleScreen);
+
+    menuIndex = lines.size() - 1;
+
     closeWithPause = false;
 }
 

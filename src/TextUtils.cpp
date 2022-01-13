@@ -16,20 +16,20 @@ constexpr float BEST_SIZE = 1.2f;
 constexpr float TIME_SIZE = 1.2f;
 constexpr float HELP_SIZE = 0.6f;
 
-void createTextBuffer(char* buffer, int bufSize, long ticks) {
+void createTextBuffer(char* buffer, int bufSize, int64_t ticks) {
     float seconds = Window::SECONDS_PER_TICK * ticks;
     float minutes = seconds / 60.f;
     snprintf(buffer, bufSize, "%02.0f:%05.2f", minutes, fmod(seconds, 60));
 }
 
-void createFullTextBuffer(char* buffer, int bufSize, long ticks) {
+void createFullTextBuffer(char* buffer, int bufSize, int64_t ticks) {
     float seconds = Window::SECONDS_PER_TICK * ticks;
     float minutes = seconds / 60.f;
     snprintf(buffer, bufSize, "#%d - %02.0f:%05.2f", Player::getDeaths(), minutes,
              fmod(seconds, 60));
 }
 
-void TextUtils::drawTimer(Vector position, long ticks) {
+void TextUtils::drawTimer(Vector position, int64_t ticks) {
     Matrix m;
     m.transform(Vector(-1.0f, 1.0f));
     m.scale(Vector(0.1f * Window::getHeight() / Window::getWidth(), -0.1f));
@@ -72,7 +72,7 @@ void TextUtils::drawPopupObjectSpace(Vector position, char* text, int alpha) {
     Font::setZ(0.0f);
 }
 
-void TextUtils::drawBestTimeObjectSpace(Vector position, long ticks, int alpha) {
+void TextUtils::drawBestTimeObjectSpace(Vector position, int64_t ticks, int alpha) {
     char buffer[256];
     createTextBuffer(buffer, 256, ticks);
 

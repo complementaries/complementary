@@ -72,8 +72,8 @@ constexpr int BACKGROUND_PARTICLE_ALPHA_WHITE = 40;
 constexpr int MAX_WORLD_SWITCH_BUFFER = 9;
 static int worldSwitchBuffer = 0;
 
-long totalTicks = 0;
-long timerTicks = 0;
+int64_t totalTicks = 0;
+int64_t timerTicks = 0;
 
 static void findLevels() {
 #ifdef _WIN32
@@ -310,7 +310,14 @@ void Game::nextLevel() {
 
         loadLevelSelect();
     } else if (mode == GameMode::SPEEDRUN) {
-        Menu::showSpeedrunMenu();
+        uint64_t record = static_cast<uint64_t>(Savegame::getSpeedrunTime());
+        uint64_t timerTicks = getTimerTicks();
+        bool isRecord = timerTicks < record || record <= 0;
+        if (isRecord) {
+            Savegame::setSpeedrunTime(static_cast<uint32_t>(timerTicks));
+            Savegame::save();
+        }
+        Menu::showSpeedrunMenu(isRecord, record);
     }
 }
 
@@ -472,9 +479,9 @@ void Game::tick() {
     totalTicks++;
     if (Player::isAllowedToMove()) {
         timerTicks++;
-        if (timerTicks > UINT32_MAX) {
+        if (timerTicks > UINT32_MAX / 2 - 1) {
             // Sanitize high counter values
-            timerTicks = UINT32_MAX;
+            timerTicks = UINT32_MAX / 2 - 1;
         }
     }
 }
@@ -873,7 +880,7 @@ void Game::resetTickCounter() {
     }
 }
 
-long Game::getTimerTicks() {
+int64_t Game::getTimerTicks() {
     return timerTicks;
 }
 

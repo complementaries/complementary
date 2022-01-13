@@ -18,7 +18,7 @@
 #include "objects/Objects.h"
 #include "sound/SoundManager.h"
 
-typedef long long int Nanos;
+typedef int64_t Nanos;
 static constexpr Nanos NANOS_PER_TICK = 1'000'000'000L * Window::SECONDS_PER_TICK;
 
 static SDL_Window* window = nullptr;

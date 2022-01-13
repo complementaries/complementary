@@ -76,7 +76,7 @@ struct PlayerData {
     float dashStrength = 0.35f;
     float gliderGravity = 0.005f;
     int maxJumpCount = 2;
-    int wallJumpBufferTicks = 4;
+    int wallJumpBufferTicks = 7;
 };
 
 static PlayerData data;

@@ -112,7 +112,8 @@ bool TutorialObject::shouldShowTutorial() const {
         case TutorialType::DASH: return Player::hasAbility(Ability::DASH);
         case TutorialType::WALL_JUMP: return Player::hasAbility(Ability::WALL_JUMP);
         case TutorialType::DASH_SWITCH_COMBO:
-            return Player::hasAbility(Ability::DASH) || Player::hasAbility(Ability::WALL_JUMP);
+            return Player::hasAbility(Ability::DASH) || Player::hasAbility(Ability::WALL_JUMP) ||
+                   Player::hasAbility(Ability::GLIDER) || Player::hasAbility(Ability::DOUBLE_JUMP);
         default: return false;
     }
     return false;

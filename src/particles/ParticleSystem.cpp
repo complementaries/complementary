@@ -190,6 +190,9 @@ void ParticleSystem::tickParticles(std::vector<Particle>& particles) {
         }
     }
 }
+bool ParticleSystem::isSpiky(Face face) const {
+    return spiky[static_cast<int>(face)];
+}
 
 void ParticleSystem::lateTick() {
     if (data.followPlayer) {
@@ -204,7 +207,14 @@ void ParticleSystem::lateTick() {
             int emissionRate = random.next(data.minEmissionRate, data.maxEmissionRate + 1);
             for (int i = 0; i < emissionRate; i++) {
                 if (data.spawnPositionType == SpawnPositionType::BOX_EDGE) {
-                    Face spawnFace = static_cast<Face>(random.next(0, static_cast<int>(Face::MAX)));
+                    Face spawnFace;
+                    float value = random.nextFloat(0.0f, data.boxSize.x + data.boxSize.y);
+                    if (value < data.boxSize.x) {
+                        spawnFace = (random.next(0, 2) == 0) ? Face::UP : Face::DOWN;
+                    } else {
+                        spawnFace = (random.next(0, 2) == 0) ? Face::LEFT : Face::RIGHT;
+                    }
+
                     if (spawnFace == Face::LEFT) {
                         particlePosition.x = position.x - data.boxSize.x * 0.5f;
                         particlePosition.y = position.y + random.nextFloat(-data.boxSize.y * 0.5f,
@@ -223,31 +233,53 @@ void ParticleSystem::lateTick() {
                         particlePosition.y = position.y + data.boxSize.y * 0.5f;
                     }
                 } else if (data.spawnPositionType == SpawnPositionType::BOX_EDGE_SPIKY) {
-                    Face spawnFace = static_cast<Face>(random.next(0, static_cast<int>(Face::MAX)));
+                    Face spawnFace;
+                    float value = random.nextFloat(0.0f, data.boxSize.x + data.boxSize.y);
+                    if (value < data.boxSize.x) {
+                        spawnFace = (random.next(0, 2) == 0) ? Face::UP : Face::DOWN;
+                    } else {
+                        spawnFace = (random.next(0, 2) == 0) ? Face::LEFT : Face::RIGHT;
+                    }
                     if (spawnFace == Face::LEFT) {
                         particlePosition.x = position.x - data.boxSize.x * 0.5f;
-                        particlePosition.y = position.y + random.nextFloat(-data.boxSize.y * 0.5f,
-                                                                           data.boxSize.y * 0.5f);
+                        particlePosition.y =
+                            position.y +
+                            random.nextFloat(-data.boxSize.y * 0.5f +
+                                                 0.25f * isSpiky(Face::UP) * !isSpiky(Face::LEFT),
+                                             data.boxSize.y * 0.5f - 0.25f * isSpiky(Face::DOWN) *
+                                                                         !isSpiky(Face::LEFT));
                         float base = std::abs(0.25f - fmod(particlePosition.y, 0.5f));
-                        particlePosition.x += base * spiky[static_cast<int>(Face::LEFT)];
+                        particlePosition.x += base * isSpiky(Face::LEFT);
                     } else if (spawnFace == Face::RIGHT) {
                         particlePosition.x = position.x + data.boxSize.x * 0.5f;
-                        particlePosition.y = position.y + random.nextFloat(-data.boxSize.y * 0.5f,
-                                                                           data.boxSize.y * 0.5f);
+                        particlePosition.y =
+                            position.y +
+                            random.nextFloat(-data.boxSize.y * 0.5f +
+                                                 0.25f * isSpiky(Face::UP) * !isSpiky(Face::RIGHT),
+                                             data.boxSize.y * 0.5f - 0.25f * isSpiky(Face::DOWN) *
+                                                                         !isSpiky(Face::RIGHT));
                         float base = std::abs(0.25f - fmod(particlePosition.y, 0.5f));
-                        particlePosition.x -= base * spiky[static_cast<int>(Face::RIGHT)];
+                        particlePosition.x -= base * isSpiky(Face::RIGHT);
                     } else if (spawnFace == Face::UP) {
-                        particlePosition.x = position.x + random.nextFloat(-data.boxSize.x * 0.5f,
-                                                                           data.boxSize.x * 0.5f);
+                        particlePosition.x =
+                            position.x +
+                            random.nextFloat(-data.boxSize.x * 0.5f +
+                                                 0.25f * isSpiky(Face::LEFT) * !isSpiky(Face::UP),
+                                             data.boxSize.x * 0.5f -
+                                                 0.25f * isSpiky(Face::RIGHT) * !isSpiky(Face::UP));
                         particlePosition.y = position.y - data.boxSize.y * 0.5f;
                         float base = std::abs(0.25f - fmod(particlePosition.x, 0.5f));
-                        particlePosition.y += base * spiky[static_cast<int>(Face::UP)];
+                        particlePosition.y += base * isSpiky(Face::UP);
                     } else if (spawnFace == Face::DOWN) {
-                        particlePosition.x = position.x + random.nextFloat(-data.boxSize.x * 0.5f,
-                                                                           data.boxSize.x * 0.5f);
+                        particlePosition.x =
+                            position.x +
+                            random.nextFloat(-data.boxSize.x * 0.5f +
+                                                 0.25f * isSpiky(Face::LEFT) * !isSpiky(Face::DOWN),
+                                             data.boxSize.x * 0.5f - 0.25f * isSpiky(Face::RIGHT) *
+                                                                         !isSpiky(Face::DOWN));
                         particlePosition.y = position.y + data.boxSize.y * 0.5f;
                         float base = std::abs(0.25f - fmod(particlePosition.x, 0.5f));
-                        particlePosition.y -= base * spiky[static_cast<int>(Face::DOWN)];
+                        particlePosition.y -= base * isSpiky(Face::DOWN);
                     }
                 } else if (data.spawnPositionType == SpawnPositionType::BOX) {
                     particlePosition.x = position.x + random.nextFloat(-data.boxSize.x * 0.5f,

@@ -97,6 +97,7 @@ class ParticleSystem : public Object<ParticleSystemData> {
 
     bool isInBox(const Particle& particle) const;
     float getZ() const;
+    bool isSpiky(Face face) const;
 
     int currentLifetime = 0;
     bool playing = false;

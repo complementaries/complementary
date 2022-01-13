@@ -588,7 +588,7 @@ void Game::render(float lag) {
         TextureRenderer::render(lag);
     }
     if (!isInTitleScreen && currentLevelIndex > -1) {
-        TextUtils::drawTimer(Vector(0.2f, 0.2f), timerTicks);
+        TextUtils::drawTimer(timerTicks);
     }
     ObjectRenderer::addRectangle(Vector(-1.0f, -1.0f), Vector(2.0f, 2.0f),
                                  ColorUtils::setAlpha(ColorUtils::BLACK, fade));

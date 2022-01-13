@@ -25,28 +25,41 @@ void createTextBuffer(char* buffer, int bufSize, int64_t ticks) {
 void createFullTextBuffer(char* buffer, int bufSize, int64_t ticks) {
     float seconds = Window::SECONDS_PER_TICK * ticks;
     float minutes = seconds / 60.f;
-    snprintf(buffer, bufSize, "#%d - %02.0f:%05.2f", Player::getDeaths(), minutes,
-             fmod(seconds, 60));
+    snprintf(buffer, bufSize, "%02.0f:%05.2f", minutes, fmod(seconds, 60));
 }
 
-void TextUtils::drawTimer(Vector position, int64_t ticks) {
+void TextUtils::drawTimer(long ticks) {
+    Color light = Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK;
+    Color dark = ColorUtils::invert(light);
+
     Matrix m;
+    float factor = 0.1f * Window::getHeight() / Window::getWidth();
     m.transform(Vector(-1.0f, 1.0f));
-    m.scale(Vector(0.1f * Window::getHeight() / Window::getWidth(), -0.1f));
+    m.scale(Vector(factor, -0.1f));
 
     char buffer[256];
     createFullTextBuffer(buffer, 256, ticks);
+    char deathBuffer[256];
+    snprintf(deathBuffer, 256, "\6 %d", Player::getDeaths());
+    char levelNumber[256];
+    snprintf(levelNumber, 256, "# %d", Game::getCurrentLevel() + 1);
 
     Vector size(Font::getWidth(1.0f, buffer), 1.0f);
-    Vector oversize = size * 0.1f;
-
-    ObjectRenderer::addRectangle(position - oversize * 0.5f, size + oversize,
-                                 Player::invertColors() ? ColorUtils::WHITE : ColorUtils::BLACK);
+    Vector deathSize(Font::getWidth(1.0f, deathBuffer), 1.0f);
+    Vector levelSize(Font::getWidth(1.0f, levelNumber), 1.0f);
+    Vector oversize(0.3f, 0.1f);
+    float right = 2.0f / factor;
+    ObjectRenderer::addRectangle(Vector(), size + oversize, light);
+    Vector startRight(right - deathSize.x - oversize.x, 0.0f);
+    ObjectRenderer::addRectangle(startRight, deathSize + oversize, light);
+    Vector startMid(right * 0.5 - (levelSize.x + oversize.x) * 0.5f, 0.0f);
+    ObjectRenderer::addRectangle(startMid, levelSize + oversize, light);
     ObjectRenderer::render(m);
 
     Font::prepare(m);
-    Font::draw(position, 1.0f, Player::invertColors() ? ColorUtils::BLACK : ColorUtils::WHITE,
-               buffer);
+    Font::draw(oversize * 0.5f, 1.0f, dark, buffer);
+    Font::draw(startRight + oversize * 0.5f, 1.0f, dark, deathBuffer);
+    Font::draw(startMid + oversize * 0.5f, 1.0f, dark, levelNumber);
 }
 
 void TextUtils::drawPopupObjectSpace(Vector position, char* text, int alpha) {

@@ -500,7 +500,7 @@ void Player::setAbilities(Ability dark, Ability light, bool animate) {
             if (!Savegame::abilitiesUnlocked(dark, light) && !Game::inTitleScreen()) {
                 Savegame::unlockAbilities(dark, light);
                 Savegame::save();
-                if (!Arguments::skipAnim) {
+                if (!Arguments::skipAnim && !Game::isInSpeedrun()) {
                     AbilityCutscene::show(lastAbility);
                 }
             }

@@ -46,6 +46,8 @@ namespace Game {
     int levelStartAlpha();
 
     int64_t getTimerTicks();
+
+    bool isInSpeedrun();
 }
 
 #endif

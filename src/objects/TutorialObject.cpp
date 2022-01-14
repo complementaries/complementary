@@ -29,6 +29,9 @@ TutorialObject::TutorialObject(TutorialObjectData data)
 }
 
 void TutorialObject::tick() {
+    if (Game::isInSpeedrun()) {
+        return;
+    }
     bool colliding = Player::isColliding(*this);
     if (colliding && !wasCollidingInLastFrame) {
         ticksUntilDisplayed = DISPLAY_DELAY;

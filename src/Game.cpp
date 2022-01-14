@@ -896,3 +896,7 @@ void Game::pause() {
 bool Game::isPaused() {
     return paused;
 }
+
+bool Game::isInSpeedrun() {
+    return mode == GameMode::SPEEDRUN;
+}

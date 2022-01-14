@@ -128,7 +128,7 @@ bool Player::init() {
     if (shader.compile({"assets/shaders/player.vs", "assets/shaders/player.fs"})) {
         return true;
     }
-    buffer.init(GL::VertexBuffer::Attributes().addVector2().addRGBA());
+    buffer.init(GL::VertexBuffer::Attributes().addVector3().addRGBA());
 
     deathParticles =
         Objects::instantiateObject<ParticleSystem>("assets/particlesystems/death.cmob");
@@ -935,30 +935,31 @@ static void addGlider(Buffer& buf, Color color) {
     float gliderRight = gliderLeft + gliderWidth;
     float dia = 0.5f * gliderScale;
     float thickness = 0.3f * gliderScale;
+    constexpr float z = -0.45f;
 
-    buf.add(gliderLeft).add(-oy).add(color);
-    buf.add(gliderRight).add(-oy).add(color);
-    buf.add(gliderLeft).add(-oy + thickness).add(color);
+    buf.add(gliderLeft).add(-oy).add(z).add(color);
+    buf.add(gliderRight).add(-oy).add(z).add(color);
+    buf.add(gliderLeft).add(-oy + thickness).add(z).add(color);
 
-    buf.add(gliderRight).add(-oy).add(color);
-    buf.add(gliderLeft).add(-oy + thickness).add(color);
-    buf.add(gliderRight).add(-oy + thickness).add(color);
+    buf.add(gliderRight).add(-oy).add(z).add(color);
+    buf.add(gliderLeft).add(-oy + thickness).add(z).add(color);
+    buf.add(gliderRight).add(-oy + thickness).add(z).add(color);
 
-    buf.add(gliderLeft).add(-oy).add(color);
-    buf.add(gliderLeft).add(-oy + thickness).add(color);
-    buf.add(gliderLeft - dia).add(-oy + dia).add(color);
+    buf.add(gliderLeft).add(-oy).add(z).add(color);
+    buf.add(gliderLeft).add(-oy + thickness).add(z).add(color);
+    buf.add(gliderLeft - dia).add(-oy + dia).add(z).add(color);
 
-    buf.add(gliderLeft).add(-oy + thickness).add(color);
-    buf.add(gliderLeft - dia).add(-oy + dia).add(color);
-    buf.add(gliderLeft - dia).add(-oy + dia + thickness).add(color);
+    buf.add(gliderLeft).add(-oy + thickness).add(z).add(color);
+    buf.add(gliderLeft - dia).add(-oy + dia).add(z).add(color);
+    buf.add(gliderLeft - dia).add(-oy + dia + thickness).add(z).add(color);
 
-    buf.add(gliderRight).add(-oy).add(color);
-    buf.add(gliderRight).add(-oy + thickness).add(color);
-    buf.add(gliderRight + dia).add(-oy + dia).add(color);
+    buf.add(gliderRight).add(-oy).add(z).add(color);
+    buf.add(gliderRight).add(-oy + thickness).add(z).add(color);
+    buf.add(gliderRight + dia).add(-oy + dia).add(z).add(color);
 
-    buf.add(gliderRight).add(-oy + thickness).add(color);
-    buf.add(gliderRight + dia).add(-oy + dia).add(color);
-    buf.add(gliderRight + dia).add(-oy + dia + thickness).add(color);
+    buf.add(gliderRight).add(-oy + thickness).add(z).add(color);
+    buf.add(gliderRight + dia).add(-oy + dia).add(z).add(color);
+    buf.add(gliderRight + dia).add(-oy + dia + thickness).add(z).add(color);
 }
 
 void Player::render(float lag) {
@@ -993,18 +994,18 @@ void Player::render(float lag) {
     if (base < 0.0) {
         base = 0.0f;
     }
-
+    constexpr float z = -0.15f;
     float shear = lastTopShear + (topShear - lastTopShear) * lag;
-    buf.add(0.0f).add(0.0f).add(color);
-    buf.add(1.0f).add(0.0f).add(color);
-    buf.add(shear + 0.0f).add(1.0f + base).add(color);
-    buf.add(shear + 1.0f).add(1.0f + base).add(color);
-    buf.add(1.0f).add(0.0f).add(color);
-    buf.add(shear + 0.0f).add(1.0f + base).add(color);
+    buf.add(0.0f).add(0.0f).add(z).add(color);
+    buf.add(1.0f).add(0.0f).add(z).add(color);
+    buf.add(shear + 0.0f).add(1.0f + base).add(z).add(color);
+    buf.add(shear + 1.0f).add(1.0f + base).add(z).add(color);
+    buf.add(1.0f).add(0.0f).add(z).add(color);
+    buf.add(shear + 0.0f).add(1.0f + base).add(z).add(color);
     addGlider(buf, color);
 
     buffer.setStreamData(buf.getData(), buf.getSize());
-    buffer.drawTriangles(buf.getSize() / (sizeof(float) * 2 + sizeof(Color)));
+    buffer.drawTriangles(buf.getSize() / (sizeof(float) * 3 + sizeof(Color)));
 }
 
 void Player::renderImGui() {

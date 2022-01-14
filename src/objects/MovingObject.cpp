@@ -53,6 +53,8 @@ void MovingObject::tick() {
         velocity *= data.speed / length;
         position += velocity;
     }
+    position.x = static_cast<int>(position.x * 100000.0f) / 100000.0f;
+    position.y = static_cast<int>(position.y * 100000.0f) / 100000.0f;
 
     Vector step = velocity;
     if (step.y != 0.0f) {

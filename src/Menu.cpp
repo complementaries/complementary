@@ -363,11 +363,11 @@ void Menu::showCredits() {
     clear();
     add("[Complementary]", nothing, 4.f, false);
     add("", nothing, 2.f, false);
-    add("A game by Annabelle Nissl, Kajetan Hammerle and Rene Buchmayer", nothing, 2.f, false);
-    add("Sound effects from ryusa, pelicanicious, fedsmoker,", nothing, 2.f, false);
-    add("LittleRobotSoundFactory, djlprojects, tkky, ihitokage, Robinhood76, ", nothing, 2.f,
-        false);
-    add("martian, nsstudios and tissman from freesound.org", nothing, 2.f, false);
+    add("A game by Rene Buchmayer, Kajetan Hammerle and Annabelle Nissl", nothing, 2.f, false);
+    add("", nothing, 2.f, false);
+    add("Sound effects from djlprojects, fedsmoker, ihitokage,", nothing, 2.f, false);
+    add("LittleRobotSoundFactory, martian, nsstudios, pelicanicious,", nothing, 2.f, false);
+    add("Robinhood76, ryusa, tissman and tkky from freesound.org", nothing, 2.f, false);
     add("", nothing, 2.f, false);
     add("Thanks for playing!", nothing, 3.f, false);
     add("", nothing, 2.f, false);

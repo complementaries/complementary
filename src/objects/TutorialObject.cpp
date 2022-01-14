@@ -41,7 +41,7 @@ void TutorialObject::tick() {
         completed = checkTutorialCompleted();
         alpha += 10.f;
     } else {
-        alpha -= 10.f;
+        alpha -= 0.5f;
     }
     alpha = std::max(std::min(alpha, 255), 0);
 

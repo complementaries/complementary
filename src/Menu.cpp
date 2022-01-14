@@ -6,6 +6,7 @@
 
 #include "Game.h"
 #include "Input.h"
+#include "Savegame.h"
 #include "graphics/Font.h"
 #include "graphics/Window.h"
 #include "objects/ObjectRenderer.h"
@@ -284,7 +285,9 @@ void Menu::showStartMenu() {
     menuIndex = 1;
     add("[Complementary]", nothing);
     add("Campaign", startDefault);
-    add("Speed Mode", startSpeedrun);
+    if (Savegame::getCompletedLevels() >= 29) {
+        add("Speed Mode", startSpeedrun);
+    }
     add("Quit", quit);
     closeWithPause = false;
 }

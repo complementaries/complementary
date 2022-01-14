@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "GoalCutscene.h"
+#include "Menu.h"
 #include "player/Player.h"
 #include "tilemap/Tilemap.h"
 #include "tilemap/Tiles.h"
@@ -16,7 +17,7 @@ GoalTile::GoalTile(Face face) : Tile(ColorUtils::BLACK, false, "default"), face(
 }
 
 void GoalTile::onCollision(int x, int y) const {
-    if (!GoalCutscene::isActive() && Game::getCurrentLevel() != -1) {
+    if (!GoalCutscene::isActive() && Game::getCurrentLevel() != -1 && !Menu::isActive()) {
         GoalCutscene::show(Vector(x, y), face);
         if (Game::getCurrentLevel() == -1) {
             Game::setLevelScreenPosition(Player::getPosition() + FaceUtils::getDirection(face) * 2);

@@ -7,6 +7,7 @@ namespace Window {
     bool init();
     void run();
     void exit();
+    void resize();
 
     int getWidth();
     int getHeight();

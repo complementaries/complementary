@@ -288,6 +288,7 @@ void Menu::showStartMenu() {
     if (Savegame::getCompletedLevels() >= 29) {
         add("Speed Mode", startSpeedrun);
     }
+    add("Credits", showCredits);
     add("Quit", quit);
     closeWithPause = false;
 }
@@ -367,6 +368,7 @@ void Menu::showCredits() {
     add("LittleRobotSoundFactory, djlprojects, tkky, ihitokage, Robinhood76, ", nothing, 2.f,
         false);
     add("martian, nsstudios and tissman from freesound.org", nothing, 2.f, false);
+    add("", nothing, 2.f, false);
     add("Thanks for playing!", nothing, 3.f, false);
     add("", nothing, 2.f, false);
     add("Back to title screen", openTitleScreen, 4.f);

@@ -30,7 +30,7 @@ static int drawableHeight = 480;
 static int previousWidth = 850;
 static int previousHeight = 480;
 
-static void resize(int w, int h) {
+static void resizeWindow(int w, int h) {
     Utils::print("Resizing to %d, %d\n", w, h);
     Game::onWindowResize(w, h);
 
@@ -40,12 +40,12 @@ static void resize(int w, int h) {
     height = windowH;
 }
 
-static void resize() {
+void Window::resize() {
     int w, h;
     SDL_GL_GetDrawableSize(window, &w, &h);
     drawableWidth = w;
     drawableHeight = h;
-    resize(w, h);
+    resizeWindow(w, h);
 }
 
 bool Window::init() {
@@ -141,8 +141,6 @@ bool Window::init() {
     if (SDL_WasInit(SDL_INIT_HAPTIC) != 1) SDL_InitSubSystem(SDL_INIT_HAPTIC);
     SDL_GameControllerEventState(SDL_ENABLE);
 
-    resize(); // Fix initial viewport size on Retina display
-
     return false;
 }
 
@@ -165,7 +163,7 @@ void Window::toggleFullscreen() {
             return;
         }
         SDL_SetWindowSize(window, previousWidth, previousHeight);
-        resize();
+        Window::resize();
 
 #ifdef NDEBUG
         SDL_ShowCursor(SDL_ENABLE);
@@ -406,7 +404,7 @@ static void pollEvents() {
             }
             case SDL_WINDOWEVENT: {
                 if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
-                    resize();
+                    Window::resize();
                 }
                 break;
             }

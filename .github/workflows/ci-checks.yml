@@ -38,6 +38,7 @@ jobs:
         run: |
           mkdir -p upload
           cp build/complementary upload/complementary
+          cp THIRD_PARTY_LICENSES.txt upload/THIRD_PARTY_LICENSES.txt
           cp -r assets upload/assets
           
       - name: Upload artifacts
@@ -58,6 +59,7 @@ jobs:
         run: |
           mkdir -p upload-debug
           cp build-debug/complementary upload-debug/complementary
+          cp THIRD_PARTY_LICENSES.txt upload-debug/THIRD_PARTY_LICENSES.txt
           cp -r assets upload-debug/assets
           
       - name: Upload artifacts (Debug)
@@ -102,6 +104,7 @@ jobs:
         run: |
           mkdir -p upload
           cp build/complementary upload/complementary
+          cp THIRD_PARTY_LICENSES.txt upload/THIRD_PARTY_LICENSES.txt
           cp -r assets upload/assets
           
       - name: Upload artifacts
@@ -122,6 +125,7 @@ jobs:
         run: |
           mkdir -p upload-debug
           cp build-debug/complementary upload-debug/complementary
+          cp THIRD_PARTY_LICENSES.txt upload-debug/THIRD_PARTY_LICENSES.txt
           cp -r assets upload-debug/assets
           
       - name: Upload artifacts (Debug)
@@ -165,6 +169,7 @@ jobs:
         run: |
           mkdir upload
           copy build\complementary.exe upload\complementary.exe /B
+          copy THIRD_PARTY_LICENSES.txt upload\THIRD_PARTY_LICENSES.txt
           xcopy assets upload\assets /E /I
           
       - name: Upload artifacts
@@ -186,6 +191,7 @@ jobs:
         run: |
           mkdir upload-debug
           copy build-debug\complementary.exe upload-debug\complementary.exe /B
+          copy THIRD_PARTY_LICENSES.txt upload-debug\THIRD_PARTY_LICENSES.txt
           xcopy assets upload-debug\assets /E /I
           
       - name: Upload artifacts

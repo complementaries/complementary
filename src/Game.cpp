@@ -152,6 +152,7 @@ bool Game::init() {
 #ifndef NDEBUG
     logGlError("init");
 #endif
+    Window::resize();
 
     return false;
 }

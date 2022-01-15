@@ -338,15 +338,15 @@ void Menu::showSpeedrunMenu(bool isNewRecord, uint64_t oldRecord) {
     Player::resetDeaths();
 
     float seconds = Window::SECONDS_PER_TICK * ticks;
-    float minutes = seconds / 60.f;
-    snprintf(buffer, 256, "Time: %02.0f:%05.2f", minutes, fmod(seconds, 60));
+    int minutes = seconds / 60.f;
+    snprintf(buffer, 256, "Time: %02d:%05.2f", minutes, fmod(seconds, 60));
     add(buffer, nothing, 4.0f, false);
 
     if (oldRecord > 0) {
         seconds = Window::SECONDS_PER_TICK * oldRecord;
         minutes = seconds / 60.f;
         snprintf(buffer, 256,
-                 isNewRecord ? "Previous best time: %02.0f:%05.2f" : "Best time: %02.0f:%05.2f",
+                 isNewRecord ? "Previous best time: %02d:%05.2f" : "Best time: %02d:%05.2f",
                  minutes, fmod(seconds, 60));
 
         add(buffer, nothing, 4.0f, false);

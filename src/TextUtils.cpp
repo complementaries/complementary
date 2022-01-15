@@ -18,14 +18,14 @@ constexpr float HELP_SIZE = 0.6f;
 
 void createTextBuffer(char* buffer, int bufSize, int64_t ticks) {
     float seconds = Window::SECONDS_PER_TICK * ticks;
-    float minutes = seconds / 60.f;
-    snprintf(buffer, bufSize, "%02.0f:%05.2f", minutes, fmod(seconds, 60));
+    int minutes = seconds / 60.f;
+    snprintf(buffer, bufSize, "%02d:%05.2f", minutes, fmod(seconds, 60));
 }
 
 void createFullTextBuffer(char* buffer, int bufSize, int64_t ticks) {
     float seconds = Window::SECONDS_PER_TICK * ticks;
-    float minutes = seconds / 60.f;
-    snprintf(buffer, bufSize, "%02.0f:%05.2f", minutes, fmod(seconds, 60));
+    int minutes = seconds / 60.f;
+    snprintf(buffer, bufSize, "%02d:%05.2f", minutes, fmod(seconds, 60));
 }
 
 void TextUtils::drawTimer(long ticks) {

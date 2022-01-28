@@ -1,15 +1,47 @@
-Disclaimer: Sound Effects are taken from free websites and not our original work.
-A list of the used sounds and their sources can be found below.
-Some effects where cut to be shorter and fit the games actions.
+Credits:
+Disclaimer: Sound Effects are taken from freesound.org and not our original work. A list of the used sounds and their sources can be found below. Some effects were cut to be shorter and fit the game's actions.
 
-jump - https://freesound.org/people/ryusa/sounds/531145/
-switch - https://freesound.org/people/pelicanicious/sounds/580062/
-wind - https://freesound.org/people/fedsmoker/sounds/208525/
-collect - https://freesound.org/people/LittleRobotSoundFactory/sounds/270304/
-dash - https://freesound.org/people/djlprojects/sounds/413145/
-death - https://freesound.org/people/tkky/sounds/524281/
-explode - https://freesound.org/people/ihitokage/sounds/413219/
-ability - https://freesound.org/people/Robinhood76/sounds/414293/
-teleport - https://freesound.org/people/martian/sounds/403973/
-ability_collect - https://freesound.org/people/nsstudios/sounds/344276/
-ability_loose - https://freesound.org/people/Tissman/sounds/456169/
+Jump Sound
+Synth_ui_interface_button_netural_switch_swap.wav copyright by ryusa
+https://freesound.org/people/ryusa/sounds/531145/
+
+World Switch Sound
+Whoosh-pew copyright by pelicanicious
+https://freesound.org/people/pelicanicious/sounds/580062/
+
+Wind Sound
+fan loop copyright by fedsmoker
+https://freesound.org/people/fedsmoker/sounds/208525/
+
+Collect Key Sound
+Collect_Point_00.wav copyright by LittleRobotSoundFactory
+https://freesound.org/people/LittleRobotSoundFactory/sounds/270304/
+
+Dash Sound
+Woosh SFX Clean copyright by djlprojects
+https://freesound.org/people/djlprojects/sounds/413145/
+
+Death Sound
+Bb_Srm_Future HipHop_Stab.wav copyright by tkky
+https://freesound.org/people/tkky/sounds/524281/
+
+Exploding Sound (in Teleportation)
+Energy impact 1 copyright by ihitokage
+https://freesound.org/people/ihitokage/sounds/413219/
+
+Teleporting Sound
+beast_whoosh.wav copyright by martian
+https://freesound.org/people/martian/sounds/403973/​
+
+
+Ability Animation Sound
+07024_space_laser_charging.wav copyright by Robinhood76
+https://freesound.org/people/Robinhood76/sounds/414293/
+
+Ability Collect Sound
+laser3 copyright by nsstudios
+https://freesound.org/people/nsstudios/sounds/344276/
+
+Ability Loose Sound
+gun9.wav copyright by Tissman
+https://freesound.org/people/Tissman/sounds/456169/

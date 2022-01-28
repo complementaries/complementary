@@ -34,6 +34,9 @@ static void channelDone(int channel) {
         Utils::print("Mix_UnregisterAllEffects: %s\n", Mix_GetError());
     }
     int ID = getIdFromChannel(channel);
+    if (ID < 0 || ID >= Sound::MAX) {
+        return;
+    }
     soundArray[ID].playing = false;
     soundArray[ID].channel = -1;
 }
